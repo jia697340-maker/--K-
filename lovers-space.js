@@ -330,12 +330,27 @@ async function renderLoversSpace(chat) {
   // 渲染头部
   document.getElementById('lovers-space-screen').style.backgroundImage = `url(${chat.loversSpaceData.background})`;
 
-  // 这是你想要的 user & char 标题
-  const userNickname = state.qzoneSettings.nickname || '{{user}}';
-  document.getElementById('ls-char-name').textContent = `${userNickname} & ${chat.name}`;
+  // 分别设置用户和角色昵称，优先使用情侣空间的自定义昵称
+  const userNickname = chat.loversSpaceData.customUserNickname || state.qzoneSettings.nickname || '{{user}}';
+  const charNickname = chat.loversSpaceData.customCharNickname || chat.name;
+  
+  document.getElementById('ls-user-nickname').textContent = userNickname;
+  document.getElementById('ls-char-nickname').textContent = charNickname;
+  
+  // 添加昵称点击事件监听器
+  document.getElementById('ls-user-nickname').onclick = editLoversSpaceUserNickname;
+  document.getElementById('ls-char-nickname').onclick = editLoversSpaceCharNickname;
 
-  document.getElementById('ls-user-avatar').src = chat.settings.myAvatar || defaultAvatar;
-  document.getElementById('ls-char-avatar').src = chat.settings.aiAvatar || defaultAvatar;
+  // 设置头像，优先使用情侣空间的自定义头像
+  const userAvatar = chat.loversSpaceData.customUserAvatar || chat.settings.myAvatar || defaultAvatar;
+  const charAvatar = chat.loversSpaceData.customCharAvatar || chat.settings.aiAvatar || defaultAvatar;
+  
+  document.getElementById('ls-user-avatar').src = userAvatar;
+  document.getElementById('ls-char-avatar').src = charAvatar;
+  
+  // 添加头像点击事件监听器
+  document.getElementById('ls-user-avatar').onclick = editLoversSpaceUserAvatar;
+  document.getElementById('ls-char-avatar').onclick = editLoversSpaceCharAvatar;
 
   // 调用新函数来更新天数
   updateLoversSpaceDaysCounter(chat);
@@ -356,6 +371,142 @@ async function renderLoversSpace(chat) {
 }
 
 // ▲▲▲ 替换到这里结束 ▲▲▲
+
+/**
+ * 【新功能】编辑情侣空间顶部的用户昵称
+ */
+async function editLoversSpaceUserNickname() {
+  const chat = state.chats[activeLoversSpaceCharId];
+  if (!chat) return;
+  
+  const currentNickname = chat.loversSpaceData.customUserNickname || state.qzoneSettings.nickname || '{{user}}';
+  const newNickname = prompt('请输入你的昵称：', currentNickname);
+  
+  if (newNickname !== null && newNickname.trim() !== '') {
+    // 保存到情侣空间数据中
+    chat.loversSpaceData.customUserNickname = newNickname.trim();
+    await db.chats.put(chat);
+    
+    // 立即更新显示
+    document.getElementById('ls-user-nickname').textContent = newNickname.trim();
+  }
+}
+
+/**
+ * 【新功能】编辑情侣空间顶部的角色昵称
+ */
+async function editLoversSpaceCharNickname() {
+  const chat = state.chats[activeLoversSpaceCharId];
+  if (!chat) return;
+  
+  const currentNickname = chat.loversSpaceData.customCharNickname || chat.name;
+  const newNickname = prompt('请输入Ta的昵称：', currentNickname);
+  
+  if (newNickname !== null && newNickname.trim() !== '') {
+    // 保存到情侣空间数据中
+    chat.loversSpaceData.customCharNickname = newNickname.trim();
+    await db.chats.put(chat);
+    
+    // 立即更新显示
+    document.getElementById('ls-char-nickname').textContent = newNickname.trim();
+  }
+}
+
+/**
+ * 【新功能】编辑情侣空间顶部的用户头像
+ */
+async function editLoversSpaceUserAvatar() {
+  const chat = state.chats[activeLoversSpaceCharId];
+  if (!chat) return;
+  
+  // 显示选项菜单
+  const choice = await showChoiceModal('更换你的头像', [
+    { text: '📁 从本地上传', value: 'local' },
+    { text: '🌐 使用网络URL', value: 'url' },
+    { text: '🔄 重置为默认', value: 'reset' },
+  ]);
+  
+  if (!choice) return; // 用户取消
+  
+  let newAvatar = null;
+  
+  if (choice === 'local') {
+    // 本地上传
+    newAvatar = await uploadImageLocally();
+    if (!newAvatar) return; // 用户取消上传
+  } else if (choice === 'url') {
+    // URL上传
+    newAvatar = prompt('请输入图片URL：', '');
+    if (!newAvatar || newAvatar.trim() === '') return;
+    newAvatar = newAvatar.trim();
+  } else if (choice === 'reset') {
+    // 重置为默认
+    delete chat.loversSpaceData.customUserAvatar;
+    await db.chats.put(chat);
+    
+    // 立即更新显示
+    const defaultUserAvatar = chat.settings.myAvatar || defaultAvatar;
+    document.getElementById('ls-user-avatar').src = defaultUserAvatar;
+    return;
+  }
+  
+  // 保存新头像
+  if (newAvatar) {
+    chat.loversSpaceData.customUserAvatar = newAvatar;
+    await db.chats.put(chat);
+    
+    // 立即更新显示
+    document.getElementById('ls-user-avatar').src = newAvatar;
+  }
+}
+
+/**
+ * 【新功能】编辑情侣空间顶部的角色头像
+ */
+async function editLoversSpaceCharAvatar() {
+  const chat = state.chats[activeLoversSpaceCharId];
+  if (!chat) return;
+  
+  // 显示选项菜单
+  const choice = await showChoiceModal('更换Ta的头像', [
+    { text: '📁 从本地上传', value: 'local' },
+    { text: '🌐 使用网络URL', value: 'url' },
+    { text: '🔄 重置为默认', value: 'reset' },
+  ]);
+  
+  if (!choice) return; // 用户取消
+  
+  let newAvatar = null;
+  
+  if (choice === 'local') {
+    // 本地上传
+    newAvatar = await uploadImageLocally();
+    if (!newAvatar) return; // 用户取消上传
+  } else if (choice === 'url') {
+    // URL上传
+    newAvatar = prompt('请输入图片URL：', '');
+    if (!newAvatar || newAvatar.trim() === '') return;
+    newAvatar = newAvatar.trim();
+  } else if (choice === 'reset') {
+    // 重置为默认
+    delete chat.loversSpaceData.customCharAvatar;
+    await db.chats.put(chat);
+    
+    // 立即更新显示
+    const defaultCharAvatar = chat.settings.aiAvatar || defaultAvatar;
+    document.getElementById('ls-char-avatar').src = defaultCharAvatar;
+    return;
+  }
+  
+  // 保存新头像
+  if (newAvatar) {
+    chat.loversSpaceData.customCharAvatar = newAvatar;
+    await db.chats.put(chat);
+    
+    // 立即更新显示
+    document.getElementById('ls-char-avatar').src = newAvatar;
+  }
+}
 
 /**
  * 【V2 - 已集成今日足迹】切换情侣空间的页签
@@ -1543,17 +1694,13 @@ function openDiaryEditor(dateStr, entryData) {
 }
 
 /**
- * 打开日记查看器（新增评论功能）
+ * 打开日记查看器
  */
 function openDiaryViewer(dateStr, entryData, chat) {
   const modal = document.getElementById('ls-diary-viewer-modal');
   document.getElementById('ls-diary-viewer-title').textContent = `查看 ${dateStr} 的日记`;
   const bodyEl = document.getElementById('ls-diary-viewer-body');
   bodyEl.innerHTML = '';
-
-  // 初始化评论数据结构
-  if (!entryData.userComments) entryData.userComments = [];
-  if (!entryData.charComments) entryData.charComments = [];
 
   // 显示用户日记
   if (entryData.userDiary) {
@@ -1567,9 +1714,6 @@ function openDiaryViewer(dateStr, entryData, chat) {
             <p class="entry-content">${entryData.userDiary.replace(/\n/g, '<br>')}</p>
         `;
     bodyEl.appendChild(userBlock);
-
-    // 添加用户日记的评论区
-    renderDiaryComments(bodyEl, entryData.userComments, 'user', dateStr, chat);
   }
 
   // 显示角色日记
@@ -1585,250 +1729,12 @@ function openDiaryViewer(dateStr, entryData, chat) {
             <p class="entry-content">${entryData.charDiary.replace(/\n/g, '<br>')}</p>
         `;
     bodyEl.appendChild(charBlock);
-
-    // 添加角色日记的评论区
-    renderDiaryComments(bodyEl, entryData.charComments, 'char', dateStr, chat);
   } else {
     // 如果角色还没写，给个提示
     bodyEl.innerHTML += `<p style="text-align: center; color: var(--text-secondary);">Ta 还没写今天的心情日记哦~</p>`;
   }
 
   modal.classList.add('visible');
-}
-
-/**
- * 渲染日记的评论区（包括已有评论和评论输入框）
- */
-function renderDiaryComments(parentEl, comments, diaryOwner, dateStr, chat) {
-  const commentsSection = document.createElement('div');
-  commentsSection.className = 'ls-diary-comments-section';
-  commentsSection.dataset.diaryOwner = diaryOwner;
-  commentsSection.dataset.dateStr = dateStr;
-
-  // 显示已有评论
-  if (comments && comments.length > 0) {
-    comments.forEach(comment => {
-      const commentEl = document.createElement('div');
-      commentEl.className = 'ls-diary-comment-item';
-      commentEl.dataset.commentId = comment.id;
-      
-      const isUserComment = comment.author === 'user';
-      const authorName = isUserComment ? (chat.settings.myNickname || '我') : chat.name;
-      const authorAvatar = isUserComment ? (chat.settings.myAvatar || defaultAvatar) : (chat.settings.aiAvatar || defaultAvatar);
-      
-      commentEl.innerHTML = `
-        <img src="${authorAvatar}" class="comment-avatar">
-        <div class="comment-content-wrapper">
-          <div class="comment-header">
-            <span class="comment-author">${authorName}</span>
-            <span class="comment-timestamp">${formatPostTimestamp(comment.timestamp)}</span>
-          </div>
-          <p class="comment-text">${comment.content.replace(/\n/g, '<br>')}</p>
-          ${comment.hasUnreadReply ? '<span class="comment-unread-badge">新回复</span>' : ''}
-          <button class="comment-reply-btn" data-comment-id="${comment.id}">回复</button>
-        </div>
-      `;
-      
-      // 显示该评论的追评
-      if (comment.replies && comment.replies.length > 0) {
-        const repliesContainer = document.createElement('div');
-        repliesContainer.className = 'ls-diary-comment-replies';
-        
-        comment.replies.forEach(reply => {
-          const isUserReply = reply.author === 'user';
-          const replyAuthorName = isUserReply ? (chat.settings.myNickname || '我') : chat.name;
-          const replyAuthorAvatar = isUserReply ? (chat.settings.myAvatar || defaultAvatar) : (chat.settings.aiAvatar || defaultAvatar);
-          
-          const replyEl = document.createElement('div');
-          replyEl.className = 'ls-diary-comment-reply-item';
-          replyEl.innerHTML = `
-            <img src="${replyAuthorAvatar}" class="comment-reply-avatar">
-            <div class="comment-reply-content">
-              <div class="comment-reply-header">
-                <span class="comment-reply-author">${replyAuthorName}</span>
-                <span class="comment-reply-timestamp">${formatPostTimestamp(reply.timestamp)}</span>
-              </div>
-              <p class="comment-reply-text">${reply.content.replace(/\n/g, '<br>')}</p>
-            </div>
-          `;
-          repliesContainer.appendChild(replyEl);
-        });
-        
-        commentEl.querySelector('.comment-content-wrapper').appendChild(repliesContainer);
-      }
-      
-      commentsSection.appendChild(commentEl);
-    });
-  }
-
-  // 添加评论按钮
-  const addCommentBtn = document.createElement('button');
-  addCommentBtn.className = 'ls-add-comment-btn';
-  addCommentBtn.textContent = '💬 写评论';
-  addCommentBtn.onclick = () => openDiaryCommentEditor(diaryOwner, dateStr, chat);
-  commentsSection.appendChild(addCommentBtn);
-
-  // 使用事件委托处理所有回复按钮
-  commentsSection.addEventListener('click', (e) => {
-    if (e.target.classList.contains('comment-reply-btn')) {
-      const commentId = e.target.dataset.commentId;
-      openDiaryCommentEditor(diaryOwner, dateStr, chat, commentId);
-    }
-  });
-
-  parentEl.appendChild(commentsSection);
-}
-
-/**
- * 创建评论弹窗（如果不存在）
- */
-function createDiaryCommentModal() {
-  if (document.getElementById('ls-diary-comment-modal')) return;
-  
-  const modalHtml = `
-    <div id="ls-diary-comment-modal" class="modal">
-      <div class="modal-content" style="height: auto; max-height: 60%;">
-        <div class="modal-header">
-          <span id="ls-diary-comment-title">评论日记</span>
-          <button class="close-btn" onclick="document.getElementById('ls-diary-comment-modal').classList.remove('visible')">×</button>
-        </div>
-        <div class="modal-body">
-          <textarea id="ls-diary-comment-input" placeholder="写下你的评论..." style="width: 100%; min-height: 100px; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; resize: vertical;"></textarea>
-        </div>
-        <div class="modal-footer">
-          <button class="cancel" onclick="document.getElementById('ls-diary-comment-modal').classList.remove('visible')">取消</button>
-          <button class="save" onclick="handleSubmitDiaryComment()">提交</button>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-}
-
-/**
- * 打开评论编辑器弹窗
- */
-function openDiaryCommentEditor(diaryOwner, dateStr, chat, replyToCommentId = null) {
-  createDiaryCommentModal(); // 确保弹窗存在
-  
-  const modal = document.getElementById('ls-diary-comment-modal');
-  const ownerName = diaryOwner === 'user' ? (chat.settings.myNickname || '我') : chat.name;
-  const titleEl = document.getElementById('ls-diary-comment-title');
-  
-  if (replyToCommentId) {
-    titleEl.textContent = `回复评论`;
-  } else {
-    titleEl.textContent = `评论 ${ownerName} 的日记`;
-  }
-
-  document.getElementById('ls-diary-comment-input').value = '';
-  modal.dataset.diaryOwner = diaryOwner;
-  modal.dataset.dateStr = dateStr;
-  modal.dataset.replyTo = replyToCommentId || '';
-  
-  modal.classList.add('visible');
-}
-
-/**
- * 提交日记评论或追评
- */
-async function handleSubmitDiaryComment() {
-  const modal = document.getElementById('ls-diary-comment-modal');
-  const content = document.getElementById('ls-diary-comment-input').value.trim();
-  
-  if (!content) {
-    alert('评论内容不能为空！');
-    return;
-  }
-
-  const diaryOwner = modal.dataset.diaryOwner;
-  const dateStr = modal.dataset.dateStr;
-  const replyToCommentId = modal.dataset.replyTo;
-  const chat = state.chats[activeLoversSpaceCharId];
-  
-  if (!chat.loversSpaceData.emotionDiaries[dateStr]) {
-    alert('日记数据不存在！');
-    return;
-  }
-
-  const entryData = chat.loversSpaceData.emotionDiaries[dateStr];
-  const commentsArray = diaryOwner === 'user' ? 'userComments' : 'charComments';
-  
-  if (!entryData[commentsArray]) {
-    entryData[commentsArray] = [];
-  }
-
-  if (replyToCommentId) {
-    // 这是一个追评
-    const parentComment = entryData[commentsArray].find(c => c.id === replyToCommentId);
-    if (parentComment) {
-      if (!parentComment.replies) parentComment.replies = [];
-      
-      const reply = {
-        id: 'reply_' + Date.now(),
-        author: 'user',
-        content: content,
-        timestamp: Date.now()
-      };
-      
-      parentComment.replies.push(reply);
-      
-      // 通知AI有新的追评
-      await notifyCharAboutDiaryReply(chat, dateStr, diaryOwner, parentComment, reply);
-    }
-  } else {
-    // 这是一个新评论
-    const comment = {
-      id: 'comment_' + Date.now(),
-      author: 'user',
-      content: content,
-      timestamp: Date.now(),
-      replies: [],
-      hasUnreadReply: false
-    };
-    
-    entryData[commentsArray].push(comment);
-    
-    // 通知AI有新评论
-    await notifyCharAboutDiaryComment(chat, dateStr, diaryOwner, comment);
-  }
-
-  await db.chats.put(chat);
-  
-  // 关闭弹窗并刷新日记查看器
-  modal.classList.remove('visible');
-  openDiaryViewer(dateStr, entryData, chat);
-}
-
-/**
- * 通知CHAR用户评论了日记
- */
-async function notifyCharAboutDiaryComment(chat, dateStr, diaryOwner, comment) {
-  const ownerName = diaryOwner === 'user' ? '你自己' : chat.name;
-  const hiddenMessage = {
-    role: 'system',
-    content: `[系统提示：用户在情侣空间给${ownerName}在${dateStr}的日记写了评论："${comment.content}"。如果你觉得有必要，可以使用 'ls_diary_comment_reply' 指令回复这条评论，评论ID是"${comment.id}"，日记日期是"${dateStr}"，日记所属者是"${diaryOwner}"。]`,
-    timestamp: Date.now(),
-    isHidden: true
-  };
-  chat.history.push(hiddenMessage);
-  await db.chats.put(chat);
-}
-
-/**
- * 通知CHAR用户追评了评论
- */
-async function notifyCharAboutDiaryReply(chat, dateStr, diaryOwner, parentComment, reply) {
-  const ownerName = diaryOwner === 'user' ? '你自己' : chat.name;
-  const hiddenMessage = {
-    role: 'system',
-    content: `[系统提示：用户在情侣空间回复了${ownerName}在${dateStr}日记下的评论。原评论内容："${parentComment.content}"，用户的回复："${reply.content}"。如果你觉得有必要，可以继续回复。评论ID是"${parentComment.id}"，日记日期是"${dateStr}"，日记所属者是"${diaryOwner}"。]`,
-    timestamp: Date.now(),
-    isHidden: true
-  };
-  chat.history.push(hiddenMessage);
-  await db.chats.put(chat);
 }
 
 /**
@@ -1885,13 +1791,11 @@ async function handleSaveUserDiary() {
     const hiddenMessage = {
       role: 'system',
       content: `[系统指令：用户刚刚在情侣空间写了今天的日记。
-            - 日记日期: ${currentDiaryDate}
             - 他们的心情是: ${userEmoji}
             - 日记内容是: "${userDiary}"
             你的任务:
             1.  【必须】根据你的人设和今天的聊天记录，也写一篇你自己的心情日记，并使用 'ls_diary_entry' 指令发送。
-            2.  【推荐】在写完日记后，给用户的日记写一条温馨的评论，使用指令: {"type": "ls_diary_comment", "dateStr": "${currentDiaryDate}", "diaryOwner": "user", "commentContent": "你的评论内容..."}
-            3.  【必须】在完成以上操作后，以你的角色口吻，就用户的日记内容，主动开启一段新的对话。]`,
+            2.  【必须】在写完日记后，立刻就用户今天的日记内容，以你的角色口吻，主动开启一段新的对话。]`,
       timestamp: Date.now() + 1, // 确保时间戳在后
       isHidden: true, // 这个标记能让消息对用户隐藏，但AI能看见
     };

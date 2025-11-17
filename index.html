@@ -44,6 +44,7 @@
     <script src="lovers-space.js" defer></script>
     <script src="taobao.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.84/darkreader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 
 
 
@@ -99,6 +100,58 @@
         
         .snow-color-preset.selected::after {
             transform: translate(-50%, -50%) scale(1);
+        }
+        
+        /* 八卦六爻历史记录样式 */
+        .bagua-history-item {
+            position: relative;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: var(--bg-color, #f5f5f5);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .bagua-history-item:hover {
+            background: var(--hover-bg-color, #e8e8e8);
+            transform: translateX(2px);
+        }
+        
+        .bagua-history-item .question {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-color, #333);
+        }
+        
+        .bagua-history-item .details {
+            font-size: 12px;
+            color: var(--secondary-text-color, #999);
+        }
+        
+        .bagua-history-delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: rgba(255, 59, 48, 0.1);
+            color: #ff3b30;
+            border-radius: 50%;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .bagua-history-delete-btn:hover {
+            background: #ff3b30;
+            color: white;
         }
     </style>
     <!-- ▼▼▼ 在这里添加下面这行 ▼▼▼ -->
@@ -1128,6 +1181,22 @@
 </button>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 <!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
+<!-- ▼▼▼ 八卦六爻按钮 ▼▼▼ -->
+<button id="open-bagua-btn" class="chat-action-icon-btn action-button" title="八卦六爻">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 外圈八卦圆 -->
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+        <!-- 太极阴阳鱼简化版 - 上半圆（阳） -->
+        <path d="M12 2 A10 10 0 0 1 12 12 A5 5 0 0 0 12 2" fill="currentColor"/>
+        <!-- 太极阴阳鱼简化版 - 下半圆（阴） -->
+        <path d="M12 12 A10 10 0 0 1 12 22 A5 5 0 0 1 12 12" fill="currentColor"/>
+        <!-- 阳眼 -->
+        <circle cx="12" cy="7" r="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <!-- 阴眼 -->
+        <circle cx="12" cy="17" r="1.5" fill="currentColor"/>
+    </svg>
+</button>
+<!-- ▲▲▲ 八卦六爻按钮结束 ▲▲▲ -->
 <!-- ▼▼▼ 【歪头杀·满分可爱猫】请用这块代码替换旧的宠物按钮 <button> ▼▼▼ -->
 <button id="pet-action-btn" class="chat-action-icon-btn action-button" title="我的宠物">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1145,6 +1214,21 @@
     </svg>
 </button>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 我的钱包按钮 ▼▼▼ -->
+<button id="wallet-action-btn" class="chat-action-icon-btn action-button" title="我的钱包">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 钱包外框 -->
+        <rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+        <!-- 钱包开口 -->
+        <path d="M3 9 L21 9" stroke="currentColor" stroke-width="2"/>
+        <!-- 钱包卡槽 -->
+        <rect x="16" y="11" width="4" height="6" rx="1" fill="currentColor"/>
+        <!-- 金钱符号 -->
+        <text x="9" y="16" font-size="8" fill="currentColor" font-weight="bold">¥</text>
+    </svg>
+</button>
+<!-- ▲▲▲ 我的钱包按钮结束 ▲▲▲ -->
 
 
         </div>
@@ -1385,7 +1469,7 @@
     <div style="display: flex; gap: 10px; margin-top: 10px;">
         <button id="export-theme-btn" class="form-button-secondary" style="flex:1;">导出方案</button>
         <button id="import-theme-btn" class="form-button-secondary" style="flex:1;">导入方案</button>
-        <input type="file" id="import-theme-input" accept=".json" hidden>
+        <input type="file" id="import-theme-input" accept=".json,.docx" hidden>
     </div>
     <div style="margin-top: 10px;">
         <button id="adapt-mobile-theme-btn" class="form-button-secondary" style="width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-weight: 500;">
@@ -2218,6 +2302,35 @@
             <label for="date-search-input">日期</label>
             <input type="date" id="date-search-input">
         </div>
+        <div class="form-group">
+            <label for="type-search-select">消息类型</label>
+            <select id="type-search-select">
+                <option value="">全部类型</option>
+                <option value="text">普通文本</option>
+                <option value="voice_message">语音消息</option>
+                <option value="user_photo">用户照片</option>
+                <option value="ai_image">AI图片</option>
+                <option value="sticker">表情包</option>
+                <option value="location">位置</option>
+                <option value="transfer">转账</option>
+                <option value="red_packet">红包</option>
+                <option value="share_link">分享链接</option>
+                <option value="share_card">分享卡片</option>
+                <option value="waimai_request">外卖请求</option>
+                <option value="waimai_gift_from_char">外卖礼物</option>
+                <option value="gift_notification">礼物通知</option>
+                <option value="borrow_money_request">借钱请求</option>
+                <option value="cart_share_request">购物车分享</option>
+                <option value="poll">投票</option>
+                <option value="tarot_reading">塔罗占卜</option>
+                <option value="pat_message">拍一拍</option>
+                <option value="lovers_space_invitation">情侣空间邀请</option>
+                <option value="lovers_space_notification">情侣空间通知</option>
+                <option value="ls_diary_notification">情侣日记</option>
+                <option value="dating_summary_card">约会总结</option>
+                <option value="repost_forum_post">论坛帖子</option>
+            </select>
+        </div>
         <button class="form-button" id="perform-search-btn">开始查找</button>
         
         <!-- 搜索结果显示区 -->
@@ -2259,7 +2372,11 @@
         <div class="ls-header-overlay"></div>
         <div class="ls-header-top-bar">
             <span class="back-btn" onclick="showScreen('home-screen')">‹</span>
-            <span id="ls-char-name"></span>
+            <span id="ls-char-name">
+                <span id="ls-user-nickname" style="cursor: pointer;" title="点击编辑你的昵称"></span>
+                <span> & </span>
+                <span id="ls-char-nickname" style="cursor: pointer;" title="点击编辑角色昵称"></span>
+            </span>
             <div class="header-actions">
                 <span class="action-btn" id="ls-settings-btn" title="空间设置">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -2272,9 +2389,9 @@
         </div>
         <div class="ls-avatar-and-counter-wrapper">
             <div class="ls-header-avatars">
-                <img id="ls-user-avatar" src="">
+                <img id="ls-user-avatar" src="" style="cursor: pointer;" title="点击更换你的头像">
                 <span class="heart-icon">❤</span>
-                <img id="ls-char-avatar" src="">
+                <img id="ls-char-avatar" src="" style="cursor: pointer;" title="点击更换角色头像">
             </div>
             <div id="ls-days-counter"></div>
         </div>
@@ -2383,7 +2500,15 @@
     </div>
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
-    <div id="chat-settings-modal" class="modal"><div class="modal-content"><div class="modal-header"><span>聊天设置</span></div><div class="modal-body"><div class="form-group" id="chat-name-group"><label for="chat-name-input">备注名 / 群名</label><input type="text" id="chat-name-input"></div>
+    <div id="chat-settings-modal" class="modal"><div class="modal-content"><div class="modal-header"><span>聊天设置</span></div><div class="modal-body">
+    
+    <!-- 角色真名输入框（仅单聊显示） -->
+    <div class="form-group" id="real-name-group" style="display: none;">
+        <label for="real-name-input">角色真名</label>
+        <input type="text" id="real-name-input" placeholder="自动填入创建角色时的名字">
+    </div>
+    
+    <div class="form-group" id="chat-name-group"><label for="chat-name-input">备注名 / 群名</label><input type="text" id="chat-name-input"></div>
 
     <!-- ▼▼▼ 请将这段新代码粘贴到“备注名”输入框的 form-group 之后 ▼▼▼ -->
     <div class="form-group" id="assign-group-section" style="display: none;"> <!-- 默认隐藏，只对单聊显示 -->
@@ -2535,6 +2660,40 @@
     <span id="context-token-count-display" style="color: var(--text-secondary); font-weight: 500;">--</span>
 </div>
 <!-- ▲▲▲ 新代码粘贴结束 ▲▲▲ -->
+<!-- ▼▼▼ TOKEN过大提示设置 ▼▼▼ -->
+<div class="form-group" style="margin-top: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <label style="margin-bottom: 0;">TOKEN过大提示</label>
+        <label class="switch-container" style="margin-bottom: 0;">
+            <input type="checkbox" id="token-warning-enabled">
+            <span class="switch-slider"></span>
+        </label>
+    </div>
+    <div id="token-threshold-group" style="margin-top: 10px; display: none;">
+        <label for="token-warning-threshold" style="font-size: 12px; color: #999;">
+            提示阈值（留空则默认检测卡顿）
+        </label>
+        <input type="number" id="token-warning-threshold" placeholder="例如: 4000" min="0" style="margin-top: 5px;">
+    </div>
+</div>
+<!-- ▲▲▲ TOKEN过大提示设置结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 删除指定范围聊天记录功能 ▼▼▼ -->
+<div class="form-group" style="margin-top: 10px;">
+    <label>删除指定范围的聊天记录</label>
+    <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+        <input type="text" id="delete-messages-range" placeholder="例如: 2-10" 
+               style="flex: 0 0 80%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+        <button id="delete-messages-range-btn" class="form-button" 
+                style="flex: 0 0 20%; padding: 8px 16px; white-space: nowrap;">
+            删除记录
+        </button>
+    </div>
+    <div style="font-size: 12px; color: #999; margin-top: 5px;">
+        输入范围格式如 "2-10" 表示删除第2条到第10条消息（包含第2条和第10条）
+    </div>
+</div>
+<!-- ▲▲▲ 删除指定范围聊天记录功能结束 ▲▲▲ -->
 <!-- ▲▲▲ 新增HTML代码粘贴结束 ▲▲▲ -->
 
             <div class="form-group" id="ai-persona-group"><label for="ai-persona">对方人设 (AI Persona)</label><textarea id="ai-persona" rows="3"></textarea></div>
@@ -4309,6 +4468,67 @@
         </div>
     </div>
 </div>
+<!-- ▼▼▼ 八卦六爻占卜弹窗 ▼▼▼ -->
+<div id="bagua-divination-modal" class="modal">
+    <div class="modal-content" style="height: 85%; width: 95%;">
+        
+        <!-- 1. 占卜设置界面 -->
+        <div id="bagua-setup-view">
+            <div class="modal-header">
+                <span>八卦六爻占卜</span>
+                <div>
+                    <span id="bagua-history-btn" class="action-btn" style="font-size: 16px;">历史</span>
+                    <span id="close-bagua-modal-btn" class="action-btn" style="font-size: 16px;">关闭</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="bagua-question-input">您的问题或关注点</label>
+                    <textarea id="bagua-question-input" rows="2" placeholder="例如：我近期事业发展如何？"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>起卦方式</label>
+                    <select id="bagua-method-select">
+                        <option value="coin">铜钱摇卦 - 传统方式</option>
+                        <option value="time">时间起卦 - 根据当前时间</option>
+                        <option value="number">数字起卦 - 心念数字</option>
+                    </select>
+                </div>
+                <div class="form-group" id="bagua-number-input-group" style="display: none;">
+                    <label for="bagua-number-input">请输入一个数字（用于起卦）</label>
+                    <input type="number" id="bagua-number-input" placeholder="输入任意正整数">
+                </div>
+                <button id="start-bagua-btn" class="form-button" style="margin-top: 20px;">开始起卦</button>
+            </div>
+        </div>
+
+        <!-- 2. 占卜结果界面 (默认隐藏) -->
+        <div id="bagua-result-view" style="display: none; height: 100%; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <span id="back-to-bagua-setup-btn" class="action-btn" style="font-size: 16px;">返回</span>
+                <span>卦象结果</span>
+            </div>
+            <div class="modal-body" id="bagua-result-display" style="overflow-y: auto;">
+                <!-- 结果将由JS动态生成在这里 -->
+            </div>
+            <div class="modal-footer">
+                <button id="send-bagua-result-btn" class="save" style="width: 100%;">发给易经大师解读</button>
+            </div>
+        </div>
+
+        <!-- 3. 历史记录界面 (默认隐藏) -->
+        <div id="bagua-history-view" style="display: none; height: 100%; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <span id="back-to-bagua-main-btn" class="action-btn" style="font-size: 16px;">返回</span>
+                <span>占卜历史</span>
+            </div>
+            <div class="modal-body" id="bagua-history-list">
+                <!-- 历史记录将由JS动态生成在这里 -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 八卦六爻占卜弹窗结束 ▲▲▲ -->
 <!-- ▼▼▼ 【全新】这里是整个情侣空间功能的HTML代码 ▼▼▼ -->
 <!-- 2. 切换角色的弹窗 -->
 <div id="ls-char-selector-modal" class="modal">
@@ -6052,6 +6272,38 @@
     </div>
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 我的钱包模态框 ▼▼▼ -->
+<div id="wallet-modal" class="modal">
+    <div class="modal-content" style="height: auto; max-height: 70%;">
+        <div class="modal-header">
+            <span>我的钱包</span>
+        </div>
+        <div class="modal-body">
+            <!-- 余额显示区 -->
+            <div style="text-align: center; padding: 30px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; margin-bottom: 20px; color: white;">
+                <p style="font-size: 14px; margin-bottom: 5px; opacity: 0.9;">我的余额</p>
+                <h1 id="wallet-balance-display" style="font-size: 36px; margin: 10px 0; font-weight: bold;">¥ 520.00</h1>
+                <p style="font-size: 12px; opacity: 0.8;">与桃宝余额同步</p>
+            </div>
+
+            <!-- 功能按钮区 -->
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button id="wallet-modify-balance-btn" class="form-button" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 15px; font-size: 16px;">
+                    💰 修改余额
+                </button>
+                <button id="wallet-family-card-btn" class="form-button-secondary" style="padding: 15px; font-size: 16px;">
+                    👨‍👩‍👧 亲属卡
+                </button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="wallet-modal-close-btn">关闭</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 我的钱包模态框结束 ▲▲▲ -->
+
 <input type="file" id="pet-custom-image-input" accept="image/*" style="display: none;">
 <!-- ▼▼▼ 【全新】宠物聊天模态框 ▼▼▼ -->
 <div id="pet-chat-modal" class="modal">
@@ -9105,6 +9357,7 @@ db.version(54).stores({ // 版本号从 53 升级到 54
     forumComments: '++id, postId, timestamp',
     forumCategories: '++id, name',
     tarotReadings: '++id, timestamp',
+    baguaReadings: '++id, timestamp',
     pomodoroSessions: '++id, chatId, startTime',
     scriptKillScripts: '++id, name, isBuiltIn',
     taobaoProducts: '++id, name, category', 
@@ -9934,6 +10187,7 @@ async function createCharacterFromData(data, avatarBase64) {
 const newChat = {
     id: newChatId,
     name: characterName,
+    realName: characterName, // 保存创建时的原始名字
     isGroup: false,
     isPinned: false,
     history: [],
@@ -11135,6 +11389,14 @@ if (chat.settings && typeof chat.settings.innerVoiceAdopterLabelFormat === 'unde
             console.log(`为旧角色 "${chat.name}" 补全了status属性。`);
         }
         // --- ▲▲▲ 修复结束 ▲▲▲
+        
+        // --- ▼▼▼ 【新增】兼容realName字段 ▼▼▼ ---
+        // 如果是单聊，并且没有realName字段，则使用当前的name作为默认值
+        if (!chat.isGroup && !chat.realName) {
+            chat.realName = chat.name;
+            console.log(`为旧角色 "${chat.name}" 补全了realName属性。`);
+        }
+        // --- ▲▲▲ realName兼容结束 ▲▲▲
 
         // --- ▼▼▼ 核心修复就在这里 ▼▼▼ ---
         // 检查2：兼容最新的“关系”功能
@@ -14381,6 +14643,7 @@ document.getElementById('char-heart-btn').style.display = chat.isGroup ? 'none' 
     // 【核心修正】根据是否为群聊，显示或隐藏投票按钮
     document.getElementById('send-poll-btn').style.display = chat.isGroup ? 'flex' : 'none';
     document.getElementById('pet-action-btn').style.display = chat.isGroup ? 'none' : 'flex';
+    document.getElementById('wallet-action-btn').style.display = chat.isGroup ? 'none' : 'flex';
     startPetDecayTimer(); 
 }
 // ▲▲▲ 替换结束 ▲▲▲
@@ -18480,7 +18743,12 @@ case 'change_avatar':
                         const originalMsg = chat.history[originalTransferMsgIndex];
                         originalMsg.status = 'declined';
                         
-                        // 【核心】创建一条新的“退款”消息
+                        // 【新增】退款给用户 - CHAR拒绝了用户的转账，需要退还金额
+                        const refundNote = originalMsg.note ? ` (备注: ${originalMsg.note})` : '';
+                        const refundDescription = `退款: ${chat.name} 拒收转账${refundNote}`;
+                        await updateUserBalanceAndLogTransaction(originalMsg.amount, refundDescription);
+                        
+                        // 【核心】创建一条新的"退款"消息
                         const refundMessage = {
                             role: 'assistant',
                             senderName: chat.name,
@@ -18944,8 +19212,12 @@ async function sendUserTransfer() {
     const senderName = chat.isGroup ? (chat.settings.myNickname || '我') : '我'; 
     const receiverName = chat.isGroup ? '群聊' : chat.name; 
 
+    // 准备交易描述，包含收款人和备注（如果有）
+    const transferNote = note ? ` (备注: ${note})` : '';
+    const description = `转账给 ${receiverName}${transferNote}`;
+    
     // 【核心新增2】调用我们的新函数来扣款并记录
-    await updateUserBalanceAndLogTransaction(-amount, `转账给 ${receiverName}`);
+    await updateUserBalanceAndLogTransaction(-amount, description);
 
     const msg = { role: 'user', type: 'transfer', amount: amount, note: note, senderName, receiverName, timestamp: Date.now() }; 
     chat.history.push(msg); 
@@ -24609,11 +24881,17 @@ async function handleUserTransferResponse(choice) {
         chat.history.push(refundMessage);
         
         // 准备一条对AI可见的隐藏消息，告诉它发生了什么
-        systemContent = `[系统提示：你拒绝并退还了“${originalMessage.senderName}”的转账。]`;
+        systemContent = `[系统提示：你拒绝并退还了"${originalMessage.senderName}"的转账。]`;
     } else { // 如果用户选择“接受”
-        // 只需准备隐藏消息通知AI即可
-        systemContent = `[系统提示：你接受了“${originalMessage.senderName}”的转账。]`;
-        await updateUserBalanceAndLogTransaction(originalMessage.amount, `收到来自 ${originalMessage.senderName} 的转账`);
+        // 准备交易描述，包含转款人和备注（如果有）
+        const transferNote = originalMessage.note ? ` (备注: ${originalMessage.note})` : '';
+        const description = `收到来自 ${originalMessage.senderName} 的转账${transferNote}`;
+        
+        // 更新余额并记录交易
+        await updateUserBalanceAndLogTransaction(originalMessage.amount, description);
+        
+        // 准备隐藏消息通知AI
+        systemContent = `[系统提示：你接受了"${originalMessage.senderName}"的转账。]`;
     }
 
     // 3. 创建这条对用户隐藏、但对AI可见的系统消息
@@ -25947,33 +26225,178 @@ async function exportTheme() {
 }
 
 /**
- * 导入一个主题JSON文件
+ * 导入一个主题JSON或DOCX文件
  */
 function importTheme(file) {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-        try {
-            const data = JSON.parse(e.target.result);
-            if (data.themeName && typeof data.themeCss !== 'undefined') {
-                // 为了避免重名，导入时可以在名字后面加个 "(导入)"
-                const newTheme = {
-                    name: `${data.themeName} (导入)`,
-                    css: data.themeCss
-                };
-                const newId = await db.themes.add(newTheme);
-                await loadThemesToDropdown();
-                document.getElementById('theme-selector').value = newId;
-                handleThemeSelection(); // 导入后自动选中并应用
-                alert(`方案 "${newTheme.name}" 导入成功！`);
-            } else {
-                alert("导入失败：文件格式不正确。");
+    
+    const fileName = file.name.toLowerCase();
+    const isDocx = fileName.endsWith('.docx');
+    const isJson = fileName.endsWith('.json');
+    
+    if (!isJson && !isDocx) {
+        alert('仅支持 .json 或 .docx 文件格式');
+        return;
+    }
+    
+    if (isDocx) {
+        // 处理DOCX文件
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const arrayBuffer = e.target.result;
+                const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                const text = result.value;
+                
+                // 智能提取CSS代码和主题名称
+                let themeName = '';
+                let themeCss = '';
+                
+                // 1. 尝试从文件名提取主题名称（去掉扩展名）
+                const baseFileName = file.name.replace(/\.docx$/i, '').trim();
+                
+                // 2. 清理文本内容
+                let cleanedText = text.trim();
+                
+                // 3. 尝试多种方式提取CSS代码
+                
+                // 方式1: 查找CSS代码块标记（如 ```css 或 <style> 标签）
+                const cssBlockMatch = cleanedText.match(/```css\s*([\s\S]*?)```/i) || 
+                                      cleanedText.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+                
+                if (cssBlockMatch) {
+                    themeCss = cssBlockMatch[1].trim();
+                    // 尝试提取代码块前的标题作为主题名
+                    const beforeBlock = cleanedText.substring(0, cssBlockMatch.index);
+                    const lines = beforeBlock.split('\n').filter(l => l.trim());
+                    if (lines.length > 0) {
+                        themeName = lines[lines.length - 1].trim();
+                    }
+                }
+                
+                // 方式2: 检测是否包含明显的CSS特征（选择器和花括号）
+                if (!themeCss) {
+                    const hasCssFeatures = /[.#\w\s-]+\s*\{[\s\S]*?\}/g.test(cleanedText);
+                    
+                    if (hasCssFeatures) {
+                        // 分离标题和CSS代码
+                        const lines = cleanedText.split('\n');
+                        let cssStartIndex = 0;
+                        
+                        // 查找第一个看起来像CSS的行
+                        for (let i = 0; i < lines.length; i++) {
+                            if (lines[i].includes('{') || lines[i].match(/^[.#\w\s-]+\s*$/)) {
+                                cssStartIndex = i;
+                                break;
+                            }
+                        }
+                        
+                        // 前面的行作为标题（取最后一个非空行）
+                        if (cssStartIndex > 0) {
+                            const titleLines = lines.slice(0, cssStartIndex).filter(l => l.trim());
+                            if (titleLines.length > 0) {
+                                themeName = titleLines[titleLines.length - 1].trim();
+                            }
+                        }
+                        
+                        // CSS代码从检测到的位置开始
+                        themeCss = lines.slice(cssStartIndex).join('\n').trim();
+                    }
+                }
+                
+                // 方式3: 如果前面的方法都没找到，尝试查找关键词分隔
+                if (!themeCss) {
+                    const keywords = ['css', '样式', '代码', 'style', '美化'];
+                    const lines = cleanedText.split('\n');
+                    
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i].toLowerCase();
+                        if (keywords.some(kw => line.includes(kw))) {
+                            // 关键词行之前的作为标题
+                            if (i > 0) {
+                                const titleLines = lines.slice(0, i).filter(l => l.trim());
+                                if (titleLines.length > 0) {
+                                    themeName = titleLines[titleLines.length - 1].trim();
+                                }
+                            }
+                            // 关键词行之后的作为CSS
+                            themeCss = lines.slice(i + 1).join('\n').trim();
+                            break;
+                        }
+                    }
+                }
+                
+                // 方式4: 如果还是没找到，将整个内容作为CSS
+                if (!themeCss) {
+                    // 检查是否第一行是标题（短且不含CSS特征）
+                    const lines = cleanedText.split('\n');
+                    const firstLine = lines[0].trim();
+                    
+                    if (firstLine.length < 50 && !firstLine.includes('{') && !firstLine.includes('}')) {
+                        themeName = firstLine;
+                        themeCss = lines.slice(1).join('\n').trim();
+                    } else {
+                        // 整个内容都是CSS
+                        themeCss = cleanedText;
+                    }
+                }
+                
+                // 使用文件名作为默认主题名
+                if (!themeName) {
+                    themeName = baseFileName || '未命名主题';
+                }
+                
+                // 清理主题名称（移除特殊字符，限制长度）
+                themeName = themeName
+                    .replace(/[#*\[\]]/g, '')
+                    .replace(/主题名[称]?\s*[:：]?\s*/i, '')
+                    .substring(0, 50)
+                    .trim() || baseFileName || '未命名主题';
+                
+                // 验证CSS代码
+                if (themeCss && themeCss.length > 10) {
+                    const newTheme = {
+                        name: `${themeName} (导入)`,
+                        css: themeCss
+                    };
+                    const newId = await db.themes.add(newTheme);
+                    await loadThemesToDropdown();
+                    document.getElementById('theme-selector').value = newId;
+                    handleThemeSelection();
+                    alert(`方案 "${newTheme.name}" 导入成功！\n已提取 ${themeCss.length} 字符的CSS代码。`);
+                } else {
+                    alert('导入失败：DOCX文件中未找到有效的CSS代码。\n\n提示：请确保文档包含CSS样式代码。');
+                }
+            } catch (error) {
+                alert(`导入DOCX失败：${error.message}`);
             }
-        } catch (error) {
-            alert(`导入失败：文件解析错误。 ${error.message}`);
-        }
-    };
-    reader.readAsText(file);
+        };
+        reader.readAsArrayBuffer(file);
+    } else {
+        // 处理JSON文件（原有逻辑）
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.themeName && typeof data.themeCss !== 'undefined') {
+                    const newTheme = {
+                        name: `${data.themeName} (导入)`,
+                        css: data.themeCss
+                    };
+                    const newId = await db.themes.add(newTheme);
+                    await loadThemesToDropdown();
+                    document.getElementById('theme-selector').value = newId;
+                    handleThemeSelection();
+                    alert(`方案 "${newTheme.name}" 导入成功！`);
+                } else {
+                    alert("导入失败：JSON文件格式不正确。");
+                }
+            } catch (error) {
+                alert(`导入JSON失败：${error.message}`);
+            }
+        };
+        reader.readAsText(file);
+    }
 }
 
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
@@ -29304,7 +29727,7 @@ async function generatePlazaFeed(hotTopics = null, targets = 'all') {
         publicFigures = Object.values(state.chats)
             .filter(chat => !chat.isGroup)
             .map(chat => ({ 
-                name: chat.name, 
+                name: chat.realName || chat.name,  // 【修改】使用realName作为真实名字
                 persona: chat.settings.aiPersona.substring(0, 150) + '...',
                 weibo_profession: chat.settings.weiboProfession || '未设定',
                 weibo_instruction: chat.settings.weiboInstruction || '无'
@@ -29314,7 +29737,7 @@ async function generatePlazaFeed(hotTopics = null, targets = 'all') {
             const char = state.chats[chatId];
             if(char) {
                  publicFigures.push({ 
-                    name: char.name, 
+                    name: char.realName || char.name,  // 【修改】使用realName作为真实名字
                     persona: char.settings.aiPersona.substring(0, 150) + '...',
                     weibo_profession: char.settings.weiboProfession || '未设定',
                     weibo_instruction: char.settings.weiboInstruction || '无'
@@ -29633,17 +30056,18 @@ function performChatSearch() {
     const keyword = document.getElementById('keyword-search-input').value.trim();
     const senderValue = document.getElementById('sender-search-select').value;
     const dateValue = document.getElementById('date-search-input').value;
+    const typeValue = document.getElementById('type-search-select').value;
 
     // 将关键词保存到全局变量，以便在渲染结果时用于高亮
     currentSearchKeyword = keyword;
 
-    if (!keyword && !senderValue && !dateValue) {
+    if (!keyword && !senderValue && !dateValue && !typeValue) {
         alert('请至少输入一个搜索条件！');
         return;
     }
 
     // 2. 筛选聊天记录
-    console.log(`开始搜索: 关键词='${keyword}', 发言人='${senderValue}', 日期='${dateValue}'`);
+    console.log(`开始搜索: 关键词='${keyword}', 发言人='${senderValue}', 日期='${dateValue}', 类型='${typeValue}'`);
     
     const results = chat.history.filter(msg => {
         // 过滤掉系统消息和对用户隐藏的消息
@@ -29688,6 +30112,25 @@ function performChatSearch() {
             
             if (!contentText.toLowerCase().includes(keyword.toLowerCase())) {
                 return false;
+            }
+        }
+
+        // d. 筛选消息类型
+        if (typeValue) {
+            // 获取消息的实际类型
+            const msgType = msg.type || 'text'; // 如果没有type属性，默认为普通文本
+            
+            // 特殊处理：如果选择的是 'text'，匹配所有没有type或type为undefined的消息
+            if (typeValue === 'text') {
+                // 普通文本消息通常没有type属性，或者type为空
+                if (msgType && msgType !== 'text' && msgType !== '') {
+                    return false;
+                }
+            } else {
+                // 其他类型需要精确匹配
+                if (msgType !== typeValue) {
+                    return false;
+                }
             }
         }
 
@@ -31530,6 +31973,424 @@ async function deleteTarotReading(readingId) {
 }
 
 // ▲▲▲ 新功能函数粘贴结束 ▲▲▲
+
+// ▼▼▼ 八卦六爻占卜功能 ▼▼▼
+/**
+ * 八卦六爻占卜功能核心
+ */
+let activeBaguaReading = null; // 用于暂存当前占卜的结果
+
+// 64卦基本信息
+const BAGUA_64 = {
+    1: { name: '乾为天', trigrams: ['乾', '乾'], meaning: '刚健中正，自强不息' },
+    2: { name: '坤为地', trigrams: ['坤', '坤'], meaning: '柔顺载物，厚德载福' },
+    3: { name: '水雷屯', trigrams: ['坎', '震'], meaning: '始生之难，万物初萌' },
+    4: { name: '山水蒙', trigrams: ['艮', '坎'], meaning: '启蒙教化，循序渐进' },
+    5: { name: '水天需', trigrams: ['坎', '乾'], meaning: '等待时机，养精蓄锐' },
+    6: { name: '天水讼', trigrams: ['乾', '坎'], meaning: '争讼之象，宜和不宜争' },
+    7: { name: '地水师', trigrams: ['坤', '坎'], meaning: '统率之道，纪律严明' },
+    8: { name: '水地比', trigrams: ['坎', '坤'], meaning: '亲比辅佐，团结协作' },
+    9: { name: '风天小畜', trigrams: ['巽', '乾'], meaning: '小有积蓄，循序渐进' },
+    10: { name: '天泽履', trigrams: ['乾', '兑'], meaning: '如履薄冰，谨慎前行' },
+    11: { name: '地天泰', trigrams: ['坤', '乾'], meaning: '天地交泰，诸事亨通' },
+    12: { name: '天地否', trigrams: ['乾', '坤'], meaning: '阻塞不通，守正待时' },
+    13: { name: '天火同人', trigrams: ['乾', '离'], meaning: '和同志合，众志成城' },
+    14: { name: '火天大有', trigrams: ['离', '乾'], meaning: '大有收获，丰盛富足' },
+    15: { name: '地山谦', trigrams: ['坤', '艮'], meaning: '谦逊退让，德配天地' },
+    16: { name: '雷地豫', trigrams: ['震', '坤'], meaning: '顺应天时，喜悦和乐' },
+    17: { name: '泽雷随', trigrams: ['兑', '震'], meaning: '随顺时势，因时制宜' },
+    18: { name: '山风蛊', trigrams: ['艮', '巽'], meaning: '整治祸乱，拨乱反正' },
+    19: { name: '地泽临', trigrams: ['坤', '兑'], meaning: '居高临下，教导关怀' },
+    20: { name: '风地观', trigrams: ['巽', '坤'], meaning: '观察省思，见贤思齐' },
+    21: { name: '火雷噬嗑', trigrams: ['离', '震'], meaning: '刚柔相济，决断明快' },
+    22: { name: '山火贲', trigrams: ['艮', '离'], meaning: '文饰之美，内外兼修' },
+    23: { name: '山地剥', trigrams: ['艮', '坤'], meaning: '剥落消退，以守为进' },
+    24: { name: '地雷复', trigrams: ['坤', '震'], meaning: '复苏回归，否极泰来' },
+    25: { name: '天雷无妄', trigrams: ['乾', '震'], meaning: '正道而行，顺应自然' },
+    26: { name: '山天大畜', trigrams: ['艮', '乾'], meaning: '大有积蓄，厚积薄发' },
+    27: { name: '山雷颐', trigrams: ['艮', '震'], meaning: '养生之道，慎言节食' },
+    28: { name: '泽风大过', trigrams: ['兑', '巽'], meaning: '大有过越，栋梁之才' },
+    29: { name: '坎为水', trigrams: ['坎', '坎'], meaning: '险中求进，信守正道' },
+    30: { name: '离为火', trigrams: ['离', '离'], meaning: '光明磊落，依附正道' },
+    31: { name: '泽山咸', trigrams: ['兑', '艮'], meaning: '感应相通，彼此吸引' },
+    32: { name: '雷风恒', trigrams: ['震', '巽'], meaning: '恒久不变，持之以恒' },
+    33: { name: '天山遁', trigrams: ['乾', '艮'], meaning: '退避隐遁，以退为进' },
+    34: { name: '雷天大壮', trigrams: ['震', '乾'], meaning: '刚强壮盛，光明正大' },
+    35: { name: '火地晋', trigrams: ['离', '坤'], meaning: '晋升发展，日出大地' },
+    36: { name: '地火明夷', trigrams: ['坤', '离'], meaning: '明珠暗投，韬光养晦' },
+    37: { name: '风火家人', trigrams: ['巽', '离'], meaning: '家道兴旺，和睦相处' },
+    38: { name: '火泽睽', trigrams: ['离', '兑'], meaning: '违背乖离，求同存异' },
+    39: { name: '水山蹇', trigrams: ['坎', '艮'], meaning: '艰难险阻，谨慎前行' },
+    40: { name: '雷水解', trigrams: ['震', '坎'], meaning: '解除困难，雨过天晴' },
+    41: { name: '山泽损', trigrams: ['艮', '兑'], meaning: '损己益人，惩忿窒欲' },
+    42: { name: '风雷益', trigrams: ['巽', '震'], meaning: '增益积极，见善则迁' },
+    43: { name: '泽天夬', trigrams: ['兑', '乾'], meaning: '刚决果断，以正除邪' },
+    44: { name: '天风姤', trigrams: ['乾', '巽'], meaning: '不期而遇，防微杜渐' },
+    45: { name: '泽地萃', trigrams: ['兑', '坤'], meaning: '聚集汇合，众志成城' },
+    46: { name: '地风升', trigrams: ['坤', '巽'], meaning: '上升进取，循序渐进' },
+    47: { name: '泽水困', trigrams: ['兑', '坎'], meaning: '困顿窘迫，坚守正道' },
+    48: { name: '水风井', trigrams: ['坎', '巽'], meaning: '养人济世，源源不断' },
+    49: { name: '泽火革', trigrams: ['兑', '离'], meaning: '革故鼎新，顺天应人' },
+    50: { name: '火风鼎', trigrams: ['离', '巽'], meaning: '稳重图新，去旧立新' },
+    51: { name: '震为雷', trigrams: ['震', '震'], meaning: '震动奋起，反省警醒' },
+    52: { name: '艮为山', trigrams: ['艮', '艮'], meaning: '止于至善，沉稳镇定' },
+    53: { name: '风山渐', trigrams: ['巽', '艮'], meaning: '循序渐进，水到渠成' },
+    54: { name: '雷泽归妹', trigrams: ['震', '兑'], meaning: '归顺从属，以柔克刚' },
+    55: { name: '雷火丰', trigrams: ['震', '离'], meaning: '丰盛美满，盛极必衰' },
+    56: { name: '火山旅', trigrams: ['离', '艮'], meaning: '羁旅他乡，谦恭谨慎' },
+    57: { name: '巽为风', trigrams: ['巽', '巽'], meaning: '谦逊顺从，随风而动' },
+    58: { name: '兑为泽', trigrams: ['兑', '兑'], meaning: '喜悦交流，和悦相处' },
+    59: { name: '风水涣', trigrams: ['巽', '坎'], meaning: '涣散消融，聚散有时' },
+    60: { name: '水泽节', trigrams: ['坎', '兑'], meaning: '节制有度，不可过分' },
+    61: { name: '风泽中孚', trigrams: ['巽', '兑'], meaning: '诚信至诚，内外一致' },
+    62: { name: '雷山小过', trigrams: ['震', '艮'], meaning: '小有过越，大事不宜' },
+    63: { name: '水火既济', trigrams: ['坎', '离'], meaning: '功德圆满，持盈保泰' },
+    64: { name: '火水未济', trigrams: ['离', '坎'], meaning: '尚未完成，继续努力' }
+};
+
+// 打开八卦六爻占卜弹窗
+function openBaguaModal() {
+    document.getElementById('bagua-divination-modal').classList.add('visible');
+    document.getElementById('bagua-setup-view').style.display = 'block';
+    document.getElementById('bagua-result-view').style.display = 'none';
+    document.getElementById('bagua-history-view').style.display = 'none';
+    document.getElementById('bagua-question-input').value = '';
+}
+
+// 监听起卦方式的变化
+document.getElementById('bagua-method-select')?.addEventListener('change', (e) => {
+    const numberInputGroup = document.getElementById('bagua-number-input-group');
+    if (e.target.value === 'number') {
+        numberInputGroup.style.display = 'block';
+    } else {
+        numberInputGroup.style.display = 'none';
+    }
+});
+
+// 执行起卦逻辑
+function startBaguaDivination() {
+    const question = document.getElementById('bagua-question-input').value.trim();
+    const method = document.getElementById('bagua-method-select').value;
+    
+    if (!question) {
+        alert('请输入您的问题或关注点。');
+        return;
+    }
+    
+    let lines = [];
+    
+    if (method === 'coin') {
+        // 铜钱摇卦法：摇6次，每次3枚铜钱
+        for (let i = 0; i < 6; i++) {
+            let sum = 0;
+            for (let j = 0; j < 3; j++) {
+                sum += Math.random() < 0.5 ? 2 : 3; // 2为背，3为字
+            }
+            // 6为老阴（变爻），7为少阳，8为少阴，9为老阳（变爻）
+            lines.push(sum);
+        }
+    } else if (method === 'time') {
+        // 时间起卦法：根据当前时间
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
+        const hour = now.getHours();
+        
+        const upper = (year + month + day) % 8 || 8;
+        const lower = (year + month + day + hour) % 8 || 8;
+        const changing = (year + month + day + hour) % 6 || 6;
+        
+        lines = generateLinesFromTrigrams(upper, lower, changing);
+    } else if (method === 'number') {
+        // 数字起卦法
+        const number = parseInt(document.getElementById('bagua-number-input').value);
+        if (!number || number <= 0) {
+            alert('请输入一个正整数。');
+            return;
+        }
+        
+        const upper = number % 8 || 8;
+        const lower = Math.floor(number / 8) % 8 || 8;
+        const changing = number % 6 || 6;
+        
+        lines = generateLinesFromTrigrams(upper, lower, changing);
+    }
+    
+    // 根据六爻生成本卦和变卦
+    const originalHex = getHexagramFromLines(lines);
+    const changingLines = lines.map((line, index) => line === 6 || line === 9 ? index + 1 : 0).filter(l => l > 0);
+    
+    // 生成变卦
+    const changedLines = lines.map(line => {
+        if (line === 6) return 8; // 老阴变少阳
+        if (line === 9) return 7; // 老阳变少阴
+        return line;
+    });
+    const changedHex = getHexagramFromLines(changedLines);
+    
+    activeBaguaReading = {
+        question: question,
+        method: method,
+        lines: lines,
+        originalHexagram: originalHex,
+        changedHexagram: changedHex,
+        changingLines: changingLines,
+        timestamp: Date.now()
+    };
+    
+    displayBaguaResults(activeBaguaReading);
+}
+
+// 根据卦数生成六爻（辅助函数）
+function generateLinesFromTrigrams(upper, lower, changing) {
+    const trigramToLines = {
+        1: [9, 9, 9], // 乾 ☰
+        2: [6, 6, 6], // 坤 ☷
+        3: [7, 6, 9], // 震 ☳
+        4: [6, 9, 7], // 坎 ☵
+        5: [9, 7, 6], // 艮 ☶
+        6: [9, 9, 7], // 巽 ☴
+        7: [6, 9, 9], // 离 ☲
+        8: [7, 9, 9]  // 兑 ☱
+    };
+    
+    const lowerLines = trigramToLines[lower] || [7, 7, 7];
+    const upperLines = trigramToLines[upper] || [7, 7, 7];
+    const lines = [...lowerLines, ...upperLines];
+    
+    // 设置动爻
+    if (changing >= 1 && changing <= 6) {
+        const currentLine = lines[changing - 1];
+        if (currentLine === 7) lines[changing - 1] = 9; // 少阳变老阳
+        else if (currentLine === 8) lines[changing - 1] = 6; // 少阴变老阴
+    }
+    
+    return lines;
+}
+
+// 根据六爻获取卦象
+function getHexagramFromLines(lines) {
+    // 将六爻转换为64卦索引（简化版本）
+    const binary = lines.map(line => (line === 7 || line === 9) ? 1 : 0).join('');
+    const decimal = parseInt(binary, 2) + 1;
+    const hexIndex = ((decimal - 1) % 64) + 1;
+    return BAGUA_64[hexIndex] || BAGUA_64[1];
+}
+
+// 显示占卜结果
+function displayBaguaResults(reading) {
+    const displayEl = document.getElementById('bagua-result-display');
+    displayEl.innerHTML = '';
+    
+    // 显示问题
+    const questionEl = document.createElement('div');
+    questionEl.className = 'bagua-result-question';
+    questionEl.textContent = `您的问题是："${reading.question}"`;
+    displayEl.appendChild(questionEl);
+    
+    const container = document.createElement('div');
+    container.className = 'bagua-hexagram-container';
+    
+    // 本卦
+    const originalBox = document.createElement('div');
+    originalBox.className = 'bagua-hexagram-box';
+    originalBox.innerHTML = `
+        <div class="bagua-hexagram-title">本卦</div>
+        <div class="bagua-hexagram-name">${reading.originalHexagram.name}</div>
+        ${renderBaguaLines(reading.lines, reading.changingLines)}
+        <div class="bagua-details">${reading.originalHexagram.meaning}</div>
+    `;
+    container.appendChild(originalBox);
+    
+    // 如果有动爻，显示变卦
+    if (reading.changingLines.length > 0) {
+        const changedBox = document.createElement('div');
+        changedBox.className = 'bagua-hexagram-box';
+        const changedLines = reading.lines.map(line => {
+            if (line === 6) return 8;
+            if (line === 9) return 7;
+            return line;
+        });
+        changedBox.innerHTML = `
+            <div class="bagua-hexagram-title">变卦</div>
+            <div class="bagua-hexagram-name">${reading.changedHexagram.name}</div>
+            ${renderBaguaLines(changedLines, [])}
+            <div class="bagua-details">${reading.changedHexagram.meaning}</div>
+            <div class="bagua-details" style="margin-top: 10px; color: #ff6b6b;">动爻：第${reading.changingLines.join('、')}爻</div>
+        `;
+        container.appendChild(changedBox);
+    }
+    
+    displayEl.appendChild(container);
+    
+    // 切换视图
+    document.getElementById('bagua-setup-view').style.display = 'none';
+    document.getElementById('bagua-result-view').style.display = 'flex';
+}
+
+// 渲染卦象的六爻
+function renderBaguaLines(lines, changingLines) {
+    let html = '<div class="bagua-lines">';
+    lines.forEach((line, index) => {
+        const isYang = line === 7 || line === 9;
+        const isChanging = changingLines.includes(index + 1);
+        const classes = `bagua-line ${!isYang ? 'yin' : ''} ${isChanging ? 'changing' : ''}`;
+        html += `<div class="${classes}"><span class="bagua-line-number">${index + 1}</span></div>`;
+    });
+    html += '</div>';
+    return html;
+}
+
+// 发送给AI解读
+async function sendBaguaReadingToChat() {
+    if (!activeBaguaReading) return;
+    
+    const { proxyUrl, apiKey, model } = state.apiConfig;
+    
+    if (!proxyUrl || !apiKey || !model) {
+        alert('请先在API设置中配置好才能触发AI解读哦！');
+        return;
+    }
+    
+    document.getElementById('bagua-divination-modal').classList.remove('visible');
+    await showCustomAlert("请稍候...", "易经大师正在为你解读卦象...");
+    
+    try {
+        const reading = activeBaguaReading;
+        
+        const hexInfo = `本卦：${reading.originalHexagram.name}（${reading.originalHexagram.meaning}）` +
+            (reading.changingLines.length > 0 ? `\n变卦：${reading.changedHexagram.name}（${reading.changedHexagram.meaning}）\n动爻：第${reading.changingLines.join('、')}爻` : '');
+        
+        const yijingMasterPrompt = `
+# 角色
+你是一位精通易经的占卜大师，对八卦六爻有深刻的理解和丰富的实践经验。
+
+# 核心任务
+为用户提供一次专业、结构化且易于理解的八卦六爻解读。你的解读必须严格遵循下面的输出结构。
+
+# 输出结构 (必须严格遵守)
+你的回答必须包含以下部分，并使用Markdown加粗标题来分隔：
+
+1. **🌟 卦象综述 (Overall Interpretation):**
+   首先，根据本卦和变卦的整体象征，给出一个高度概括的、1-2句话的核心结论。
+
+2. **📊 卦象详解 (Hexagram Details):**
+   详细分析本卦的含义，如果有变卦，也要分析变卦的意义和动爻的影响。
+   将卦象的象征意义与用户的具体问题紧密结合起来进行分析。
+
+3. **💡 指引建议 (Guidance):**
+   综合所有信息，为用户提供一个明确、具体、可操作的建议或心态指引。
+
+# 指导原则
+- **贴合实际**: 将卦象的抽象含义转化为与用户问题相关的具体指引。
+- **清晰易懂**: 用平实的语言解释复杂的卦象，避免过于玄奥的术语。
+- **深度分析**: 不要只是罗列卦辞，而是要深入分析其背后的智慧和启示。
+
+# 占卜信息
+- **用户的问题**: "${reading.question}"
+- **卦象信息**:
+${hexInfo}
+
+# 最终指令
+你的最终输出【只能是】完整的、格式化后的解读文本。不要添加任何对话性开场白。
+`;
+        
+        let isGemini = proxyUrl === GEMINI_API_URL;
+        let messagesForApi = [{ role: 'user', content: yijingMasterPrompt }];
+        let geminiConfig = toGeminiRequestData(model, apiKey, yijingMasterPrompt, messagesForApi, isGemini);
+        
+        const response = isGemini 
+            ? await fetch(geminiConfig.url, geminiConfig.data) 
+            : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                body: JSON.stringify({ model: model, messages: messagesForApi, temperature: parseFloat(state.apiConfig.temperature) || 0.8 })
+            });
+        
+        if (!response.ok) {
+            throw new Error(`API请求失败: ${await response.text()}`);
+        }
+        
+        const data = await response.json();
+        const interpretation = (isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content).trim();
+        
+        // 保存解读结果到数据库（包含AI解读）
+        await db.baguaReadings.add({
+            question: reading.question,
+            interpretation: hexInfo + '\n\n' + interpretation,
+            timestamp: reading.timestamp
+        });
+        
+        // 用弹窗显示解读结果
+        await showCustomAlert(
+            '☯️ 八卦六爻解读', 
+            `**您的问题**："${reading.question}"\n\n**卦象信息**：\n${hexInfo}\n\n${interpretation}`,
+            { confirmButtonText: '知道了' }
+        );
+        
+        activeBaguaReading = null;
+        
+    } catch (error) {
+        console.error("八卦六爻AI解读失败:", error);
+        await showCustomAlert('解读失败', `抱歉，连接易经大师时出现了一点问题：\n\n${error.message}`);
+        activeBaguaReading = null;
+    }
+}
+
+// 打开历史记录界面
+async function openBaguaHistory() {
+    const readings = await db.baguaReadings.orderBy('timestamp').reverse().toArray();
+    renderBaguaHistory(readings);
+    document.getElementById('bagua-setup-view').style.display = 'none';
+    document.getElementById('bagua-history-view').style.display = 'flex';
+}
+
+// 渲染历史记录列表
+function renderBaguaHistory(readings) {
+    const listEl = document.getElementById('bagua-history-list');
+    listEl.innerHTML = '';
+    if (readings.length === 0) {
+        listEl.innerHTML = '<p style="text-align:center; color: #8a8a8a; margin-top: 50px;">还没有占卜历史哦</p>';
+        return;
+    }
+    readings.forEach(reading => {
+        const item = document.createElement('div');
+        item.className = 'bagua-history-item';
+        item.innerHTML = `
+            <div class="question">${reading.question}</div>
+            <div class="details">${new Date(reading.timestamp).toLocaleString()}</div>
+            <button class="bagua-history-delete-btn" data-id="${reading.id}">×</button>
+        `;
+        // 添加点击事件查看详情
+        item.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('bagua-history-delete-btn')) {
+                showBaguaReadingDetail(reading);
+            }
+        });
+        listEl.appendChild(item);
+    });
+}
+
+// 显示历史记录详情
+function showBaguaReadingDetail(reading) {
+    showCustomAlert(
+        '☯️ 八卦六爻解读', 
+        reading.interpretation,
+        { confirmButtonText: '知道了' }
+    );
+}
+
+// 删除一条历史记录
+async function deleteBaguaReading(readingId) {
+    const confirmed = await showCustomConfirm('确认删除', '确定要删除这条占卜历史吗？', { confirmButtonClass: 'btn-danger' });
+    if (confirmed) {
+        await db.baguaReadings.delete(readingId);
+        openBaguaHistory();
+    }
+}
+// ▲▲▲ 八卦六爻占卜功能结束 ▲▲▲
+
 // ▼▼▼ 把这个新函数粘贴到 renderLSLetters 函数的下方 ▼▼▼
 
 
@@ -40308,8 +41169,9 @@ document.getElementById('search-results-list').addEventListener('click', (e) => 
             // ▼▼▼ 找到 id="send-btn" 的 click 事件监听器 ▼▼▼
 document.getElementById('send-btn').addEventListener('click', async () => { 
     const content = chatInput.value.trim(); 
-    if (!content || !state.activeChatId) return; 
-        // --- ▼▼▼【核心修复代码】▼▼▼ ---
+    if (!content || !state.activeChatId) return;
+    
+    // --- ▼▼▼【核心修复代码】▼▼▼ ---
     try {
         const command = JSON.parse(content);
         // 检查：这是否是一个让角色发微博的指令？
@@ -40365,6 +41227,32 @@ document.getElementById('send-btn').addEventListener('click', async () => {
         return; // 阻止发送
     }
     // ▲▲▲ 新代码粘贴结束 ▲▲▲
+    
+    // ▼▼▼ TOKEN过大提示检查 ▼▼▼
+    if (chat && chat.settings.tokenWarningEnabled) {
+        const contextTextForToken = await getContextForTokenCalculation(state.activeChatId);
+        const tokenCount = calculateTokenCount(contextTextForToken);
+        
+        let shouldWarn = false;
+        
+        // 如果设置了阈值，就用阈值判断
+        if (chat.settings.tokenWarningThreshold && tokenCount > chat.settings.tokenWarningThreshold) {
+            shouldWarn = true;
+        }
+        // 如果没有设置阈值，默认在可能卡顿时提示（假设4000为卡顿阈值）
+        else if (!chat.settings.tokenWarningThreshold && tokenCount > 4000) {
+            shouldWarn = true;
+        }
+        
+        if (shouldWarn) {
+            const confirmSend = confirm(`当前上下文Token数为 ${tokenCount}，可能导致响应卡顿。是否继续发送？`);
+            if (!confirmSend) {
+                return; // 用户选择不发送
+            }
+        }
+    }
+    // ▲▲▲ TOKEN过大提示检查结束 ▲▲▲
+    
     // --- 【核心修改】在这里添加 ---
     const msg = { 
         role: 'user', 
@@ -41201,7 +42089,14 @@ document.getElementById('weibo-instruction-group').style.display = isGroup ? 'no
     // 【核心修改1】根据是否为群聊，显示或隐藏“好友分组”区域
     document.getElementById('assign-group-section').style.display = isGroup ? 'none' : 'block';
     
+    // 【新增】根据是否为群聊，显示或隐藏"角色真名"输入框
+    document.getElementById('real-name-group').style.display = isGroup ? 'none' : 'block';
+    
     // --- 加载表单数据 ---
+    // 【新增】加载角色真名（兼容旧数据：如果没有realName，则使用当前的name）
+    if (!isGroup) {
+        document.getElementById('real-name-input').value = chat.realName || chat.name;
+    }
     document.getElementById('chat-name-input').value = chat.name;
     document.getElementById('my-persona').value = chat.settings.myPersona;
     document.getElementById('my-avatar-preview').src = chat.settings.myAvatar || (isGroup ? defaultMyGroupAvatar : defaultAvatar);
@@ -41478,6 +42373,16 @@ streakToggle.onchange = () => {
 renderBubblePresetSelector();
 document.getElementById('bubble-style-preset-select').addEventListener('change', handlePresetSelectChange);
 document.getElementById('manage-bubble-presets-btn').addEventListener('click', openBubblePresetManager);
+    
+    // ▼▼▼ 加载TOKEN过大提示设置 ▼▼▼
+    const tokenWarningEnabled = chat.settings.tokenWarningEnabled || false;
+    const tokenWarningThreshold = chat.settings.tokenWarningThreshold || '';
+    
+    document.getElementById('token-warning-enabled').checked = tokenWarningEnabled;
+    document.getElementById('token-warning-threshold').value = tokenWarningThreshold;
+    document.getElementById('token-threshold-group').style.display = tokenWarningEnabled ? 'block' : 'none';
+    // ▲▲▲ 加载TOKEN过大提示设置结束 ▲▲▲
+    
     document.getElementById('chat-settings-modal').classList.add('visible');
 });
 // ▲▲▲ 替换结束 ▲▲▲
@@ -41555,6 +42460,13 @@ document.getElementById('save-chat-settings-btn').addEventListener('click', asyn
     const newName = document.getElementById('chat-name-input').value.trim();
     if (!newName) return alert('备注名/群名不能为空！');
     chat.name = newName;
+    
+    // 【新增】保存角色真名（仅单聊）
+    if (!chat.isGroup) {
+        const newRealName = document.getElementById('real-name-input').value.trim();
+        if (!newRealName) return alert('角色真名不能为空！');
+        chat.realName = newRealName;
+    }
     // ▼▼▼ 【全新】记忆互通功能 - 保存逻辑 ▼▼▼
     const linkedMemoryCheckboxes = document.querySelectorAll('#memory-link-checkboxes-container input:checked');
     const memoryDepth = parseInt(document.getElementById('link-memory-depth-input').value) || 5;
@@ -41716,6 +42628,12 @@ if (isStreakEnabled) {
 
 
 
+    // ▼▼▼ 保存TOKEN过大提示设置 ▼▼▼
+    chat.settings.tokenWarningEnabled = document.getElementById('token-warning-enabled').checked;
+    const thresholdValue = document.getElementById('token-warning-threshold').value.trim();
+    chat.settings.tokenWarningThreshold = thresholdValue ? parseInt(thresholdValue) : null;
+    // ▲▲▲ 保存TOKEN过大提示设置结束 ▲▲▲
+    
     await db.chats.put(chat);
 saveAvatarShapeSettings(); // 保存头像形状的设置
 
@@ -44875,6 +45793,91 @@ document.getElementById('time-perception-toggle').addEventListener('change', (e)
     const customTimeContainer = document.getElementById('custom-time-container');
     customTimeContainer.style.display = e.target.checked ? 'none' : 'block';
 });
+
+// 【全新】为TOKEN过大提示开关添加实时交互事件
+document.getElementById('token-warning-enabled').addEventListener('change', (e) => {
+    const tokenThresholdGroup = document.getElementById('token-threshold-group');
+    tokenThresholdGroup.style.display = e.target.checked ? 'block' : 'none';
+});
+
+// 【全新】删除指定范围聊天记录功能
+document.getElementById('delete-messages-range-btn').addEventListener('click', async () => {
+    const rangeInput = document.getElementById('delete-messages-range').value.trim();
+    
+    // 验证输入格式
+    if (!rangeInput) {
+        await showCustomAlert('输入错误', '请输入要删除的消息范围，例如：2-10');
+        return;
+    }
+    
+    const rangeMatch = rangeInput.match(/^(\d+)-(\d+)$/);
+    if (!rangeMatch) {
+        await showCustomAlert('格式错误', '请使用正确的格式，例如：2-10');
+        return;
+    }
+    
+    const startIndex = parseInt(rangeMatch[1]);
+    const endIndex = parseInt(rangeMatch[2]);
+    
+    // 验证范围合法性
+    if (startIndex < 1 || endIndex < 1) {
+        await showCustomAlert('范围错误', '消息序号必须从1开始');
+        return;
+    }
+    
+    if (startIndex > endIndex) {
+        await showCustomAlert('范围错误', '起始位置不能大于结束位置');
+        return;
+    }
+    
+    const chatId = state.activeChatId;
+    if (!chatId) {
+        await showCustomAlert('错误', '当前没有打开的聊天');
+        return;
+    }
+    
+    const chat = state.chats[chatId];
+    if (!chat || !chat.messages || chat.messages.length === 0) {
+        await showCustomAlert('错误', '当前聊天没有消息');
+        return;
+    }
+    
+    const totalMessages = chat.messages.length;
+    
+    // 验证范围是否超出消息总数
+    if (startIndex > totalMessages || endIndex > totalMessages) {
+        await showCustomAlert('范围错误', `当前聊天只有 ${totalMessages} 条消息，无法删除超出范围的消息`);
+        return;
+    }
+    
+    // 确认删除
+    const deleteCount = endIndex - startIndex + 1;
+    const confirmed = confirm(`确定要删除第 ${startIndex} 到第 ${endIndex} 条消息吗？（共 ${deleteCount} 条消息）\n\n注意：此操作不可撤销！`);
+    
+    if (!confirmed) {
+        return;
+    }
+    
+    try {
+        // 删除指定范围的消息（数组索引从0开始，所以要减1）
+        chat.messages.splice(startIndex - 1, deleteCount);
+        
+        // 保存到数据库
+        await db.chats.put(chat);
+        
+        // 刷新聊天界面
+        await renderChatList();
+        openChat(chatId);
+        
+        // 清空输入框
+        document.getElementById('delete-messages-range').value = '';
+        
+        await showCustomAlert('删除成功', `已成功删除第 ${startIndex} 到第 ${endIndex} 条消息`);
+    } catch (error) {
+        console.error('删除消息失败:', error);
+        await showCustomAlert('删除失败', error.message || '删除消息时发生错误');
+    }
+});
 // ▲▲▲ 粘贴结束 ▲▲▲
 // 请用这段新代码替换上面的错误代码
 document.getElementById('char-heart-btn').addEventListener('click', openInnerVoiceModal);
@@ -45312,6 +46315,34 @@ document.getElementById('tarot-history-list').addEventListener('click', (e) => {
 });
 
 // --- 塔罗牌占卜功能事件绑定结束 ---
+
+// ▼▼▼ 八卦六爻占卜功能事件绑定 ▼▼▼
+document.getElementById('open-bagua-btn').addEventListener('click', openBaguaModal);
+document.getElementById('close-bagua-modal-btn').addEventListener('click', () => {
+    document.getElementById('bagua-divination-modal').classList.remove('visible');
+});
+document.getElementById('start-bagua-btn').addEventListener('click', startBaguaDivination);
+document.getElementById('back-to-bagua-setup-btn').addEventListener('click', () => {
+    document.getElementById('bagua-result-view').style.display = 'none';
+    document.getElementById('bagua-setup-view').style.display = 'block';
+});
+document.getElementById('send-bagua-result-btn').addEventListener('click', sendBaguaReadingToChat);
+document.getElementById('bagua-history-btn').addEventListener('click', openBaguaHistory);
+document.getElementById('back-to-bagua-main-btn').addEventListener('click', () => {
+    document.getElementById('bagua-history-view').style.display = 'none';
+    document.getElementById('bagua-setup-view').style.display = 'block';
+});
+// 使用事件委托处理历史记录的删除按钮
+document.getElementById('bagua-history-list').addEventListener('click', (e) => {
+    if (e.target.classList.contains('bagua-history-delete-btn')) {
+        const readingId = parseInt(e.target.dataset.id);
+        if (!isNaN(readingId)) {
+            deleteBaguaReading(readingId);
+        }
+    }
+});
+// --- 八卦六爻占卜功能事件绑定结束 ---
+
 // 1. 初始化时创建默认小组
 await initializeDefaultGroups();
 // ▲▲▲ 粘贴结束 ▲▲▲
@@ -45354,6 +46385,53 @@ document.getElementById('remove-home-font-shadow-toggle').addEventListener('chan
 
 
 // ▲▲▲ 新增事件监听结束 ▲▲▲
+
+// ▼▼▼ 【全新】钱包功能 ▼▼▼
+
+// 打开钱包模态框
+function openWalletModal() {
+    updateWalletDisplay();
+    document.getElementById('wallet-modal').classList.add('visible');
+}
+
+// 更新钱包余额显示
+function updateWalletDisplay() {
+    const balance = state.globalSettings.userBalance || 0;
+    document.getElementById('wallet-balance-display').textContent = `¥ ${balance.toFixed(2)}`;
+    
+    // 同步更新桃宝的余额显示
+    const taobaoBalanceEl = document.getElementById('user-balance-display');
+    if (taobaoBalanceEl) {
+        taobaoBalanceEl.textContent = `¥ ${balance.toFixed(2)}`;
+    }
+}
+
+// 修改余额功能 - 直接调用桃宝的handleModifyBalance
+async function modifyWalletBalance() {
+    // 调用桃宝已有的余额修改函数，这样会正确记录交易并同步所有显示
+    if (typeof handleModifyBalance === 'function') {
+        await handleModifyBalance();
+        // 确保钱包显示也更新了
+        updateWalletDisplay();
+    } else {
+        alert('余额修改功能未加载，请确保桃宝模块已正确加载。');
+    }
+}
+
+// 亲属卡功能（占位）
+function openFamilyCard() {
+    alert('亲属卡功能正在开发中...\n\n您可以在这里设置亲属卡，让亲人也能使用您的余额！');
+}
+
+// 钱包功能事件监听器
+document.getElementById('wallet-action-btn').addEventListener('click', openWalletModal);
+document.getElementById('wallet-modal-close-btn').addEventListener('click', () => {
+    document.getElementById('wallet-modal').classList.remove('visible');
+});
+document.getElementById('wallet-modify-balance-btn').addEventListener('click', modifyWalletBalance);
+document.getElementById('wallet-family-card-btn').addEventListener('click', openFamilyCard);
+
+// ▲▲▲ 钱包功能结束 ▲▲▲
 
 // ▼▼▼ 【全新】宠物功能事件监听器 ▼▼▼
 
@@ -47910,18 +48988,18 @@ const avatarFrames = [
     
     // 加载当前聊天的动态效果设置
     function loadChatEffectSettings() {
-        if (!state.currentChatId) return null;
-        const chat = state.chats[state.currentChatId];
+        if (!state.activeChatId) return null;
+        const chat = state.chats[state.activeChatId];
         return chat?.effectSettings || null;
     }
     
     // 保存当前聊天的动态效果设置
     function saveChatEffectSettings(settings) {
-        if (!state.currentChatId) return;
-        const chat = state.chats[state.currentChatId];
+        if (!state.activeChatId) return;
+        const chat = state.chats[state.activeChatId];
         if (chat) {
             chat.effectSettings = settings;
-            saveState();
+            db.chats.put(chat).catch(err => console.error('保存聊天效果设置失败:', err));
         }
     }
     
@@ -48273,7 +49351,7 @@ const avatarFrames = [
         
         // 应用效果
         if (settings.snowEnabled) {
-            startSnowEffect(settings.snowDuration, settings.snowColor);
+            startSnowEffect(settings.snowDuration, settings.snowColor, settings.snowSpeed);
         } else if (settings.customCode) {
             executeCustomEffect(settings.customCode, settings.customDuration);
         }
@@ -48322,7 +49400,7 @@ const avatarFrames = [
         stopAllEffects();
         
         if (settings.snowEnabled && settings.snowAutoTrigger) {
-            startSnowEffect(settings.snowDuration, settings.snowColor);
+            startSnowEffect(settings.snowDuration, settings.snowColor, settings.snowSpeed);
         } else if (settings.customCode && settings.customAutoTrigger) {
             executeCustomEffect(settings.customCode, settings.customDuration);
         }
@@ -48337,6 +49415,14 @@ const avatarFrames = [
             return result;
         };
     }
+    
+    // 页面加载完成后，检查并应用已保存的自动触发效果
+    setTimeout(() => {
+        if (state.activeChatId) {
+            checkAutoTrigger();
+            console.log('🎨 [页面动态效果] 已检查自动触发设置');
+        }
+    }, 1000);
     
     console.log('✅ [页面动态效果] 初始化完成');
 })();

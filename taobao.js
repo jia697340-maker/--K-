@@ -2416,6 +2416,11 @@ async function updateUserBalanceAndLogTransaction(amount, description) {
     await db.userWalletTransactions.add(newTransaction);
   });
 
+  // 同步更新钱包显示
+  if (typeof updateWalletDisplay === 'function') {
+    updateWalletDisplay();
+  }
+
   console.log(`用户钱包已更新: 金额=${amount.toFixed(2)}, 新余额=${state.globalSettings.userBalance.toFixed(2)}`);
 }
 /**
@@ -2522,6 +2527,11 @@ async function handleModifyBalance() {
     // 刷新UI
     await renderBalanceDetails();
     
+    // 同步更新钱包显示
+    if (typeof updateWalletDisplay === 'function') {
+      updateWalletDisplay();
+    }
+    
     await showCustomAlert(
       '修改成功', 
       `余额已更新为 ¥${newBalance.toFixed(2)}<br>变动: ${difference >= 0 ? '+' : ''}${difference.toFixed(2)}`
@@ -2541,6 +2551,11 @@ async function renderBalanceDetails() {
   // 1. 渲染当前余额
   const balance = state.globalSettings.userBalance || 0;
   document.getElementById('user-balance-display').textContent = `¥ ${balance.toFixed(2)}`;
+
+  // 同步更新钱包显示
+  if (typeof updateWalletDisplay === 'function') {
+    updateWalletDisplay();
+  }
 
   // 2. 渲染交易明细列表
   const listEl = document.getElementById('balance-details-list');
