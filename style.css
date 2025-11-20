@@ -11244,6 +11244,73 @@ body {
 }
 
 /* ▲▲▲ 新增样式结束 ▲▲▲ */
+/* ▼▼▼ 主屏幕页面管理样式 ▼▼▼ */
+
+.home-page-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: var(--bg-primary);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.home-page-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary-color);
+}
+
+.home-page-item.default-page {
+  opacity: 0.7;
+}
+
+.home-page-item.default-page .home-page-checkbox {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.home-page-checkbox {
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+.home-page-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-page-number {
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 60px;
+}
+
+.home-page-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 11px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.home-page-badge.default {
+  background: #999;
+}
+
+.home-page-badge.custom {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+/* ▲▲▲ 页面管理样式结束 ▲▲▲ */
+
 /* ▼▼▼ 把这段新样式粘贴到 <style> 标签的最末尾 ▼▼▼ */
 
 /* 这是第二页布局的全新样式 (V2 美化版) */
@@ -18589,3 +18656,241 @@ body {
 #phone-screen.dark-mode #character-chat-list.list-container {
     background-color: #000000;
 }
+
+/* ▼▼▼ 【全新】亲属卡功能样式 ▼▼▼ */
+
+/* 亲属卡列表项样式 */
+.family-card-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.family-card-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.family-card-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+}
+
+.family-card-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.family-card-item-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.family-card-item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.family-card-item-action-btn {
+    padding: 5px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.family-card-item-action-btn.send {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.family-card-item-action-btn.edit {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.family-card-item-action-btn.delete {
+    background: #ffebee;
+    color: #f44336;
+}
+
+.family-card-item-action-btn:hover {
+    transform: scale(1.05);
+}
+
+.family-card-item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.family-card-item-detail {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+}
+
+.family-card-item-detail-label {
+    font-weight: 500;
+}
+
+.family-card-item-detail-value {
+    color: #333;
+}
+
+/* 颜色选择器样式 */
+.family-card-color-option {
+    width: 60px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 3px solid transparent;
+}
+
+.family-card-color-option:hover {
+    transform: scale(1.1);
+}
+
+.family-card-color-option.selected {
+    border-color: #333;
+    transform: scale(1.15);
+}
+
+/* 亲属卡消息气泡样式 */
+.family-card-message {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    max-width: 280px;
+}
+
+.family-card-message-header {
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.family-card-message-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.family-card-message-amount {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.family-card-message-cycle {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.family-card-message-note {
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #666;
+    margin-top: 12px;
+}
+
+.family-card-message-status {
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.family-card-message-status.accepted {
+    background: #e8f5e9;
+    color: #4caf50;
+}
+
+.family-card-message-status.declined {
+    background: #ffebee;
+    color: #f44336;
+}
+
+.family-card-message-status.pending {
+    background: #fff3e0;
+    color: #ff9800;
+}
+
+.family-card-message-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.family-card-message-action-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.family-card-message-action-btn.accept {
+    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+    color: white;
+}
+
+.family-card-message-action-btn.decline {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.family-card-message-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 夜间模式适配 */
+#phone-screen.dark-mode .family-card-item {
+    background: #2c2c2e;
+}
+
+#phone-screen.dark-mode .family-card-item-name,
+#phone-screen.dark-mode .family-card-item-detail-value {
+    color: #f5f5f5;
+}
+
+#phone-screen.dark-mode .family-card-item-detail-label {
+    color: #999;
+}
+
+#phone-screen.dark-mode .family-card-message {
+    background: #2c2c2e;
+}
+
+#phone-screen.dark-mode .family-card-message-note {
+    background: #1c1c1e;
+    color: #999;
+}
+
+/* ▲▲▲ 亲属卡功能样式结束 ▲▲▲ */
