@@ -19322,3 +19322,14 @@ body {
 }
 
 /* ▲▲▲ 消息存放功能样式结束 ▲▲▲ */
+
+/* ▼▼▼ 删除记录按钮样式 ▼▼▼ */
+#delete-messages-range-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+#delete-messages-range-btn:active {
+  transform: scale(0.98);
+}
+/* ▲▲▲ 删除记录按钮样式结束 ▲▲▲ */
