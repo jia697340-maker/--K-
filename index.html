@@ -1351,6 +1351,14 @@
 </button>
 <!-- ▲▲▲ 学习按钮结束 ▲▲▲ -->
 
+<!-- ▼▼▼ 消息存放按钮 ▼▼▼ -->
+<button id="message-storage-btn" class="chat-action-icon-btn action-button" title="消息存放">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM7 10H17V12H7V10ZM7 13H17V15H7V13ZM7 7H17V9H7V7Z" fill="currentColor"/>
+    </svg>
+</button>
+<!-- ▲▲▲ 消息存放按钮结束 ▲▲▲ -->
+
 
         </div>
         <div id="chat-input-main-row">
@@ -3544,6 +3552,7 @@
     <button class="form-button form-button-secondary" id="export-chat-history-btn" style="flex: 1; margin: 0;">导出聊天记录</button>
 </div>
 <input type="file" id="import-chat-history-input" accept="application/json" style="display: none;">
+<button class="form-button form-button-secondary" id="chat-memory-stats-btn">我们的聊天记忆</button>
 <button class="form-button form-button-secondary" id="search-chat-btn">查找聊天记录</button>
 <button class="form-button form-button-secondary" id="clear-chat-btn">清空聊天记录</button>
 <button class="form-button form-button-secondary" id="block-chat-btn" style="background-color: #ff3b30; color: white; border-color: #ff3b30;">拉黑对方</button>
@@ -4184,6 +4193,66 @@
         <div class="modal-footer">
             <button class="cancel" id="cancel-create-poll-btn">取消</button>
             <button class="save" id="confirm-create-poll-btn">发起投票</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新】聊天记忆统计模态框 ▼▼▼ -->
+<div id="chat-memory-stats-modal" class="modal">
+    <div class="modal-content" style="width: 350px; height: auto; max-height: 80vh; overflow-y: auto;">
+        <div class="modal-header">
+            <span>我们的聊天记忆 💕</span>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 20px; color: white; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                <div style="text-align: center; font-size: 14px; margin-bottom: 15px; opacity: 0.9;">我们的故事</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 28px; font-weight: bold;" id="stats-message-count">0</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">条消息</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 28px; font-weight: bold;" id="stats-call-count">0</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">次通话</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                <div style="font-size: 13px; font-weight: bold; color: #333; margin-bottom: 12px; display: flex; align-items: center;">
+                    <span style="font-size: 16px; margin-right: 8px;">💰</span>转账记录
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #666; font-size: 13px;">Ta 转给我：</span>
+                    <span style="color: #ff6b6b; font-weight: bold; font-size: 14px;" id="stats-ai-transfer">¥0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #666; font-size: 13px;">我转给 Ta：</span>
+                    <span style="color: #51cf66; font-weight: bold; font-size: 14px;" id="stats-user-transfer">¥0.00</span>
+                </div>
+            </div>
+            
+            <div style="background: #fff3cd; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                <div style="font-size: 13px; font-weight: bold; color: #856404; margin-bottom: 10px; display: flex; align-items: center;">
+                    <span style="font-size: 16px; margin-right: 8px;">💬</span>Ta 最常说的话
+                </div>
+                <div id="stats-ai-common-words" style="color: #666; font-size: 13px; line-height: 1.6; font-style: italic;">
+                    加载中...
+                </div>
+            </div>
+            
+            <div style="background: #d1ecf1; border-radius: 10px; padding: 15px;">
+                <div style="font-size: 13px; font-weight: bold; color: #0c5460; margin-bottom: 10px; display: flex; align-items: center;">
+                    <span style="font-size: 16px; margin-right: 8px;">💭</span>我最常说的话
+                </div>
+                <div id="stats-user-common-words" style="color: #666; font-size: 13px; line-height: 1.6; font-style: italic;">
+                    加载中...
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="save" id="close-chat-memory-stats-btn" style="width: 100%;">关闭</button>
         </div>
     </div>
 </div>
@@ -7109,6 +7178,82 @@
     </div>
 </div>
 <!-- ▲▲▲ 学习中心模态框结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 消息存放模态框 ▼▼▼ -->
+<div id="message-storage-modal" class="modal">
+    <div class="modal-content" style="max-width: 800px; width: 90%; max-height: 85vh;">
+        <div class="modal-header">
+            <span>消息存放</span>
+        </div>
+        <div class="modal-body" style="padding: 20px; overflow-y: auto; max-height: calc(85vh - 150px);">
+            <div style="margin-bottom: 20px;">
+                <button id="add-storage-slot-btn" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    新增存储位
+                </button>
+            </div>
+            
+            <div id="storage-slots-container" style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- 存储位列表将在这里动态生成 -->
+                <div style="text-align: center; color: #999; padding: 40px 20px;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin: 0 auto 15px;">
+                        <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM7 10H17V12H7V10ZM7 13H17V15H7V13ZM7 7H17V9H7V7Z"/>
+                    </svg>
+                    <p>暂无存储位</p>
+                    <p style="font-size: 12px; color: #ccc;">点击上方按钮创建新的消息存储位</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="message-storage-close-btn">关闭</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 消息存放模态框结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 编辑存储位模态框 ▼▼▼ -->
+<div id="edit-storage-slot-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px; width: 90%; max-height: 90vh;">
+        <div class="modal-header">
+            <span id="edit-storage-slot-title">编辑存储位</span>
+        </div>
+        <div class="modal-body" style="padding: 20px; overflow-y: auto; max-height: calc(90vh - 180px);">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">存储位名称</label>
+                <input type="text" id="storage-slot-name-input" placeholder="给这个存储位起个名字..." style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">消息列表</label>
+                <div id="messages-list-container" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                    <!-- 消息列表将在这里动态生成 -->
+                </div>
+                <button id="add-message-btn" style="width: 100%; padding: 10px; background: #f5f5f5; color: #666; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    添加消息
+                </button>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 12px; background: #f0f7ff; border-radius: 8px; font-size: 13px; color: #1976d2;">
+                <strong>💡 使用提示：</strong><br>
+                • 每个存储位可以存放多条消息<br>
+                • 点击存储位后会按顺序自动发送所有消息<br>
+                • 每条消息之间会有短暂间隔
+            </div>
+        </div>
+        <div class="modal-footer" style="display: flex; gap: 10px;">
+            <button class="cancel" id="cancel-edit-storage-btn" style="flex: 1;">取消</button>
+            <button id="save-storage-slot-btn" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">保存</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 编辑存储位模态框结束 ▲▲▲ -->
 
 <input type="file" id="pet-custom-image-input" accept="image/*" style="display: none;">
 <!-- ▼▼▼ 【全新】宠物聊天模态框 ▼▼▼ -->
@@ -16864,7 +17009,7 @@ ${localStorage.getItem('novelai-enabled') === 'true' ? `- **【发布NovelAI真�
 - **邀请开启情侣空间**: \`{"type": "lovers_space_invitation"}\`
 - **回应情侣空间邀请**: \`{"type": "lovers_space_response", "decision": "accept" or "reject"}\`
 - **发说说**: \`{"type": "ls_moment", "content": "我想对你说的话..."}\`
-- **评论说说**: \`{"type": "ls_comment", "momentIndex": 0, "commentText": "你的评论..."}\` (momentIndex: 0代表最新一条)
+- **评论说说**: \`{"type": "ls_comment", "momentTimestamp": 时间戳数字, "commentText": "你的评论..."}\` (使用系统提示中给出的说说唯一标识)
 - **发照片**: \`{"type": "ls_photo", "description": "对照片的文字描述..."}\`
 - **提问**: \`{"type": "ls_ask_question", "questionText": "你想问的问题..."}\`
 - **回答**: \`{"type": "ls_answer_question", "questionId": "q_123456789", "answerText": "你的回答..."}\`
@@ -18232,12 +18377,11 @@ case 'ls_moment': {
 }
 
 case 'ls_comment': {
-    const { momentIndex, commentText } = msgData;
+    const { momentTimestamp, commentText } = msgData;
     if (chat.loversSpaceData && chat.loversSpaceData.moments) {
-        // AI返回的 index 是从0开始代表最新的，我们需要转换成真实索引
-        const realIndex = chat.loversSpaceData.moments.length - 1 - momentIndex;
-        if (realIndex >= 0 && realIndex < chat.loversSpaceData.moments.length) {
-            const momentToComment = chat.loversSpaceData.moments[realIndex];
+        // 使用timestamp来精确定位说说
+        const momentToComment = chat.loversSpaceData.moments.find(m => m.timestamp === momentTimestamp);
+        if (momentToComment) {
             if (!momentToComment.comments) {
                 momentToComment.comments = [];
             }
@@ -18245,7 +18389,9 @@ case 'ls_comment': {
                 author: chat.name,
                 text: commentText
             });
-            console.log(`AI 评论了情侣空间说说 (索引: ${realIndex}): ${commentText}`);
+            console.log(`AI 评论了情侣空间说说 (timestamp: ${momentTimestamp}): ${commentText}`);
+        } else {
+            console.warn(`未找到timestamp为 ${momentTimestamp} 的说说`);
         }
     }
     continue; // 同样是后台操作
@@ -21445,7 +21591,7 @@ async function triggerInactiveAiAction(chatId) {
 -   **【新】在情侣空间提问**:\`[{"type": "ls_ask_question", "questionText": "你想问的问题..."}]\`
 -   **【新】在情侣空间回答**: \`[{"type": "ls_answer_question", "questionId": "q_123456789", "answerText": "你的回答..."}]\`
 -   **【新】在情侣空间发说说**:\`[{"type": "ls_moment", "content": "我想对你说的话..."}]\`
--   **【新】在情侣空间评论说说**: \`[{"type": "ls_comment", "momentIndex": 0, "commentText": "你的评论内容..."}]\` (momentIndex 是说说的索引，最新的一个是0)
+-   **【新】在情侣空间评论说说**: \`[{"type": "ls_comment", "momentTimestamp": 时间戳数字, "commentText": "你的评论内容..."}]\` (使用系统提示中给出的说说唯一标识)
 -   **【新】在情侣空间发照片**: \`[{"type": "ls_photo", "description": "对这张照片的文字描述..."}]\`
 -   **【新】在情侣空间写情书**: \`[{"type": "ls_letter", "content": "情书的正文内容..."}]\`
 -   **【新】在情侣空间分享歌曲**: \`[{"type": "ls_share", "shareType": "song", "title": "歌曲名", "artist": "歌手", "thoughts": "在这里写下你分享这首歌的感想..."}]\`
@@ -42518,6 +42664,119 @@ document.getElementById('chat-search-results-list').addEventListener('click', (e
     }
 });
 // ▲▲▲ 新事件绑定结束 ▲▲▲
+
+// ▼▼▼ 【全新】聊天记忆统计功能 ▼▼▼
+/**
+ * 打开聊天记忆统计弹窗并显示统计信息
+ */
+async function openChatMemoryStats() {
+    const chat = state.chats[state.activeChatId];
+    if (!chat) return;
+    
+    const modal = document.getElementById('chat-memory-stats-modal');
+    modal.classList.add('visible');
+    
+    // 1. 统计消息数量（排除隐藏消息）
+    const visibleMessages = chat.history.filter(msg => !msg.isHidden);
+    const messageCount = visibleMessages.length;
+    document.getElementById('stats-message-count').textContent = messageCount;
+    
+    // 2. 统计通话次数（从数据库查询）
+    const callRecords = await db.callRecords.where('chatId').equals(state.activeChatId).toArray();
+    const callCount = callRecords.length;
+    document.getElementById('stats-call-count').textContent = callCount;
+    
+    // 3. 统计转账金额
+    let aiTransferTotal = 0;
+    let userTransferTotal = 0;
+    
+    visibleMessages.forEach(msg => {
+        if (msg.type === 'transfer' && msg.amount) {
+            if (msg.role === 'assistant') {
+                aiTransferTotal += parseFloat(msg.amount);
+            } else if (msg.role === 'user') {
+                userTransferTotal += parseFloat(msg.amount);
+            }
+        }
+    });
+    
+    document.getElementById('stats-ai-transfer').textContent = `¥${aiTransferTotal.toFixed(2)}`;
+    document.getElementById('stats-user-transfer').textContent = `¥${userTransferTotal.toFixed(2)}`;
+    
+    // 4. 统计最常说的话
+    const aiMessages = [];
+    const userMessages = [];
+    
+    visibleMessages.forEach(msg => {
+        // 只统计普通文本消息
+        if (msg.type && !['text', 'sticker'].includes(msg.type)) return;
+        if (typeof msg.content !== 'string') return;
+        if (msg.content.trim().length === 0) return;
+        
+        // 排除系统消息和特殊格式
+        const content = msg.content.trim();
+        if (content.startsWith('[') || content.startsWith('{')) return;
+        
+        if (msg.role === 'assistant') {
+            aiMessages.push(content);
+        } else if (msg.role === 'user') {
+            userMessages.push(content);
+        }
+    });
+    
+    // 分析AI最常说的话
+    const aiCommonWords = analyzeCommonPhrases(aiMessages);
+    document.getElementById('stats-ai-common-words').innerHTML = aiCommonWords.length > 0 
+        ? aiCommonWords.slice(0, 3).map((item, index) => 
+            `${index + 1}. "${item.phrase}" <span style="color: #999;">(${item.count}次)</span>`
+          ).join('<br>') 
+        : '暂无数据';
+    
+    // 分析用户最常说的话
+    const userCommonWords = analyzeCommonPhrases(userMessages);
+    document.getElementById('stats-user-common-words').innerHTML = userCommonWords.length > 0 
+        ? userCommonWords.slice(0, 3).map((item, index) => 
+            `${index + 1}. "${item.phrase}" <span style="color: #999;">(${item.count}次)</span>`
+          ).join('<br>') 
+        : '暂无数据';
+}
+
+/**
+ * 分析常用短语
+ * @param {Array<string>} messages - 消息数组
+ * @returns {Array<{phrase: string, count: number}>} 按出现次数排序的短语数组
+ */
+function analyzeCommonPhrases(messages) {
+    const phraseCount = {};
+    
+    messages.forEach(msg => {
+        const cleanMsg = msg.replace(/<[^>]*>/g, '').trim(); // 移除HTML标签
+        if (cleanMsg.length < 2 || cleanMsg.length > 30) return; // 只统计2-30字符的短语
+        
+        // 统计出现次数
+        if (phraseCount[cleanMsg]) {
+            phraseCount[cleanMsg]++;
+        } else {
+            phraseCount[cleanMsg] = 1;
+        }
+    });
+    
+    // 转换为数组并排序
+    const phrases = Object.entries(phraseCount)
+        .map(([phrase, count]) => ({ phrase, count }))
+        .filter(item => item.count >= 2) // 至少出现2次
+        .sort((a, b) => b.count - a.count);
+    
+    return phrases;
+}
+
+// 绑定事件监听器
+document.getElementById('chat-memory-stats-btn').addEventListener('click', openChatMemoryStats);
+document.getElementById('close-chat-memory-stats-btn').addEventListener('click', () => {
+    document.getElementById('chat-memory-stats-modal').classList.remove('visible');
+});
+// ▲▲▲ 聊天记忆统计功能结束 ▲▲▲
+
 // ▼▼▼ 【全新】头像形状自定义功能事件监听器 ▼▼▼
 
 // 监听聊天设置弹窗的打开，以加载当前设置
@@ -51177,6 +51436,355 @@ async function getStudyInfoForChar() {
 }
 
 // ▲▲▲ 学习功能结束 ▲▲▲
+
+// ▼▼▼ 消息存放功能开始 ▼▼▼
+
+// 数据结构：存储位列表
+let messageStorageSlots = [];
+let currentEditingSlotIndex = -1; // 当前正在编辑的存储位索引，-1表示新建
+
+// 从localStorage加载存储位数据
+function loadMessageStorageData() {
+    const saved = localStorage.getItem('messageStorageSlots');
+    if (saved) {
+        try {
+            messageStorageSlots = JSON.parse(saved);
+        } catch (e) {
+            console.error('加载消息存储数据失败:', e);
+            messageStorageSlots = [];
+        }
+    }
+}
+
+// 保存存储位数据到localStorage
+function saveMessageStorageData() {
+    try {
+        localStorage.setItem('messageStorageSlots', JSON.stringify(messageStorageSlots));
+    } catch (e) {
+        console.error('保存消息存储数据失败:', e);
+    }
+}
+
+// 打开消息存放模态框
+function openMessageStorageModal() {
+    const modal = document.getElementById('message-storage-modal');
+    modal.style.display = 'flex';
+    renderStorageSlots();
+}
+
+// 关闭消息存放模态框
+function closeMessageStorageModal() {
+    const modal = document.getElementById('message-storage-modal');
+    modal.style.display = 'none';
+}
+
+// 渲染存储位列表
+function renderStorageSlots() {
+    const container = document.getElementById('storage-slots-container');
+    
+    if (messageStorageSlots.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; color: #999; padding: 40px 20px;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin: 0 auto 15px;">
+                    <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM7 10H17V12H7V10ZM7 13H17V15H7V13ZM7 7H17V9H7V7Z"/>
+                </svg>
+                <p>暂无存储位</p>
+                <p style="font-size: 12px; color: #ccc;">点击上方按钮创建新的消息存储位</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = messageStorageSlots.map((slot, index) => `
+        <div class="storage-slot-card" style="background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div style="flex: 1;">
+                    <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #333;">${slot.name || '未命名存储位'}</h3>
+                    <div style="font-size: 13px; color: #999;">
+                        <span>📝 ${slot.messages.length} 条消息</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="edit-slot-btn" data-index="${index}" style="padding: 6px 12px; background: #e3f2fd; color: #2196f3; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+                        编辑
+                    </button>
+                    <button class="delete-slot-btn" data-index="${index}" style="padding: 6px 12px; background: #ffebee; color: #f44336; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+                        删除
+                    </button>
+                </div>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
+                ${slot.messages.slice(0, 3).map(msg => `
+                    <div style="padding: 4px 10px; background: #f5f5f5; border-radius: 4px; font-size: 12px; color: #666; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${msg.substring(0, 20)}${msg.length > 20 ? '...' : ''}
+                    </div>
+                `).join('')}
+                ${slot.messages.length > 3 ? `<div style="padding: 4px 10px; background: #f5f5f5; border-radius: 4px; font-size: 12px; color: #999;">+${slot.messages.length - 3}</div>` : ''}
+            </div>
+            <button class="send-slot-btn" data-index="${index}" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                发送全部消息
+            </button>
+        </div>
+    `).join('');
+    
+    // 绑定编辑按钮
+    container.querySelectorAll('.edit-slot-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const index = parseInt(btn.dataset.index);
+            openEditStorageSlotModal(index);
+        });
+    });
+    
+    // 绑定删除按钮
+    container.querySelectorAll('.delete-slot-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const index = parseInt(btn.dataset.index);
+            deleteStorageSlot(index);
+        });
+    });
+    
+    // 绑定发送按钮
+    container.querySelectorAll('.send-slot-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const index = parseInt(btn.dataset.index);
+            sendStorageSlotMessages(index);
+        });
+    });
+}
+
+// 删除存储位
+function deleteStorageSlot(index) {
+    if (confirm('确定要删除这个存储位吗？')) {
+        messageStorageSlots.splice(index, 1);
+        saveMessageStorageData();
+        renderStorageSlots();
+    }
+}
+
+// 发送存储位中的所有消息
+async function sendStorageSlotMessages(index) {
+    const slot = messageStorageSlots[index];
+    if (!slot || slot.messages.length === 0) {
+        alert('该存储位没有消息');
+        return;
+    }
+    
+    closeMessageStorageModal();
+    
+    // 依次发送每条消息
+    for (let i = 0; i < slot.messages.length; i++) {
+        const message = slot.messages[i];
+        if (message.trim()) {
+            // 设置输入框内容并发送
+            const chatInput = document.getElementById('chat-input');
+            chatInput.value = message;
+            
+            // 触发发送
+            document.getElementById('send-btn').click();
+            
+            // 等待一段时间再发送下一条（避免发送太快）
+            if (i < slot.messages.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+        }
+    }
+}
+
+// 打开编辑存储位模态框
+function openEditStorageSlotModal(index = -1) {
+    currentEditingSlotIndex = index;
+    const modal = document.getElementById('edit-storage-slot-modal');
+    const titleEl = document.getElementById('edit-storage-slot-title');
+    const nameInput = document.getElementById('storage-slot-name-input');
+    
+    if (index >= 0) {
+        // 编辑模式
+        const slot = messageStorageSlots[index];
+        titleEl.textContent = '编辑存储位';
+        nameInput.value = slot.name || '';
+        renderMessagesList(slot.messages);
+    } else {
+        // 新建模式
+        titleEl.textContent = '新建存储位';
+        nameInput.value = '';
+        renderMessagesList([]);
+    }
+    
+    modal.style.display = 'flex';
+}
+
+// 关闭编辑存储位模态框
+function closeEditStorageSlotModal() {
+    const modal = document.getElementById('edit-storage-slot-modal');
+    modal.style.display = 'none';
+    currentEditingSlotIndex = -1;
+}
+
+// 渲染消息列表
+function renderMessagesList(messages = []) {
+    const container = document.getElementById('messages-list-container');
+    
+    if (messages.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; color: #999; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px dashed #ddd;">
+                暂无消息，点击下方"添加消息"按钮开始添加
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = messages.map((msg, index) => `
+        <div class="message-item" style="display: flex; gap: 10px; align-items: flex-start;">
+            <div style="flex: 1;">
+                <textarea class="message-textarea" data-index="${index}" style="width: 100%; min-height: 60px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; resize: vertical; font-family: inherit;">${msg}</textarea>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <button class="move-up-btn" data-index="${index}" style="padding: 5px 8px; background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 4px; cursor: pointer; font-size: 12px;" ${index === 0 ? 'disabled' : ''}>↑</button>
+                <button class="move-down-btn" data-index="${index}" style="padding: 5px 8px; background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 4px; cursor: pointer; font-size: 12px;" ${index === messages.length - 1 ? 'disabled' : ''}>↓</button>
+                <button class="delete-message-btn" data-index="${index}" style="padding: 5px 8px; background: #ffebee; color: #f44336; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">×</button>
+            </div>
+        </div>
+    `).join('');
+    
+    // 绑定删除消息按钮
+    container.querySelectorAll('.delete-message-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const index = parseInt(btn.dataset.index);
+            messages.splice(index, 1);
+            renderMessagesList(messages);
+        });
+    });
+    
+    // 绑定上移按钮
+    container.querySelectorAll('.move-up-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const index = parseInt(btn.dataset.index);
+            if (index > 0) {
+                [messages[index], messages[index - 1]] = [messages[index - 1], messages[index]];
+                renderMessagesList(messages);
+            }
+        });
+    });
+    
+    // 绑定下移按钮
+    container.querySelectorAll('.move-down-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const index = parseInt(btn.dataset.index);
+            if (index < messages.length - 1) {
+                [messages[index], messages[index + 1]] = [messages[index + 1], messages[index]];
+                renderMessagesList(messages);
+            }
+        });
+    });
+}
+
+// 添加新消息
+function addNewMessage() {
+    const container = document.getElementById('messages-list-container');
+    const textareas = container.querySelectorAll('.message-textarea');
+    const messages = Array.from(textareas).map(ta => ta.value);
+    
+    messages.push(''); // 添加一个空消息
+    renderMessagesList(messages);
+    
+    // 聚焦到新添加的textarea
+    setTimeout(() => {
+        const newTextarea = container.querySelector('.message-textarea:last-child');
+        if (newTextarea) newTextarea.focus();
+    }, 100);
+}
+
+// 保存存储位
+function saveStorageSlot() {
+    const nameInput = document.getElementById('storage-slot-name-input');
+    const name = nameInput.value.trim();
+    
+    if (!name) {
+        alert('请输入存储位名称');
+        return;
+    }
+    
+    const container = document.getElementById('messages-list-container');
+    const textareas = container.querySelectorAll('.message-textarea');
+    const messages = Array.from(textareas).map(ta => ta.value.trim()).filter(msg => msg);
+    
+    if (messages.length === 0) {
+        alert('请至少添加一条消息');
+        return;
+    }
+    
+    const slotData = {
+        name: name,
+        messages: messages,
+        createdAt: new Date().toISOString()
+    };
+    
+    if (currentEditingSlotIndex >= 0) {
+        // 更新现有存储位
+        messageStorageSlots[currentEditingSlotIndex] = slotData;
+    } else {
+        // 创建新存储位
+        messageStorageSlots.push(slotData);
+    }
+    
+    saveMessageStorageData();
+    closeEditStorageSlotModal();
+    renderStorageSlots();
+}
+
+// 初始化消息存放功能
+function initMessageStorage() {
+    loadMessageStorageData();
+    
+    // 绑定消息存放按钮
+    document.getElementById('message-storage-btn').addEventListener('click', openMessageStorageModal);
+    
+    // 绑定关闭按钮
+    document.getElementById('message-storage-close-btn').addEventListener('click', closeMessageStorageModal);
+    
+    // 绑定新增存储位按钮
+    document.getElementById('add-storage-slot-btn').addEventListener('click', () => {
+        openEditStorageSlotModal(-1);
+    });
+    
+    // 绑定编辑模态框的关闭按钮
+    document.getElementById('cancel-edit-storage-btn').addEventListener('click', closeEditStorageSlotModal);
+    
+    // 绑定添加消息按钮
+    document.getElementById('add-message-btn').addEventListener('click', addNewMessage);
+    
+    // 绑定保存按钮
+    document.getElementById('save-storage-slot-btn').addEventListener('click', saveStorageSlot);
+    
+    // 点击模态框外部关闭
+    document.getElementById('message-storage-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'message-storage-modal') {
+            closeMessageStorageModal();
+        }
+    });
+    
+    document.getElementById('edit-storage-slot-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'edit-storage-slot-modal') {
+            closeEditStorageSlotModal();
+        }
+    });
+}
+
+// 在页面加载完成后初始化
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMessageStorage);
+} else {
+    initMessageStorage();
+}
+
+// ▲▲▲ 消息存放功能结束 ▲▲▲
 
 // ▼▼▼ 【全新】宠物功能事件监听器 ▼▼▼
 

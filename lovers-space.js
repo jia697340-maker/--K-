@@ -1214,15 +1214,15 @@ async function handlePostMoment() {
     role: 'system',
     content: `[系统提示：用户（${
       chat.settings.myNickname || '我'
-    }）刚刚在我们的情侣空间发布了一条新的说说，内容是：“${content}”。请你根据人设，使用 'ls_comment' 指令对这条说说发表你的看法。]`,
+    }）刚刚在我们的情侣空间发布了一条新的说说，内容是："${content}"。请你根据人设，使用 'ls_comment' 指令对这条说说发表你的看法。说说的唯一标识是：${newMoment.timestamp}]`,
     timestamp: Date.now(),
     isHidden: true, // 这个标记能让消息对你隐藏，但AI能看见
   };
   chat.history.push(hiddenMessage);
   await db.chats.put(chat); // 再次保存，确保隐藏消息被存入
 
-  // （可选）如果你希望AI在你发完说说后立刻就去评论，可以取消下面这行的注释
-  // triggerAiResponse();
+  // AI在用户发完说说后立刻评论
+  triggerAiResponse();
   // ▲▲▲ 粘贴结束 ▲▲▲
 }
 
