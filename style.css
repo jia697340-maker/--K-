@@ -13244,6 +13244,61 @@ body {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+/* 日记评论区 */
+.ls-diary-comments-section {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed #ddd;
+}
+.ls-diary-comment-item {
+  font-size: 13px;
+  margin-bottom: 6px;
+  line-height: 1.4;
+  color: #555;
+}
+.ls-diary-comment-item .comment-author {
+  font-weight: bold;
+  margin-right: 4px;
+  color: #333;
+}
+.comment-input-area {
+  display: flex;
+  margin-top: 10px;
+  gap: 5px;
+}
+.ls-diary-comment-input {
+  flex: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 15px;
+  padding: 6px 12px;
+  font-size: 13px;
+  outline: none;
+}
+.ls-diary-comment-input:focus {
+  border-color: var(--accent-color);
+}
+.ls-diary-comment-submit-btn {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  padding: 0 15px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.ls-diary-comment-delete-btn {
+  color: #999;
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 16px;
+  line-height: 1;
+  vertical-align: middle;
+}
+.ls-diary-comment-delete-btn:hover {
+  color: #ff4d4f;
+}
+
 /* ▲▲▲ 新增CSS结束 ▲▲▲ */
 /* ▼▼▼ 把这一整块全新的CSS，粘贴到 <style> 标签的最末尾 ▼▼▼ */
 

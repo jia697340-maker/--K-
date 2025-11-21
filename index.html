@@ -1,6 +1,12 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    
+    <!-- 强制刷新缓存，防止用户加载旧版本 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
 <!-- ▼▼▼ 用这整块代码替换掉你旧的meta和icon链接 ▼▼▼ -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
@@ -3033,6 +3039,70 @@
     </div>
 </div>
 <!-- ▼▼▼ 把这一整块全新的代码，粘贴到 id="streak-settings-section" 的 div 上方 ▼▼▼ -->
+<hr style="opacity: 0.2; margin: 20px 0;">
+
+<!-- === 攻略模式设置 === -->
+<div class="form-group" id="conquest-mode-group">
+    <label for="conquest-mode-toggle" class="toggle-switch-label">
+        <span class="toggle-switch-text">
+            攻略模式开关
+            <p style="font-size: 12px; font-weight: normal; color: #ff6b6b; margin-top: 5px;">
+                开启后，角色将进入攻略系统模式。警告：可能影响正常对话！
+            </p>
+        </span>
+        <input type="checkbox" id="conquest-mode-toggle">
+        <span class="toggle-switch-slider"></span>
+    </label>
+
+    <!-- 攻略模式详细设置区域 (默认隐藏) -->
+    <div id="conquest-mode-details" style="display: none; margin-top: 15px; padding: 15px; border: 2px solid #ff6b6b; border-radius: 8px; background: rgba(255, 107, 107, 0.05);">
+        
+        <!-- 初始好感度设置 -->
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label for="conquest-initial-affection">
+                初始好感度
+                <p style="font-size: 12px; font-weight: normal; color: #999; margin-top: 5px;">
+                    设置角色对你的默认好感度（建议 0-100）
+                </p>
+            </label>
+            <input type="number" id="conquest-initial-affection" min="0" max="100" value="50" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
+        </div>
+
+        <!-- 攻略成功好感度 -->
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label for="conquest-success-affection">
+                攻略成功目标好感度
+                <p style="font-size: 12px; font-weight: normal; color: #999; margin-top: 5px;">
+                    达到此好感度即为攻略成功（建议 80-100）
+                </p>
+            </label>
+            <input type="number" id="conquest-success-affection" min="0" max="100" value="90" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
+        </div>
+
+        <!-- 实时好感度输入 -->
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label for="conquest-current-affection">
+                实时好感度
+                <p style="font-size: 12px; font-weight: normal; color: #999; margin-top: 5px;">
+                    当前角色对你的好感度（可随时调整）
+                </p>
+            </label>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="number" id="conquest-current-affection" min="0" max="100" value="50" style="flex: 0 0 80%; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <button id="update-affection-btn" class="form-button form-button-secondary" style="flex: 0 0 20%; margin: 0; padding: 8px 4px; white-space: nowrap; font-size: 12px;">更新好感度</button>
+            </div>
+            <div id="affection-display" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: var(--bg-secondary); text-align: center; font-size: 16px; font-weight: bold;">
+                当前好感度: <span id="affection-value">50</span> / <span id="affection-target">90</span>
+            </div>
+        </div>
+
+        <!-- 好感度变化提示 -->
+        <div style="padding: 10px; background: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; border-radius: 4px; font-size: 13px; color: var(--text-secondary);">
+            <strong>提示：</strong>角色会实时看到好感度的增减变化。增加好感度表示你对TA好感上升，减少则表示好感下降。角色会根据好感度变化调整自己的攻略策略。
+        </div>
+    </div>
+</div>
+
 <hr style="opacity: 0.2; margin: 20px 0;">
 
 <!-- === 用户头像形状设置 === -->
@@ -6518,7 +6588,7 @@
                         <input type="checkbox" id="notify-char-toggle" checked>
                         <span class="toggle-switch-slider"></span>
                     </label>
-                    <p style="font-size: 12px; color: #999; margin-top: 5px;">开启后，角色会看到这笔账并可能回复你</p>
+                    <p style="font-size: 12px; color: #999; margin-top: 5px;">开启后，角色会看到这笔账并可能回复你。关闭后，角色完全看不到记账内容</p>
                 </div>
 
                 <!-- 保存按钮 -->
@@ -6542,11 +6612,11 @@
                 </div>
 
                 <!-- 时间筛选 -->
-                <div style="display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 10px;">
-                    <button class="time-filter-btn active" data-filter="all" style="padding: 8px 16px; border: 1px solid #ddd; background: #667eea; color: white; border-radius: 20px; white-space: nowrap; cursor: pointer;">全部</button>
-                    <button class="time-filter-btn" data-filter="today" style="padding: 8px 16px; border: 1px solid #ddd; background: white; color: #666; border-radius: 20px; white-space: nowrap; cursor: pointer;">今天</button>
-                    <button class="time-filter-btn" data-filter="week" style="padding: 8px 16px; border: 1px solid #ddd; background: white; color: #666; border-radius: 20px; white-space: nowrap; cursor: pointer;">本周</button>
-                    <button class="time-filter-btn" data-filter="month" style="padding: 8px 16px; border: 1px solid #ddd; background: white; color: #666; border-radius: 20px; white-space: nowrap; cursor: pointer;">本月</button>
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; padding: 10px 0;">
+                    <button class="time-filter-btn active" data-filter="all" style="padding: 12px 24px; border: 2px solid #667eea; background: #667eea; color: white; border-radius: 25px; white-space: nowrap; cursor: pointer; font-size: 15px; font-weight: 600; min-height: 44px;">全部</button>
+                    <button class="time-filter-btn" data-filter="today" style="padding: 12px 24px; border: 2px solid #ddd; background: white; color: #666; border-radius: 25px; white-space: nowrap; cursor: pointer; font-size: 15px; font-weight: 600; min-height: 44px;">今天</button>
+                    <button class="time-filter-btn" data-filter="week" style="padding: 12px 24px; border: 2px solid #ddd; background: white; color: #666; border-radius: 25px; white-space: nowrap; cursor: pointer; font-size: 15px; font-weight: 600; min-height: 44px;">本周</button>
+                    <button class="time-filter-btn" data-filter="month" style="padding: 12px 24px; border: 2px solid #ddd; background: white; color: #666; border-radius: 25px; white-space: nowrap; cursor: pointer; font-size: 15px; font-weight: 600; min-height: 44px;">本月</button>
                 </div>
 
                 <!-- 记录列表 -->
@@ -6824,7 +6894,16 @@
                         <div style="font-size: 12px; color: #999; margin: 10px 0 4px;">或输入自定义题量</div>
                         <input type="number" id="practice-count-custom" min="1" max="999" placeholder="请输入题数" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0;">
                     </div>
-                    <button id="start-practice-btn" class="form-button" style="width: 100%; padding: 15px; margin-top: 30px; background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">开始练习</button>
+                    <!-- 是否通知角色 -->
+                    <div class="form-group" style="margin-top: 20px; margin-bottom: 20px;">
+                        <label for="notify-char-study-toggle" class="toggle-switch-label">
+                            <span>通知角色</span>
+                            <input type="checkbox" id="notify-char-study-toggle">
+                            <span class="toggle-switch-slider"></span>
+                        </label>
+                        <div style="font-size: 12px; color: #999; margin-top: 8px;">关闭后，角色将完全不知道你的学习情况</div>
+                    </div>
+                    <button id="start-practice-btn" class="form-button" style="width: 100%; padding: 15px; margin-top: 10px; background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">开始练习</button>
                 </div>
                 <!-- 练习进行中 (隐藏) -->
                 <div id="practice-active-view" style="display: none; flex: 1; flex-direction: column; height:100%;">
@@ -6835,10 +6914,10 @@
                             <span id="practice-progress-label" style="color: #666;">1/10</span>
                         </div>
                     </div>
-                    <div id="question-container" style="flex: 1; background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; overflow-y: auto; border: 1px solid #eee;">
+                    <div id="question-container" style="flex: 1; min-height: 200px; max-height: 400px; background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; overflow-y: auto; border: 1px solid #eee;">
                         <!-- Question Content -->
                         <div id="question-type-badge" style="display: inline-block; padding: 4px 8px; background: #e3f2fd; color: #2196f3; border-radius: 4px; font-size: 12px; margin-bottom: 10px;">单选题</div>
-                        <div id="question-text" style="font-size: 16px; line-height: 1.6; color: #333;"></div>
+                        <div id="question-text" style="font-size: 18px; line-height: 1.8; color: #333; padding: 10px 0;"></div>
                         
                         <!-- Drawing Area (Canvas) -->
                         <div id="drawing-area" style="display: none; margin-top: 20px;">
@@ -6892,8 +6971,17 @@
                         <div style="font-size: 12px; color: #999; margin: 10px 0 4px;">或输入自定义题量</div>
                         <input type="number" id="exam-count-custom" min="1" max="999" placeholder="请输入题数" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0;">
                     </div>
+                    <!-- 是否通知角色 -->
+                    <div class="form-group" style="margin-top: 20px; margin-bottom: 20px;">
+                        <label for="notify-char-exam-toggle" class="toggle-switch-label">
+                            <span>通知角色</span>
+                            <input type="checkbox" id="notify-char-exam-toggle">
+                            <span class="toggle-switch-slider"></span>
+                        </label>
+                        <div style="font-size: 12px; color: #999; margin-top: 8px;">关闭后，角色将完全不知道你的学习情况</div>
+                    </div>
                     
-                    <button id="start-exam-btn" class="form-button" style="width: 100%; padding: 15px; margin-top: 30px; background: linear-gradient(135deg, #2196f3 0%, #21cbf3 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">开始考试</button>
+                    <button id="start-exam-btn" class="form-button" style="width: 100%; padding: 15px; margin-top: 10px; background: linear-gradient(135deg, #2196f3 0%, #21cbf3 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">开始考试</button>
                 </div>
                 
                 <div id="exam-active-view" style="display: none; flex: 1; flex-direction: column; height: 100%;">
@@ -6905,8 +6993,8 @@
                             <span id="exam-progress-label" style="color: #666;">1/20</span>
                         </div>
                     </div>
-                    <div id="exam-question-container" style="flex: 1; background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; overflow-y: auto; border: 1px solid #eee;">
-                         <div id="exam-question-text" style="font-size: 16px; line-height: 1.6; color: #333;"></div>
+                    <div id="exam-question-container" style="flex: 1; min-height: 200px; max-height: 400px; background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; overflow-y: auto; border: 1px solid #eee;">
+                         <div id="exam-question-text" style="font-size: 18px; line-height: 1.8; color: #333; padding: 10px 0;"></div>
                          <div id="exam-drawing-area" style="display: none; margin-top: 20px;">
                             <canvas id="exam-question-canvas" width="600" height="300" style="border: 1px solid #ccc; background: white; width: 100%; touch-action: none;"></canvas>
                             <div style="margin-top: 10px; display: flex; gap: 10px;">
@@ -8393,6 +8481,50 @@ if (Array.isArray(item.content)) {
         }
     }
     document.addEventListener('DOMContentLoaded', () => {
+
+        // ===================================================================
+        // 0. 版本检测和缓存清理（必须在最前面执行）
+        // ===================================================================
+        (function() {
+            const APP_VERSION = '2024.11.21.1'; // 每次更新时修改这个版本号
+            const STORED_VERSION = localStorage.getItem('app_version');
+            
+            // 如果版本不匹配，说明是新版本，需要清理缓存
+            if (STORED_VERSION !== APP_VERSION) {
+                console.log(`检测到版本更新: ${STORED_VERSION || '未知'} -> ${APP_VERSION}`);
+                
+                // 清理所有可能的缓存
+                if ('caches' in window) {
+                    caches.keys().then(function(cacheNames) {
+                        return Promise.all(
+                            cacheNames.map(function(cacheName) {
+                                return caches.delete(cacheName);
+                            })
+                        );
+                    }).then(() => {
+                        console.log('Service Worker缓存已清理');
+                    });
+                }
+                
+                // 保存新版本号
+                localStorage.setItem('app_version', APP_VERSION);
+                
+                // 如果不是第一次加载（即有旧版本），提示用户
+                if (STORED_VERSION) {
+                    console.log('应用已更新到最新版本');
+                }
+            }
+            
+            // 注销任何已存在的Service Worker（如果有的话）
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for (let registration of registrations) {
+                        registration.unregister();
+                        console.log('Service Worker已注销');
+                    }
+                });
+            }
+        })();
 
         // ===================================================================
         // 1. 所有变量和常量定义
@@ -15290,7 +15422,20 @@ else if (msg.type === 'lovers_space_disconnect') {
         bubble.classList.add('is-realimag', 'is-card-like');
         contentHtml = `<img src="${msg.imageUrl}" class="realimag-image" alt="NovelAI图片分享" loading="lazy" onerror="this.src='https://i.postimg.cc/KYr2qRCK/1.jpg'; this.alt='图片加载失败';" title="${msg.fullPrompt || msg.prompt || 'NovelAI生成'}">`;
     } else {
-        contentHtml = String(msg.content || '').replace(/\n/g, '<br>');
+        // 【优化】智能检测并渲染HTML格式的内容
+        const rawContent = String(msg.content || '');
+        
+        // 检测是否包含HTML标签（包括常见的格式化标签）
+        const hasHtmlTags = /<(div|p|span|strong|b|i|em|u|ul|ol|li|br|h[1-6]|table|tr|td|th|code|pre|blockquote|img|a|hr)[^>]*>/i.test(rawContent);
+        
+        if (hasHtmlTags) {
+            // 如果包含HTML标签，添加特殊class并直接使用HTML
+            bubble.classList.add('has-rich-html');
+            contentHtml = rawContent;
+        } else {
+            // 普通文本，只替换换行符
+            contentHtml = rawContent.replace(/\n/g, '<br>');
+        }
     }
 
 // ▼▼▼ 【最终修正版】请用这整块代码，完整替换掉旧的引用渲染逻辑 ▼▼▼
@@ -16075,6 +16220,9 @@ return worldBook && worldBook.content ? `\n\n## 世界书: ${worldBook.name}\n${
         let musicContext = '';
 const countdownContext = await getCountdownContext(chatId); // <--- 把chatId传进去
 const streakContext = await getStreakContext(chat);
+// === 获取攻略模式上下文 ===
+const conquestContext = getConquestModeContext(chat);
+// === 攻略模式上下文获取结束 ===
         if (musicState.isActive && musicState.activeChatId === chatId) {
             // 【核心修改】提供更详细的音乐上下文
             const currentTrack = musicState.currentIndex > -1 ? musicState.playlist[musicState.currentIndex] : null;
@@ -16216,6 +16364,7 @@ if (repostMessage) {
 
 const countdownContext = await getCountdownContext(chatId); // <--- 把chatId传进去
 const streakContext = await getStreakContext(chat); // <-- 全新添加：获取火花状态
+const conquestContext = getConquestModeContext(chat); // 攻略模式上下文（群聊中不适用）
 // ▼▼▼ 用这行【已添加禁言状态】的代码替换 ▼▼▼
 const membersList = chat.members.map(m => {
     const muteStatus = m.isMuted ? ' (【状态：已被禁言，禁止让他发言】)' : '';
@@ -16737,7 +16886,8 @@ ${chat.settings.myPersona}
 
 - **当前情景**:
 ${timeContext}
-${streakContext} 
+${streakContext}
+${conquestContext}
 - **当前音乐情景**:
 ${musicContext}
 
@@ -37750,6 +37900,67 @@ async function getStreakContext(chat) {
     // 4. 拼接成最终的上下文格式
     return `\n- **聊天火花状态**: ${statusText}`;
 }
+
+// === 攻略模式上下文函数 ===
+/**
+ * 生成攻略模式的上下文信息
+ * @param {object} chat - 当前的聊天对象
+ * @returns {string} - 格式化后的攻略模式状态文本，或空字符串
+ */
+function getConquestModeContext(chat) {
+    // 检查：如果不是单聊，或者攻略模式未开启，返回空
+    if (!chat || chat.isGroup || !chat.settings.conquestMode?.enabled) {
+        return "";
+    }
+
+    const conquest = chat.settings.conquestMode;
+    const currentAffection = conquest.currentAffection || 50;
+    const successAffection = conquest.successAffection || 90;
+    const previousAffection = conquest.previousAffection || currentAffection;
+    
+    // 计算好感度变化
+    const affectionChange = currentAffection - previousAffection;
+    let changeIndicator = "";
+    if (affectionChange > 0) {
+        changeIndicator = ` (↑${affectionChange})`;
+    } else if (affectionChange < 0) {
+        changeIndicator = ` (↓${Math.abs(affectionChange)})`;
+    }
+    
+    // 根据好感度等级给出不同的状态描述
+    let statusText = "";
+    let behaviorGuide = "";
+    
+    if (currentAffection < 20) {
+        statusText = "【极度冷淡】";
+        behaviorGuide = "你对用户非常冷淡，甚至带有敌意。你会用简短、冷漠的语气回应，不主动关心用户。";
+    } else if (currentAffection < 40) {
+        statusText = "【疏远陌生】";
+        behaviorGuide = "你对用户保持距离，态度礼貌但疏离。你不会分享私人话题，也不会主动发起深入对话。";
+    } else if (currentAffection < 60) {
+        statusText = "【普通朋友】";
+        behaviorGuide = "你把用户当作普通朋友，会礼貌友好地交流，但还没有特别亲密的感觉。";
+    } else if (currentAffection < 80) {
+        statusText = "【好感增加】";
+        behaviorGuide = "你对用户产生了明显的好感，会更主动地分享想法，偶尔表现出关心和在意。";
+    } else if (currentAffection < successAffection) {
+        statusText = "【暧昧心动】";
+        behaviorGuide = "你对用户产生了爱慕之情，会表现出明显的喜欢和在意，但还没有表白。你会更加主动，更关注对方的一切。";
+    } else {
+        statusText = "【攻略成功！】";
+        behaviorGuide = "你已经深深爱上用户，会毫不掩饰地表达爱意。你们的关系已经非常亲密，可以随时表现出恋人的亲昵和甜蜜。";
+    }
+    
+    return `\n- **【攻略模式】当前好感度**: ${currentAffection}/${successAffection} ${statusText}${changeIndicator}
+- **行为指导**: ${behaviorGuide}
+- **重要规则**: 
+  * 你的态度和行为必须严格符合当前好感度等级
+  * 好感度会根据用户的行为动态变化（系统会在后台自动调整）
+  * 在低好感度时，不要表现得过于热情或亲密
+  * 随着好感度提升，逐渐展现更多的关心、信任和爱意`;
+}
+// === 攻略模式上下文函数结束 ===
+
 // ▼▼▼ 【全新】这是用户表情包批量删除的JS核心函数 ▼▼▼
 
 // ▼▼▼ 使用这块【新代码】替换旧的 toggleUserStickerSelectionMode 函数 ▼▼▼
@@ -43953,6 +44164,89 @@ streakToggle.onchange = () => {
 };
 // ▲▲▲ 替换结束 ▲▲▲
 
+// === 加载攻略模式设置 ===
+const conquestSettings = chat.settings.conquestMode || { enabled: false, initialAffection: 50, successAffection: 90, currentAffection: 50, previousAffection: 50 };
+const conquestToggle = document.getElementById('conquest-mode-toggle');
+const conquestDetails = document.getElementById('conquest-mode-details');
+const initialAffectionInput = document.getElementById('conquest-initial-affection');
+const successAffectionInput = document.getElementById('conquest-success-affection');
+const currentAffectionInput = document.getElementById('conquest-current-affection');
+const affectionValueDisplay = document.getElementById('affection-value');
+const affectionTargetDisplay = document.getElementById('affection-target');
+
+conquestToggle.checked = conquestSettings.enabled;
+conquestDetails.style.display = conquestSettings.enabled ? 'block' : 'none';
+initialAffectionInput.value = conquestSettings.initialAffection || 50;
+successAffectionInput.value = conquestSettings.successAffection || 90;
+currentAffectionInput.value = conquestSettings.currentAffection || 50;
+affectionValueDisplay.textContent = conquestSettings.currentAffection || 50;
+affectionTargetDisplay.textContent = conquestSettings.successAffection || 90;
+
+// 攻略模式开关交互
+conquestToggle.onchange = () => {
+    if (conquestToggle.checked) {
+        // 显示警告弹窗
+        const userConfirmed = confirm('⚠️ 攻略模式警告\n\n为了避免让正常聊天和攻略模式混淆造成记忆错乱，建议你：\n\n1. 保存当前对话状态到记忆库\n2. 新开一个对话来专门玩攻略模式\n\n是否继续开启攻略模式？\n\n注意：开启后角色将进入攻略系统，如果攻略失败，角色即将和你失去联系，永远不见！');
+        
+        if (userConfirmed) {
+            conquestDetails.style.display = 'block';
+        } else {
+            conquestToggle.checked = false;
+        }
+    } else {
+        conquestDetails.style.display = 'none';
+    }
+};
+
+// 更新好感度按钮
+document.getElementById('update-affection-btn').addEventListener('click', async () => {
+    const newAffection = parseInt(currentAffectionInput.value) || 50;
+    const previousAffection = conquestSettings.currentAffection || 50;
+    const affectionChange = newAffection - previousAffection;
+    
+    // 更新显示
+    affectionValueDisplay.textContent = newAffection;
+    affectionTargetDisplay.textContent = successAffectionInput.value;
+    
+    // 如果攻略模式开启且好感度发生变化，向聊天发送隐藏系统消息
+    if (conquestToggle.checked && affectionChange !== 0) {
+        const chat = state.chats[state.activeChatId];
+        if (chat) {
+            const changeText = affectionChange > 0 ? `上升了${affectionChange}点` : `下降了${Math.abs(affectionChange)}点`;
+            const hiddenMessage = {
+                role: 'system',
+                content: `[攻略系统提示：用户对你的好感度${changeText}！当前好感度：${newAffection}/${successAffectionInput.value}]`,
+                timestamp: Date.now(),
+                isHidden: true
+            };
+            chat.history.push(hiddenMessage);
+            
+            // 更新conquestSettings中的当前好感度
+            conquestSettings.currentAffection = newAffection;
+            conquestSettings.previousAffection = newAffection;
+            chat.settings.conquestMode = conquestSettings;
+            
+            await db.chats.put(chat);
+            
+            alert(`好感度已更新：${newAffection}/${successAffectionInput.value}\n变化：${changeText}`);
+        }
+    }
+});
+
+// 实时更新目标好感度显示
+successAffectionInput.addEventListener('input', () => {
+    affectionTargetDisplay.textContent = successAffectionInput.value;
+});
+
+// 当修改初始好感度时，同步更新实时好感度的默认值
+initialAffectionInput.addEventListener('input', () => {
+    const newInitialValue = initialAffectionInput.value;
+    // 同步更新实时好感度输入框和显示
+    currentAffectionInput.value = newInitialValue;
+    affectionValueDisplay.textContent = newInitialValue;
+});
+// === 攻略模式加载结束 ===
+
     customCssInput.value = chat.settings.customCss || '';
     
     updateSettingsPreview(); 
@@ -44217,7 +44511,36 @@ if (isStreakEnabled) {
 }
 // ▲▲▲ 替换结束 ▲▲▲
 
+// === 保存攻略模式设置 ===
+const conquestModeEnabled = document.getElementById('conquest-mode-toggle').checked;
+const oldConquestSettings = chat.settings.conquestMode || {};
 
+if (conquestModeEnabled) {
+    const initialAffection = parseInt(document.getElementById('conquest-initial-affection').value) || 50;
+    const successAffection = parseInt(document.getElementById('conquest-success-affection').value) || 90;
+    const currentAffection = parseInt(document.getElementById('conquest-current-affection').value) || 50;
+    
+    // 如果是首次开启，设置初始好感度
+    const isFirstTimeEnabled = !oldConquestSettings.enabled;
+    
+    chat.settings.conquestMode = {
+        enabled: true,
+        initialAffection: initialAffection,
+        successAffection: successAffection,
+        currentAffection: isFirstTimeEnabled ? initialAffection : currentAffection,
+        previousAffection: isFirstTimeEnabled ? initialAffection : (oldConquestSettings.previousAffection || currentAffection)
+    };
+} else {
+    // 关闭攻略模式，重置所有设置
+    chat.settings.conquestMode = {
+        enabled: false,
+        initialAffection: 50,
+        successAffection: 90,
+        currentAffection: 50,
+        previousAffection: 50
+    };
+}
+// === 攻略模式保存结束 ===
 
     // ▼▼▼ 保存TOKEN过大提示设置 ▼▼▼
     chat.settings.tokenWarningEnabled = document.getElementById('token-warning-enabled').checked;
@@ -44237,25 +44560,75 @@ saveAvatarShapeSettings(); // 保存头像形状的设置
 
 document.getElementById('clear-chat-btn').addEventListener('click', async () => {
     if (!state.activeChatId) return;
-    const chat = state.chats[state.activeChatId];
-    const confirmed = await showCustomConfirm('清空记录', '确定要清空此聊天的【消息和心声】吗？\n（聊天总结将被保留）', { confirmButtonClass: 'btn-danger' });
-    if (confirmed) {
-        // 【核心修改】使用 filter 方法，只保留类型为 'summary' 的消息
-        chat.history = chat.history.filter(msg => msg.type === 'summary');
+    
+    // 显示清空数据选项弹窗
+    const clearDataModal = document.getElementById('clear-data-options-modal');
+    clearDataModal.classList.add('visible');
+    
+    // 取消按钮
+    document.getElementById('cancel-clear-data-btn').onclick = () => {
+        clearDataModal.classList.remove('visible');
+    };
+    
+    // 确认按钮
+    document.getElementById('confirm-clear-data-btn').onclick = async () => {
+        const chat = state.chats[state.activeChatId];
         
-        // 【新增】根据您的要求，同时清空心声记录
+        // 清空聊天记录
+        chat.history = chat.history.filter(msg => msg.type === 'summary');
         if (chat.innerVoiceHistory) {
             chat.innerVoiceHistory = [];
         }
         chat.latestInnerVoice = null;
-
         await db.chats.put(chat);
+        
+        // 检查是否需要清空记账数据
+        if (document.getElementById('clear-accounting-checkbox').checked) {
+            await db.accountingRecords.clear();
+            await db.accountingCategories.clear();
+            await db.accountingGoals.clear();
+            // 重新初始化默认分类
+            await initDefaultCategories();
+        }
+        
+        // 检查是否需要清空月经数据
+        if (document.getElementById('clear-period-checkbox').checked) {
+            await db.periodSettings.clear();
+            await db.periodMarks.clear();
+        }
+        
+        // 检查是否需要清空学习数据
+        if (document.getElementById('clear-study-checkbox').checked) {
+            await db.studySubjects.clear();
+            await db.questionBanks.clear();
+            await db.studyRecords.clear();
+        }
+        
+        // 关闭弹窗
+        clearDataModal.classList.remove('visible');
+        chatSettingsModal.classList.remove('visible');
+        
+        // 重置复选框
+        document.getElementById('clear-accounting-checkbox').checked = false;
+        document.getElementById('clear-period-checkbox').checked = false;
+        document.getElementById('clear-study-checkbox').checked = false;
+        
+        // 刷新界面
         renderChatInterface(state.activeChatId);
         renderChatList();
-        chatSettingsModal.classList.remove('visible');
-
-        alert('聊天消息和心声已清空！');
-    }
+        
+        // 如果当前在记账、月经或学习界面，刷新对应界面
+        if (document.getElementById('accounting-screen').style.display !== 'none') {
+            loadAccountingRecords();
+            loadFinancialGoals();
+        }
+        if (document.getElementById('period-screen').style.display !== 'none') {
+            renderPeriodCalendar();
+            loadPeriodStats();
+        }
+        
+        alert('清空操作已完成！');
+    };
 });
 
             // ▼▼▼ 在 init() 的事件监听器区域末尾，粘贴这段新代码 ▼▼▼
@@ -47954,16 +48327,140 @@ function initHomeScreenSlider() {
 
     if (!slider || dots.length === 0) return;
 
-    // 监听滑动事件
-    slider.addEventListener('scroll', () => {
-        // 计算当前滑到了第几页
-        const pageIndex = Math.round(slider.scrollLeft / slider.clientWidth);
+    // 页面状态管理
+    let currentPage = 0; // 当前页码
+    let isScrolling = false; // 滚动锁，防止快速连续滑动
+    let scrollTimeout = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isDragging = false;
+
+    // 获取总页数
+    function getTotalPages() {
+        return slider.querySelectorAll('.home-page').length;
+    }
+
+    // 滚动到指定页面
+    function scrollToPage(pageIndex, smooth = true) {
+        const totalPages = getTotalPages();
         
-        // 更新小圆点的状态
-        dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === pageIndex);
+        // 确保页码在有效范围内
+        if (pageIndex < 0 || pageIndex >= totalPages) return;
+        
+        // 检查是否跳页（只允许移动到相邻页面）
+        if (Math.abs(pageIndex - currentPage) > 1) {
+            console.log(`阻止跳页：从第${currentPage + 1}页跳到第${pageIndex + 1}页`);
+            // 如果尝试跳页，只移动到相邻页面
+            pageIndex = pageIndex > currentPage ? currentPage + 1 : currentPage - 1;
+        }
+        
+        isScrolling = true;
+        currentPage = pageIndex;
+        
+        slider.scrollTo({
+            left: slider.clientWidth * pageIndex,
+            behavior: smooth ? 'smooth' : 'auto'
         });
+        
+        // 更新小圆点状态
+        updateDots();
+        
+        // 解锁滚动
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            isScrolling = false;
+        }, 500); // 500ms后解锁
+    }
+
+    // 更新小圆点状态
+    function updateDots() {
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentPage);
+        });
+    }
+
+    // 监听滚动结束事件，确保页面对齐
+    slider.addEventListener('scroll', () => {
+        if (isScrolling) return; // 如果是程序控制的滚动，跳过
+        
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            // 计算实际停留的页码
+            const actualPage = Math.round(slider.scrollLeft / slider.clientWidth);
+            
+            // 检查是否跳页
+            if (Math.abs(actualPage - currentPage) > 1) {
+                console.log(`检测到跳页：从第${currentPage + 1}页到第${actualPage + 1}页，强制回到相邻页`);
+                // 强制回到相邻页面
+                const targetPage = actualPage > currentPage ? currentPage + 1 : currentPage - 1;
+                scrollToPage(targetPage, true);
+            } else if (actualPage !== currentPage) {
+                // 正常的相邻页切换
+                currentPage = actualPage;
+                updateDots();
+            }
+        }, 150); // 滚动停止150ms后检查
     });
+
+    // 移动端触摸控制
+    slider.addEventListener('touchstart', (e) => {
+        if (isScrolling) {
+            e.preventDefault();
+            return;
+        }
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isDragging = true;
+    }, { passive: false });
+
+    slider.addEventListener('touchmove', (e) => {
+        if (!isDragging || isScrolling) return;
+        
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+        const deltaX = touchX - touchStartX;
+        const deltaY = touchY - touchStartY;
+        
+        // 判断是水平滑动还是垂直滑动
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+            // 水平滑动，阻止页面内滚动
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    slider.addEventListener('touchend', (e) => {
+        if (!isDragging || isScrolling) return;
+        
+        const touchEndX = e.changedTouches[0].clientX;
+        const deltaX = touchEndX - touchStartX;
+        const swipeThreshold = 50; // 滑动阈值
+        
+        // 判断滑动方向
+        if (Math.abs(deltaX) > swipeThreshold) {
+            if (deltaX > 0 && currentPage > 0) {
+                // 向右滑动，去上一页
+                scrollToPage(currentPage - 1);
+            } else if (deltaX < 0 && currentPage < getTotalPages() - 1) {
+                // 向左滑动，去下一页
+                scrollToPage(currentPage + 1);
+            } else {
+                // 回弹到当前页
+                scrollToPage(currentPage);
+            }
+        } else {
+            // 滑动距离不够，回弹到当前页
+            scrollToPage(currentPage);
+        }
+        
+        isDragging = false;
+    });
+
+    // 初始化小圆点
+    updateDots();
+    
+    // 暴露scrollToPage方法供外部使用
+    slider.scrollToPage = scrollToPage;
+    slider.getCurrentPage = () => currentPage;
 }
 // ▲▲▲ 新增JS逻辑结束 ▲▲▲
 initHomeScreenSlider(); // 初始化主屏幕滑动功能
@@ -48254,7 +48751,11 @@ async function openAccountingModal() {
     document.getElementById('accounting-amount').value = '';
     document.getElementById('accounting-note').value = '';
     document.getElementById('accounting-date').valueAsDate = new Date();
-    document.getElementById('notify-char-toggle').checked = true;
+    
+    // 【优化】从localStorage读取用户上次的开关设置，默认为true
+    const savedNotifyCharState = localStorage.getItem('accountingNotifyChar');
+    document.getElementById('notify-char-toggle').checked = savedNotifyCharState !== null ? savedNotifyCharState === 'true' : true;
+    
     selectedCategory = null;
     
     // 切换到记一笔面板
@@ -48445,8 +48946,8 @@ async function saveAccountingRecord() {
     // 先保存记录，获取生成的ID
     const recordId = await db.accountingRecords.add(record);
     
-    // 无论是否通知角色，都在聊天记录中显示系统通知
-    if (state.activeChatId) {
+    // 只有开启通知角色时，才在聊天记录中显示记账通知
+    if (state.activeChatId && notifyChar) {
         const chat = state.chats[state.activeChatId];
         const typeText = currentAccountingType === 'expense' ? '支出' : '收入';
         const now = new Date(date.getTime());
@@ -48468,27 +48969,25 @@ async function saveAccountingRecord() {
             appendMessage(visibleMessage, chat);
         }
         
-        // 2. 如果开启了通知角色，创建给AI看的详细信息（隐藏消息）
-        if (notifyChar) {
-            const hiddenMessage = {
-                role: 'system',
-                content: `[系统提示：用户刚刚记了一笔${typeText}账单]
+        // 2. 创建给AI看的详细信息（隐藏消息）
+        const hiddenMessage = {
+            role: 'system',
+            content: `[系统提示：用户刚刚记了一笔${typeText}账单]
 📅 时间：${dateTimeStr}
 💰 金额：${currentAccountingType === 'expense' ? '-' : '+'}¥${amount.toFixed(2)}
 🏷️ 分类：${selectedCategory.emoji} ${selectedCategory.name}${note ? `\n📝 备注：${note}` : ''}
 
 这是用户的生活记账，你可以关心一下或者给出建议。`,
-                timestamp: Date.now() + 1,
-                isHidden: true,
-                recordId: recordId  // 【新增】记录ID，方便删除时查找
-            };
-            chat.history.push(hiddenMessage);
-        }
+            timestamp: Date.now() + 1,
+            isHidden: true,
+            recordId: recordId  // 【新增】记录ID，方便删除时查找
+        };
+        chat.history.push(hiddenMessage);
         
         await db.chats.put(chat);
         
-        // 如果开启了通知角色，触发自动回复
-        if (notifyChar && typeof autoReply === 'function') {
+        // 触发自动回复
+        if (typeof autoReply === 'function') {
             await autoReply();
         }
     }
@@ -48830,6 +49329,10 @@ async function loadFinancialGoals() {
 async function checkBudgetAlert(newRecord) {
     if (newRecord.type !== 'expense') return;
     
+    // 【关键修改】如果用户关闭了通知角色，则不进行任何预算检查和通知
+    // 这样角色完全不知道记账和预算的存在
+    if (newRecord.notifyChar !== true) return;
+    
     // 获取所有有支出限额的活跃目标（不管是否开启提醒）
     const activeGoals = await db.accountingGoals
         .filter(g => g.expenseLimit && Date.now() >= g.startDate && Date.now() < g.endDate)
@@ -48841,8 +49344,9 @@ async function checkBudgetAlert(newRecord) {
             .between(goal.startDate, goal.endDate)
             .toArray();
         
+        // 【关键修改】只统计开启了通知角色的支出记录
         const totalExpense = records
-            .filter(r => r.type === 'expense')
+            .filter(r => r.type === 'expense' && r.notifyChar === true)
             .reduce((sum, r) => sum + r.amount, 0);
         
         const percent = (totalExpense / goal.expenseLimit) * 100;
@@ -48914,6 +49418,11 @@ document.getElementById('add-category-btn').addEventListener('click', addCustomC
 // 保存记账记录事件
 document.getElementById('save-accounting-btn').addEventListener('click', saveAccountingRecord);
 
+// 【优化】监听"通知当前角色"开关的变化，实时保存到localStorage
+document.getElementById('notify-char-toggle').addEventListener('change', (e) => {
+    localStorage.setItem('accountingNotifyChar', e.target.checked.toString());
+});
+
 // 时间筛选事件
 document.querySelectorAll('.time-filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -48945,13 +49454,17 @@ async function getAccountingSummaryForChar(chatId, daysBack = 30) {
     // 过滤出与当前聊天相关的记录（或所有记录）
     const records = chatId ? allRecords.filter(r => r.chatId === chatId || !r.chatId) : allRecords;
     
-    if (records.length === 0) {
-        return null;
+    // 【关键修改】只保留用户允许通知角色的记录（notifyChar === true）
+    // 这样关闭通知后，角色完全看不到该记账记录
+    const notifiableRecords = records.filter(r => r.notifyChar === true);
+    
+    if (notifiableRecords.length === 0) {
+        return null;  // 没有可通知角色的记录，返回null，角色完全看不到记账信息
     }
     
-    // 计算统计数据
-    const expenses = records.filter(r => r.type === 'expense');
-    const incomes = records.filter(r => r.type === 'income');
+    // 计算统计数据（只统计允许通知角色的记录）
+    const expenses = notifiableRecords.filter(r => r.type === 'expense');
+    const incomes = notifiableRecords.filter(r => r.type === 'income');
     const totalExpense = expenses.reduce((sum, r) => sum + r.amount, 0);
     const totalIncome = incomes.reduce((sum, r) => sum + r.amount, 0);
     
@@ -48992,17 +49505,18 @@ async function getAccountingSummaryForChar(chatId, daysBack = 30) {
         summary += `═══════════════════════════\n`;
         
         for (const goal of activeGoals) {
-            // 计算目标期间的实际支出和收入
+            // 计算目标期间的实际支出和收入（只统计允许通知角色的记录）
             const goalRecords = await db.accountingRecords
                 .where('timestamp')
                 .between(goal.startDate, goal.endDate)
                 .toArray();
             
+            // 只统计notifyChar为true的记录
             const goalExpense = goalRecords
-                .filter(r => r.type === 'expense')
+                .filter(r => r.type === 'expense' && r.notifyChar === true)
                 .reduce((sum, r) => sum + r.amount, 0);
             const goalIncome = goalRecords
-                .filter(r => r.type === 'income')
+                .filter(r => r.type === 'income' && r.notifyChar === true)
                 .reduce((sum, r) => sum + r.amount, 0);
             
             const periodText = {
@@ -49043,9 +49557,9 @@ async function getAccountingSummaryForChar(chatId, daysBack = 30) {
         summary += '\n';
     }
     
-    // 最近的10笔记录
+    // 最近的10笔记录（只显示允许通知角色的记录）
     summary += `📝 最近记录（最多显示10笔）：\n`;
-    const recentRecords = records.slice(0, 10);
+    const recentRecords = notifiableRecords.slice(0, 10);
     recentRecords.forEach((r, idx) => {
         const date = new Date(r.timestamp);
         const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
@@ -49678,22 +50192,8 @@ async function checkAndInitDefaultBanks() {
 }
 
 async function addSampleQuestions(subjectId, name) {
-    const questions = [];
-    if (name.includes('数学') || name.includes('代数')) {
-         questions.push(
-            { subjectId, type: 'single', content: 'lim(x->0) sin(x)/x = ?', options: ['0', '1', '∞', 'Undefined'], answer: '1', difficulty: 1 },
-            { subjectId, type: 'single', content: 'd(x^2)/dx = ?', options: ['x', '2x', 'x^2', '2'], answer: '2x', difficulty: 1 }
-         );
-    } else if (name.includes('英语')) {
-         questions.push(
-            { subjectId, type: 'single', content: 'Choose the correct synonym for "Happy"', options: ['Sad', 'Joyful', 'Angry', 'Tired'], answer: 'Joyful', difficulty: 1 },
-            { subjectId, type: 'single', content: 'Past tense of "Go"', options: ['Goed', 'Gone', 'Went', 'Going'], answer: 'Went', difficulty: 1 }
-         );
-    } else {
-         questions.push(
-            { subjectId, type: 'single', content: '这是一个测试问题', options: ['A', 'B', 'C', 'D'], answer: 'A', difficulty: 1 }
-         );
-    }
+    // 使用 generateQuestionsForSubject 函数生成初始题目
+    const questions = generateQuestionsForSubject(subjectId, name, 20);
     
     for (const q of questions) {
         await db.questionBanks.add(q);
@@ -49750,95 +50250,217 @@ async function handleRefreshQuestionBanks() {
 function generateQuestionsForSubject(subjectId, subjectName, count) {
     const questions = [];
     
-    // 题目模板
-    const templates = {
-        '数学': [
-            { pattern: 'lim(x->{n}) sin({m}x)/x = ?', answer: '{m}' },
-            { pattern: 'd(x^{n})/dx = ?', answer: '{n}x^{n-1}' },
-            { pattern: '∫x^{n}dx = ?', answer: 'x^{n+1}/{n+1}+C' },
-            { pattern: '{a} + {b} = ?', answer: '{a+b}' },
-            { pattern: '{a} × {b} = ?', answer: '{a*b}' },
-            { pattern: '求导：f(x)={a}x^{n}', answer: '{a*n}x^{n-1}' }
-        ],
-        '英语': [
-            { pattern: 'The past tense of "{verb}" is?', answer: '{past}' },
-            { pattern: 'Choose the synonym of "{word}"', answer: '{synonym}' },
-            { pattern: 'Translate: {chinese}', answer: '{english}' }
-        ],
-        '物理': [
-            { pattern: 'F = ma 中，若 m={m}kg, a={a}m/s², 则 F=?', answer: '{m*a}N' },
-            { pattern: '光速 c = ?', answer: '3×10^8 m/s' },
-            { pattern: 'E = mc² 中的 E 代表?', answer: '能量' }
-        ],
-        '计算机': [
-            { pattern: 'TCP/IP模型有几层?', answer: '4层' },
-            { pattern: 'HTTP默认端口号是?', answer: '80' },
-            { pattern: 'HTTPS默认端口号是?', answer: '443' }
-        ],
-        '通用': [
-            { pattern: '以下哪个选项正确?', answer: 'A' },
-            { pattern: '这是一道{subject}练习题{n}', answer: 'A' }
-        ]
+    // 真实题库模板
+    const questionBank = {
+        '高等数学': {
+            single: [
+                { content: '求极限 lim(x→0) (sin x)/x = ?', options: ['0', '1', '∞', '不存在'], answer: '1', explanation: '这是重要极限之一，lim(x→0) (sin x)/x = 1' },
+                { content: '函数 f(x) = x² 在 x = 2 处的导数是多少？', options: ['2', '4', '2x', 'x²'], answer: '4', explanation: 'f\'(x) = 2x，当 x=2 时，f\'(2) = 4' },
+                { content: '∫x dx = ?', options: ['x²', 'x²/2 + C', 'x + C', '2x + C'], answer: 'x²/2 + C', explanation: '幂函数积分公式：∫x^n dx = x^(n+1)/(n+1) + C' },
+                { content: '下列函数中，哪个是奇函数？', options: ['f(x) = x²', 'f(x) = x³', 'f(x) = |x|', 'f(x) = x² + 1'], answer: 'f(x) = x³', explanation: '奇函数满足 f(-x) = -f(x)，只有 x³ 满足' },
+                { content: 'd(e^x)/dx = ?', options: ['e^x', 'xe^(x-1)', '1/e^x', 'ln x'], answer: 'e^x', explanation: '指数函数 e^x 的导数是它本身' },
+                { content: '∫(1/x) dx = ?', options: ['ln|x| + C', 'x + C', '1/x² + C', 'e^x + C'], answer: 'ln|x| + C', explanation: '1/x 的不定积分是自然对数函数' },
+                { content: '若函数 f(x) 在点 x₀ 处可导，则 f(x) 在 x₀ 处必定：', options: ['连续', '可微', '可积', '以上都对'], answer: '连续', explanation: '可导必连续，但连续不一定可导' },
+                { content: 'lim(x→∞) (1 + 1/x)^x = ?', options: ['1', 'e', '∞', '0'], answer: 'e', explanation: '这是自然对数 e 的定义式' },
+                { content: '函数 y = ln x 的定义域是？', options: ['(-∞, +∞)', '(0, +∞)', '[0, +∞)', '(-∞, 0)'], answer: '(0, +∞)', explanation: '对数函数要求真数大于 0' },
+                { content: 'd(sin x)/dx = ?', options: ['cos x', '-cos x', 'sin x', '-sin x'], answer: 'cos x', explanation: '正弦函数的导数是余弦函数' },
+            ],
+            judge: [
+                { content: '连续函数一定可导', answer: '错误', explanation: '连续不一定可导，如 f(x)=|x| 在 x=0 处连续但不可导' },
+                { content: '可导函数一定连续', answer: '正确', explanation: '这是微分学的基本定理' },
+                { content: '两个无穷小量的商仍是无穷小量', answer: '错误', explanation: '两个无穷小量的商可能是任意值，如 lim(x→0) x/x² = ∞' },
+                { content: '定积分的值与积分变量的字母无关', answer: '正确', explanation: '∫[a,b] f(x)dx = ∫[a,b] f(t)dt，积分变量是哑变量' },
+                { content: 'e^(ln x) = x 对所有实数 x 成立', answer: '错误', explanation: '只对 x > 0 成立，因为 ln x 的定义域是 (0, +∞)' },
+            ]
+        },
+        '线性代数': {
+            single: [
+                { content: '矩阵 A = [[1,2],[3,4]] 的行列式 det(A) = ?', options: ['-2', '2', '10', '0'], answer: '-2', explanation: 'det(A) = 1×4 - 2×3 = -2' },
+                { content: '设 A 是 n 阶方阵，则 |kA| = ?', options: ['k|A|', 'k^n|A|', 'k^2|A|', '|A|'], answer: 'k^n|A|', explanation: '数乘矩阵的行列式等于该数的 n 次方乘以原行列式' },
+                { content: '零向量与任意向量的内积等于？', options: ['0', '1', '该向量的模', '不确定'], answer: '0', explanation: '零向量与任何向量的内积都是 0' },
+                { content: '矩阵的秩 rank(A) 最大不超过？', options: ['行数', '列数', 'min(行数,列数)', 'max(行数,列数)'], answer: 'min(行数,列数)', explanation: '秩不能超过行数和列数中的较小值' },
+                { content: 'n 维向量组的极大线性无关组的个数？', options: ['唯一', '不唯一', '不存在', '无穷多个'], answer: '不唯一', explanation: '极大线性无关组不唯一，但个数（秩）唯一' },
+            ],
+            judge: [
+                { content: '可逆矩阵的行列式不为零', answer: '正确', explanation: '矩阵可逆的充要条件是其行列式不为零' },
+                { content: '对称矩阵的特征值都是实数', answer: '正确', explanation: '实对称矩阵的特征值必为实数' },
+                { content: 'AB = BA 对所有矩阵成立', answer: '错误', explanation: '矩阵乘法一般不满足交换律' },
+                { content: '单位矩阵的行列式为 1', answer: '正确', explanation: '单位矩阵的行列式等于 1' },
+            ]
+        },
+        '大学英语': {
+            single: [
+                { content: 'Choose the correct form: "She _____ to the store yesterday."', options: ['go', 'goes', 'went', 'gone'], answer: 'went', explanation: '"yesterday" 表明是过去时，go 的过去式是 went' },
+                { content: 'What is the synonym of "difficult"?', options: ['easy', 'hard', 'simple', 'soft'], answer: 'hard', explanation: 'difficult 和 hard 都表示"困难的"' },
+                { content: 'Choose the correct article: "I saw ___ elephant at the zoo."', options: ['a', 'an', 'the', 'no article'], answer: 'an', explanation: 'elephant 是元音开头，用 an' },
+                { content: '"Ubiquitous" means:', options: ['rare', 'everywhere', 'beautiful', 'expensive'], answer: 'everywhere', explanation: 'ubiquitous 意为"无处不在的"' },
+                { content: 'Past participle of "write" is:', options: ['wrote', 'writing', 'written', 'writes'], answer: 'written', explanation: 'write 的过去分词是 written' },
+                { content: 'Which is grammatically correct?', options: ['He don\'t like it', 'He doesn\'t likes it', 'He doesn\'t like it', 'He not like it'], answer: 'He doesn\'t like it', explanation: '第三人称单数用 doesn\'t，后接动词原形' },
+                { content: '"Benevolent" is closest in meaning to:', options: ['cruel', 'kind', 'angry', 'neutral'], answer: 'kind', explanation: 'benevolent 意为"仁慈的，善良的"' },
+            ],
+            judge: [
+                { content: '"I have been studying English for 5 years" is in present perfect continuous tense.', answer: '正确', explanation: 'have/has been doing 是现在完成进行时' },
+                { content: '"They was happy" is grammatically correct.', answer: '错误', explanation: 'They 要用 were，不能用 was' },
+                { content: 'Adjectives in English usually come before the noun.', answer: '正确', explanation: '英语中形容词通常放在名词前面' },
+                { content: '"Information" is a countable noun.', answer: '错误', explanation: 'information 是不可数名词' },
+            ]
+        },
+        '大学物理': {
+            single: [
+                { content: '牛顿第二定律的表达式是？', options: ['F = ma', 'E = mc²', 'F = Gm₁m₂/r²', 'v = v₀ + at'], answer: 'F = ma', explanation: '牛顿第二定律：物体的加速度与合外力成正比，与质量成反比' },
+                { content: '真空中的光速约为？', options: ['3×10⁸ m/s', '3×10⁶ m/s', '3×10¹⁰ m/s', '3×10⁴ m/s'], answer: '3×10⁸ m/s', explanation: '真空光速 c ≈ 3×10⁸ m/s' },
+                { content: '重力加速度 g 的标准值约为？', options: ['9.8 m/s²', '10 m/s²', '8.9 m/s²', '11 m/s²'], answer: '9.8 m/s²', explanation: '地球表面重力加速度约为 9.8 m/s²' },
+                { content: '下列哪个物理量是矢量？', options: ['质量', '速度', '温度', '时间'], answer: '速度', explanation: '矢量既有大小又有方向，速度是矢量' },
+                { content: '电阻的单位是？', options: ['安培(A)', '伏特(V)', '欧姆(Ω)', '瓦特(W)'], answer: '欧姆(Ω)', explanation: '电阻的单位是欧姆，符号 Ω' },
+                { content: '根据能量守恒定律，孤立系统的总能量如何变化？', options: ['增加', '减少', '保持不变', '先增后减'], answer: '保持不变', explanation: '能量守恒定律：孤立系统的总能量保持不变' },
+            ],
+            judge: [
+                { content: '力是改变物体运动状态的原因', answer: '正确', explanation: '牛顿第一定律表明力是改变物体运动状态的原因' },
+                { content: '动能可以为负值', answer: '错误', explanation: '动能 Ek = ½mv²，由于 v² ≥ 0，所以动能总是非负的' },
+                { content: '摩擦力的方向总是与物体运动方向相反', answer: '错误', explanation: '静摩擦力可以与运动方向相同，如传送带上的物体' },
+                { content: '温度是物体冷热程度的量度', answer: '正确', explanation: '温度反映了物体的冷热程度和分子平均动能' },
+            ]
+        },
+        '计算机基础': {
+            single: [
+                { content: '在计算机中，1 KB 等于多少字节？', options: ['1000', '1024', '1048576', '512'], answer: '1024', explanation: '1 KB = 1024 Bytes (2^10)' },
+                { content: 'HTTP 协议默认使用的端口号是？', options: ['21', '80', '443', '8080'], answer: '80', explanation: 'HTTP 默认端口是 80，HTTPS 是 443' },
+                { content: 'TCP/IP 模型共有几层？', options: ['3层', '4层', '5层', '7层'], answer: '4层', explanation: 'TCP/IP 模型分为：应用层、传输层、网络层、网络接口层' },
+                { content: '下列哪个不是面向对象编程的特性？', options: ['封装', '继承', '多态', '编译'], answer: '编译', explanation: '面向对象三大特性是：封装、继承、多态' },
+                { content: '二进制数 1010 转换为十进制是？', options: ['8', '10', '12', '16'], answer: '10', explanation: '1010₂ = 1×2³ + 0×2² + 1×2¹ + 0×2⁰ = 10₁₀' },
+                { content: '下列哪种数据结构遵循"先进先出"(FIFO)原则？', options: ['栈', '队列', '树', '图'], answer: '队列', explanation: '队列是先进先出(FIFO)，栈是后进先出(LIFO)' },
+                { content: 'SQL 中用于查询数据的关键字是？', options: ['INSERT', 'SELECT', 'UPDATE', 'DELETE'], answer: 'SELECT', explanation: 'SELECT 用于查询数据，INSERT 插入，UPDATE 更新，DELETE 删除' },
+            ],
+            judge: [
+                { content: 'Python 是一种编译型语言', answer: '错误', explanation: 'Python 是解释型语言，不是编译型语言' },
+                { content: 'IP 地址由 32 位二进制数组成（IPv4）', answer: '正确', explanation: 'IPv4 地址是 32 位，分为 4 个 8 位段' },
+                { content: '递归函数必须有终止条件', answer: '正确', explanation: '没有终止条件的递归会导致栈溢出' },
+                { content: 'RAM 是只读存储器', answer: '错误', explanation: 'RAM 是随机存储器(可读写)，ROM 才是只读存储器' },
+            ]
+        },
+        'CET-4': {
+            single: [
+                { content: '"Abandon" means:', options: ['to keep', 'to give up', 'to find', 'to build'], answer: 'to give up', explanation: 'abandon 意为"放弃"' },
+                { content: 'Choose the correct preposition: "She is good ___ math."', options: ['at', 'in', 'on', 'with'], answer: 'at', explanation: 'be good at 表示"擅长于"' },
+                { content: '"Consequence" is closest to:', options: ['result', 'beginning', 'process', 'cause'], answer: 'result', explanation: 'consequence 意为"结果，后果"' },
+                { content: 'Which sentence is correct?', options: ['I have went there', 'I have gone there', 'I has been there', 'I have been there'], answer: 'I have been there', explanation: 'have been 表示"去过"，have gone 表示"去了"' },
+            ],
+            judge: [
+                { content: '"Affect" and "effect" can be used interchangeably.', answer: '错误', explanation: 'affect 通常是动词，effect 通常是名词' },
+                { content: 'The past tense of "read" is pronounced differently from its present tense.', answer: '错误', explanation: 'read 的现在式和过去式拼写相同，发音也相同 [riːd]，但过去分词发音是 [red]' },
+            ]
+        },
+        'CET-6': {
+            single: [
+                { content: '"Sophisticated" means:', options: ['simple', 'complex and refined', 'old-fashioned', 'cheap'], answer: 'complex and refined', explanation: 'sophisticated 意为"复杂的，精致的"' },
+                { content: 'Choose the synonym of "ubiquitous":', options: ['rare', 'omnipresent', 'specific', 'limited'], answer: 'omnipresent', explanation: 'ubiquitous 和 omnipresent 都表示"无处不在的"' },
+                { content: '"Paradox" refers to:', options: ['a simple truth', 'a contradictory statement', 'a scientific law', 'a common phrase'], answer: 'a contradictory statement', explanation: 'paradox 意为"悖论，矛盾的说法"' },
+            ],
+            judge: [
+                { content: '"Literally" should only be used for literal meanings, not for emphasis.', answer: '正确', explanation: '虽然口语中常误用，但 literally 应该只用于字面意思' },
+                { content: 'Double negatives are acceptable in formal English.', answer: '错误', explanation: '标准英语中应避免双重否定' },
+            ]
+        },
+        '雅思英语': {
+            single: [
+                { content: 'In IELTS Writing Task 2, the recommended word count is:', options: ['150 words', '200 words', '250 words', '300 words'], answer: '250 words', explanation: 'Task 2 要求至少 250 词' },
+                { content: 'Which section comes first in IELTS Listening?', options: ['Section 4', 'Section 3', 'Section 2', 'Section 1'], answer: 'Section 1', explanation: 'IELTS 听力从 Section 1 开始，难度递增' },
+                { content: '"Coherence and Cohesion" in IELTS Writing refers to:', options: ['Grammar accuracy', 'Logical flow and linking', 'Vocabulary range', 'Task achievement'], answer: 'Logical flow and linking', explanation: 'Coherence 指连贯性，Cohesion 指衔接性' },
+            ],
+            judge: [
+                { content: 'IELTS Speaking test has 3 parts.', answer: '正确', explanation: 'IELTS 口语分为 3 个部分：Introduction, Long turn, Discussion' },
+                { content: 'You can use pencil for IELTS Writing test.', answer: '正确', explanation: 'IELTS 笔试必须用铅笔' },
+            ]
+        },
+        'HSK中文': {
+            single: [
+                { content: '"你好"的正确拼音是？', options: ['nǐ hǎo', 'ní hào', 'nǐ hào', 'ní hǎo'], answer: 'nǐ hǎo', explanation: '"你"是第三声，"好"也是第三声' },
+                { content: '下列哪个词是量词？', options: ['个', '大', '吃', '很'], answer: '个', explanation: '"个"是最常用的量词之一' },
+                { content: '"汉语"的意思是？', options: ['Chinese language', 'Chinese people', 'China', 'Chinese food'], answer: 'Chinese language', explanation: '"汉语"指的是中文语言' },
+            ],
+            judge: [
+                { content: '汉语有四个声调', answer: '错误', explanation: '汉语普通话有四个声调加一个轻声，共五种声调' },
+                { content: '"的、地、得"的用法完全相同', answer: '错误', explanation: '"的"修饰名词，"地"修饰动词，"得"表示结果' },
+            ]
+        }
     };
     
-    // 根据科目名选择模板类型
-    let templateType = '通用';
-    if (subjectName.includes('数学') || subjectName.includes('代数')) templateType = '数学';
-    else if (subjectName.includes('英语')) templateType = '英语';
-    else if (subjectName.includes('物理')) templateType = '物理';
-    else if (subjectName.includes('计算机')) templateType = '计算机';
+    // 根据科目名称选择题库
+    let selectedBank = questionBank['通用'] || null;
+    for (const [key, value] of Object.entries(questionBank)) {
+        if (subjectName.includes(key.split('').filter(c => c !== ' ').join('')) || key.includes(subjectName)) {
+            selectedBank = value;
+            break;
+        }
+    }
     
-    const questionTypes = ['single', 'multiple', 'judge'];
+    // 如果没有匹配的题库，生成通用题目
+    if (!selectedBank) {
+        selectedBank = {
+            single: [
+                { content: `${subjectName}相关问题：请选择正确答案`, options: ['选项A', '选项B', '选项C', '选项D'], answer: '选项A', explanation: '这是一道示例题目' }
+            ],
+            judge: [
+                { content: `这是一道${subjectName}判断题`, answer: '正确', explanation: '这是判断题解析' }
+            ]
+        };
+    }
+    
+    // 生成题目
+    const questionTypes = ['single', 'judge'];
+    if (selectedBank.multiple) questionTypes.push('multiple');
     
     for (let i = 0; i < count; i++) {
         const type = questionTypes[Math.floor(Math.random() * questionTypes.length)];
-        let content, options, answer;
+        let questionData;
         
-        if (type === 'judge') {
-            content = `${subjectName}判断题${i + 1}：这是一道判断题`;
-            options = ['正确', '错误'];
-            answer = Math.random() > 0.5 ? '正确' : '错误';
-        } else if (type === 'multiple') {
-            content = `${subjectName}多选题${i + 1}：以下选项正确的有（多选）`;
-            options = ['选项A', '选项B', '选项C', '选项D'];
-            answer = 'A,B';
+        if (type === 'single' && selectedBank.single) {
+            const template = selectedBank.single[i % selectedBank.single.length];
+            questionData = {
+                subjectId,
+                type: 'single',
+                content: template.content,
+                options: template.options,
+                answer: template.answer,
+                difficulty: Math.floor(Math.random() * 3) + 1,
+                explanation: template.explanation || '暂无解析'
+            };
+        } else if (type === 'judge' && selectedBank.judge) {
+            const template = selectedBank.judge[i % selectedBank.judge.length];
+            questionData = {
+                subjectId,
+                type: 'judge',
+                content: template.content,
+                options: ['正确', '错误'],
+                answer: template.answer,
+                difficulty: Math.floor(Math.random() * 3) + 1,
+                explanation: template.explanation || '暂无解析'
+            };
+        } else if (type === 'multiple' && selectedBank.multiple) {
+            const template = selectedBank.multiple[i % selectedBank.multiple.length];
+            questionData = {
+                subjectId,
+                type: 'multiple',
+                content: template.content,
+                options: template.options,
+                answer: template.answer,
+                difficulty: Math.floor(Math.random() * 3) + 1,
+                explanation: template.explanation || '暂无解析'
+            };
         } else {
-            // 单选题
-            const num1 = Math.floor(Math.random() * 100);
-            const num2 = Math.floor(Math.random() * 100);
-            
-            if (templateType === '数学') {
-                content = `计算：${num1} + ${num2} = ?`;
-                const correctAnswer = num1 + num2;
-                options = [
-                    String(correctAnswer),
-                    String(correctAnswer + 1),
-                    String(correctAnswer - 1),
-                    String(correctAnswer + 2)
-                ].sort(() => Math.random() - 0.5);
-                answer = String(correctAnswer);
-            } else if (templateType === '英语') {
-                const words = ['happy-joyful', 'sad-unhappy', 'big-large', 'small-tiny', 'fast-quick'];
-                const pair = words[i % words.length].split('-');
-                content = `Choose the synonym of "${pair[0]}"`;
-                options = [pair[1], 'wrong1', 'wrong2', 'wrong3'];
-                answer = pair[1];
-            } else {
-                content = `${subjectName}单选题${i + 1}：这是第${i + 1}道练习题`;
-                options = ['选项A', '选项B', '选项C', '选项D'];
-                answer = options[0];
-            }
+            // 默认单选题
+            questionData = {
+                subjectId,
+                type: 'single',
+                content: `${subjectName}测试题${i + 1}`,
+                options: ['选项A', '选项B', '选项C', '选项D'],
+                answer: '选项A',
+                difficulty: 1,
+                explanation: '这是一道测试题'
+            };
         }
         
-        questions.push({
-            subjectId,
-            type,
-            content,
-            options,
-            answer,
-            difficulty: Math.floor(Math.random() * 3) + 1,
-            explanation: `这是${subjectName}题目${i + 1}的解析`
-        });
+        questions.push(questionData);
     }
     
     return questions;
@@ -49920,6 +50542,11 @@ async function startStudySession(mode) {
     if (!subjectId) return alert('请选择科目');
     if (!count || count <= 0) return alert('请输入有效的题目数量');
     
+    // 获取通知角色开关状态（根据模式读取对应的开关）
+    const notifyCharToggleId = mode === 'practice' ? 'notify-char-study-toggle' : 'notify-char-exam-toggle';
+    const notifyCharToggle = document.getElementById(notifyCharToggleId);
+    const notifyChar = notifyCharToggle ? notifyCharToggle.checked : false;
+    
     const subject = await db.studySubjects.get(subjectId);
     const questions = await getRandomQuestions(subjectId, count);
     
@@ -49939,7 +50566,8 @@ async function startStudySession(mode) {
         startTime: Date.now(),
         timerInterval: null,
         mode: mode,
-        subjectName: subject.name
+        subjectName: subject.name,
+        notifyChar: notifyChar  // 保存通知角色状态
     };
     
     if (mode === 'practice') {
@@ -49998,7 +50626,7 @@ function renderQuestion() {
         
         const options = Array.isArray(q.options) ? q.options : [];
         
-        if (q.type === 'single' || q.type === 'multiple') {
+        if (q.type === 'single' || q.type === 'multiple' || q.type === 'judge') {
             options.forEach((opt, idx) => {
                 const div = document.createElement('div');
                 div.className = 'study-option';
@@ -50010,7 +50638,7 @@ function renderQuestion() {
                     if(mode === 'practice' && document.getElementById('answer-feedback').style.display === 'block') return; // Already answered
                     
                     // Handle selection style
-                    if(q.type === 'single') {
+                    if(q.type === 'single' || q.type === 'judge') {
                         optionsArea.querySelectorAll('.study-option').forEach(o => {
                             o.style.background = 'white';
                             o.style.borderColor = '#ddd';
@@ -50161,7 +50789,8 @@ function checkAnswer() {
         subjectId: q.subjectId,
         score: isCorrect ? 1 : 0,
         type: 'practice',
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        notifyChar: currentStudySession.notifyChar || false  // 保存通知角色状态
     });
 }
 
@@ -50238,6 +50867,7 @@ async function finishExam() {
         score: score,
         type: 'exam',
         timestamp: Date.now(),
+        notifyChar: currentStudySession.notifyChar || false,  // 保存通知角色状态
         details: {
              total: currentStudySession.questions.length,
              correct: correctCount
@@ -50289,6 +50919,13 @@ async function askCharForStudyHelp() {
         alert('请先进入练习或考试模式');
         return;
     }
+    
+    // 检查是否开启了通知角色功能
+    if (!currentStudySession.notifyChar) {
+        alert('⚠️ 通知角色功能未开启\n\n请在开始练习或考试前，勾选「通知角色」选项。');
+        return;
+    }
+    
     const q = currentStudySession.questions[currentStudySession.currentIndex];
     
     // Close modal
@@ -50516,15 +51153,24 @@ async function updateStudyStatsDisplay() {
 async function getStudyInfoForChar() {
     const settings = await db.studySettings.get('default');
     const today = new Date().toISOString().split('T')[0];
-    const records = await db.studyRecords.where('date').equals(today).toArray();
-    const exams = await db.studyRecords.where('type').equals('exam').reverse().limit(1).toArray();
+    const allRecords = await db.studyRecords.where('date').equals(today).toArray();
+    const allExams = await db.studyRecords.where('type').equals('exam').reverse().limit(1).toArray();
+    
+    // 【关键修改】只保留用户允许通知角色的记录（notifyChar === true）
+    // 这样关闭通知后，角色完全看不到学习中心内容
+    const notifiableRecords = allRecords.filter(r => r.notifyChar === true);
+    const notifiableExams = allExams.filter(r => r.notifyChar === true);
+    
+    if (notifiableRecords.length === 0 && notifiableExams.length === 0) {
+        return null;  // 没有可通知角色的记录，返回null，角色完全不知道学习中心
+    }
     
     let info = `════════════════════════════\n`;
     info += `📚 【用户的学习情况】\n`;
-    info += `今日刷题：${records.length}道\n`;
+    info += `今日刷题：${notifiableRecords.length}道\n`;
     if (settings && settings.dailyGoal) info += `今日目标：${settings.dailyGoal}道\n`;
-    if (exams.length > 0) {
-        info += `最近考试成绩：${exams[0].score}分 (${exams[0].date})\n`;
+    if (notifiableExams.length > 0) {
+        info += `最近考试成绩：${notifiableExams[0].score}分 (${notifiableExams[0].date})\n`;
     }
     info += `════════════════════════════\n`;
     return info;
@@ -52463,23 +53109,27 @@ document.addEventListener('keydown', (e) => {
     }
 
     const slider = homeScreen.querySelector('.home-screen-slider');
-    if (!slider) return;
+    if (!slider || !slider.scrollToPage) return;
+
+    // 获取当前页码
+    const currentPage = slider.getCurrentPage ? slider.getCurrentPage() : 0;
+    const totalPages = slider.querySelectorAll('.home-page').length;
 
     // 当用户按下右箭头时
     if (e.key === 'ArrowRight') {
-        // 让滑动容器向右滚动一页的宽度
-        slider.scrollBy({
-            left: slider.clientWidth,
-            behavior: 'smooth' // 使用平滑滚动效果
-        });
+        e.preventDefault(); // 阻止默认行为
+        if (currentPage < totalPages - 1) {
+            // 只能移动到下一页
+            slider.scrollToPage(currentPage + 1);
+        }
     } 
     // 当用户按下左箭头时
     else if (e.key === 'ArrowLeft') {
-        // 让滑动容器向左滚动一页的宽度
-        slider.scrollBy({
-            left: -slider.clientWidth,
-            behavior: 'smooth' // 使用平滑滚动效果
-        });
+        e.preventDefault(); // 阻止默认行为
+        if (currentPage > 0) {
+            // 只能移动到上一页
+            slider.scrollToPage(currentPage - 1);
+        }
     }
 });
 // ▲▲▲ 新增代码结束 ▲▲▲
@@ -53882,6 +54532,45 @@ const avatarFrames = [
 <input type="file" id="world-book-import-input" accept=".json, .jsonl" style="display: none;">
 <input type="file" id="ludo-qbank-import-input" accept=".json" hidden>
 <input type="file" id="inner-voice-bg-input" accept="image/*" hidden>
+
+<!-- ▼▼▼ 清空数据选项弹窗 ▼▼▼ -->
+<div id="clear-data-options-modal" class="modal">
+    <div class="modal-content" style="width: 360px; height: auto; max-height: 70%;">
+        <div class="modal-header">
+            <span>清空数据选项</span>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            <p style="margin-bottom: 20px; color: #666; font-size: 14px;">确定要清空此聊天的【消息和心声】吗？<br>（聊天总结将被保留）</p>
+            
+            <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
+                <p style="margin-bottom: 15px; font-size: 14px; font-weight: 600; color: #333;">是否同时清空以下数据？</p>
+                
+                <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer; padding: 10px; border-radius: 8px; background: #f9f9f9;">
+                    <input type="checkbox" id="clear-accounting-checkbox" style="width: 18px; height: 18px; margin-right: 12px; cursor: pointer;">
+                    <span style="font-size: 14px; color: #333;">📊 记账数据（所有收支记录、分类、目标）</span>
+                </label>
+                
+                <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer; padding: 10px; border-radius: 8px; background: #f9f9f9;">
+                    <input type="checkbox" id="clear-period-checkbox" style="width: 18px; height: 18px; margin-right: 12px; cursor: pointer;">
+                    <span style="font-size: 14px; color: #333;">🌸 月经数据（经期设置和手动标记）</span>
+                </label>
+                
+                <label style="display: flex; align-items: center; margin-bottom: 0; cursor: pointer; padding: 10px; border-radius: 8px; background: #f9f9f9;">
+                    <input type="checkbox" id="clear-study-checkbox" style="width: 18px; height: 18px; margin-right: 12px; cursor: pointer;">
+                    <span style="font-size: 14px; color: #333;">📚 学习数据（科目、题库、学习记录）</span>
+                </label>
+            </div>
+            
+            <p style="margin-top: 15px; font-size: 12px; color: #999; line-height: 1.5;">💡 提示：默认不清除这些数据，只清除聊天记录。如需清除，请勾选对应选项。</p>
+        </div>
+        <div class="modal-footer" style="display: flex; gap: 10px;">
+            <button class="cancel" id="cancel-clear-data-btn" style="flex: 1; margin: 0;">取消</button>
+            <button class="save" id="confirm-clear-data-btn" style="flex: 1; margin: 0; background: #ff3b30; border-color: #ff3b30;">确认清空</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 清空数据选项弹窗结束 ▲▲▲ -->
+
 </body>
 </html>
 </html>

@@ -1671,21 +1671,93 @@ function openDiaryModal(dateStr) {
 }
 
 /**
- * 打开日记编辑器
+ * 【新功能】添加自定义心情
+ */
+async function addCustomMood() {
+  const chat = state.chats[activeLoversSpaceCharId];
+  if (!chat) return;
+
+  // 1. 输入Emoji
+  const emoji = prompt('请输入一个Emoji表情（只能输入一个哦）：');
+  if (!emoji || emoji.trim() === '') return;
+  
+  // 2. 输入含义
+  const meaning = prompt('给这个表情起个名字吧（例如：超级开心）：');
+  if (!meaning || meaning.trim() === '') return;
+
+  // 3. 保存
+  if (!chat.loversSpaceData.customMoods) {
+    chat.loversSpaceData.customMoods = [];
+  }
+  
+  chat.loversSpaceData.customMoods.push({
+    emoji: emoji.trim(),
+    meaning: meaning.trim()
+  });
+  
+  await db.chats.put(chat);
+  
+  // 4. 刷新编辑器界面
+  const currentContent = document.getElementById('ls-diary-content-input').value;
+  openDiaryEditor(currentDiaryDate, { 
+    userDiary: currentContent,
+    userEmoji: emoji.trim()
+  });
+}
+
+/**
+ * 打开日记编辑器 (支持自定义心情)
  */
 function openDiaryEditor(dateStr, entryData) {
   const modal = document.getElementById('ls-diary-editor-modal');
   document.getElementById('ls-diary-editor-title').textContent = `记录 ${dateStr} 的心情`;
-
+  
+  const chat = state.chats[activeLoversSpaceCharId];
   const emojiSelector = document.getElementById('ls-emoji-selector');
-  const emojis = ['😊', '😄', '😍', '😢', '😠', '🤔', '😴', '🤢'];
-  emojiSelector.innerHTML = emojis.map(e => `<span class="emoji-option" data-emoji="${e}">${e}</span>`).join('');
+  
+  // 默认心情
+  const defaultEmojis = [
+    { emoji: '😊', meaning: '开心' },
+    { emoji: '😄', meaning: '大笑' },
+    { emoji: '😍', meaning: '喜爱' },
+    { emoji: '😢', meaning: '难过' },
+    { emoji: '😠', meaning: '生气' },
+    { emoji: '🤔', meaning: '思考' },
+    { emoji: '😴', meaning: '困倦' },
+    { emoji: '🤢', meaning: '不适' }
+  ];
+
+  // 合并自定义心情
+  const customMoods = chat.loversSpaceData.customMoods || [];
+  const allMoods = [...defaultEmojis, ...customMoods];
+
+  let html = allMoods.map(m => 
+    `<span class="emoji-option" data-emoji="${m.emoji}" title="${m.meaning}">${m.emoji}</span>`
+  ).join('');
+
+  // 添加“新增”按钮
+  html += `<span class="emoji-option add-mood-btn" title="添加新心情" style="display: inline-flex; align-items: center; justify-content: center; color: #007bff; font-weight: bold; font-size: 20px; cursor: pointer;">+</span>`;
+
+  emojiSelector.innerHTML = html;
+
+  // 绑定“新增”按钮的点击事件
+  const addBtn = emojiSelector.querySelector('.add-mood-btn');
+  if (addBtn) {
+    addBtn.onclick = (e) => {
+      e.stopPropagation(); 
+      addCustomMood();
+    };
+  }
 
   // 恢复之前的选择（如果有）
   const contentInput = document.getElementById('ls-diary-content-input');
+  
   if (entryData && entryData.userEmoji) {
-    emojiSelector.querySelector(`.emoji-option[data-emoji="${entryData.userEmoji}"]`)?.classList.add('selected');
+    const target = emojiSelector.querySelector(`.emoji-option[data-emoji="${entryData.userEmoji}"]`);
+    if (target) target.classList.add('selected');
     contentInput.value = entryData.userDiary || '';
+  } else if (entryData && entryData.userDiary) {
+     contentInput.value = entryData.userDiary;
   } else {
     contentInput.value = '';
   }
@@ -1694,7 +1766,7 @@ function openDiaryEditor(dateStr, entryData) {
 }
 
 /**
- * 打开日记查看器
+ * 打开日记查看器 (支持评论)
  */
 function openDiaryViewer(dateStr, entryData, chat) {
   const modal = document.getElementById('ls-diary-viewer-modal');
@@ -1706,12 +1778,24 @@ function openDiaryViewer(dateStr, entryData, chat) {
   if (entryData.userDiary) {
     const userBlock = document.createElement('div');
     userBlock.className = 'ls-diary-entry-block';
+    
+    const commentsHtml = renderDiaryCommentsHtml(entryData.userComments || [], 'user', dateStr);
+    
     userBlock.innerHTML = `
             <div class="entry-header">
                 <span class="mood-emoji">${entryData.userEmoji}</span>
                 <span class="author">${chat.settings.myNickname || '我'}的日记</span>
             </div>
             <p class="entry-content">${entryData.userDiary.replace(/\n/g, '<br>')}</p>
+            
+            <!-- 评论区 -->
+            <div class="ls-diary-comments-section">
+                <div class="comments-list">${commentsHtml}</div>
+                <div class="comment-input-area">
+                    <input type="text" placeholder="写下你的想法..." class="ls-diary-comment-input" id="ls-comment-input-user">
+                    <button class="ls-diary-comment-submit-btn" data-target="user" data-date="${dateStr}">发送</button>
+                </div>
+            </div>
         `;
     bodyEl.appendChild(userBlock);
   }
@@ -1720,21 +1804,207 @@ function openDiaryViewer(dateStr, entryData, chat) {
   if (entryData.charDiary) {
     const charBlock = document.createElement('div');
     charBlock.className = 'ls-diary-entry-block';
-    charBlock.style.borderColor = '#ff8fab'; // 给角色日记一个不同的颜色
+    charBlock.style.borderColor = '#ff8fab'; 
+    
+    const commentsHtml = renderDiaryCommentsHtml(entryData.charComments || [], 'char', dateStr);
+
     charBlock.innerHTML = `
             <div class="entry-header">
                 <span class="mood-emoji">${entryData.charEmoji}</span>
                 <span class="author">${chat.name}的日记</span>
             </div>
             <p class="entry-content">${entryData.charDiary.replace(/\n/g, '<br>')}</p>
+            
+            <!-- 评论区 -->
+            <div class="ls-diary-comments-section">
+                <div class="comments-list">${commentsHtml}</div>
+                <div class="comment-input-area">
+                    <input type="text" placeholder="给Ta留言..." class="ls-diary-comment-input" id="ls-comment-input-char">
+                    <button class="ls-diary-comment-submit-btn" data-target="char" data-date="${dateStr}">发送</button>
+                </div>
+            </div>
         `;
     bodyEl.appendChild(charBlock);
   } else {
-    // 如果角色还没写，给个提示
-    bodyEl.innerHTML += `<p style="text-align: center; color: var(--text-secondary);">Ta 还没写今天的心情日记哦~</p>`;
+    bodyEl.innerHTML += `<p style="text-align: center; color: var(--text-secondary); margin-top: 20px;">Ta 还没写今天的心情日记哦~</p>`;
   }
 
   modal.classList.add('visible');
+}
+
+/**
+ * 生成评论列表的HTML
+ */
+function renderDiaryCommentsHtml(comments, targetType, dateStr) {
+    if (!comments || comments.length === 0) return '';
+    
+    return comments.map((comment, index) => {
+        const isUser = comment.author === 'user';
+        const chat = state.chats[activeLoversSpaceCharId];
+        const name = isUser ? (chat.settings.myNickname || '我') : chat.name;
+        const style = isUser ? '' : 'color: var(--accent-color);';
+        
+        return `
+            <div class="ls-diary-comment-item">
+                <span class="comment-author" style="${style}">${name}:</span>
+                <span class="comment-content">${comment.content}</span>
+                ${isUser ? `<span class="ls-diary-comment-delete-btn" data-target="${targetType}" data-index="${index}" data-date="${dateStr}">×</span>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * 处理发表日记评论
+ */
+async function handlePostDiaryComment(dateStr, targetType) {
+    const inputEl = document.getElementById(`ls-comment-input-${targetType}`);
+    const content = inputEl.value.trim();
+    if (!content) return;
+    
+    const chat = state.chats[activeLoversSpaceCharId];
+    const diaryEntry = chat.loversSpaceData.emotionDiaries[dateStr];
+    
+    if (!diaryEntry[targetType + 'Comments']) {
+        diaryEntry[targetType + 'Comments'] = [];
+    }
+
+    diaryEntry[targetType + 'Comments'].push({
+        author: 'user',
+        content: content,
+        timestamp: Date.now()
+    });
+    
+    await db.chats.put(chat);
+    
+    // 刷新界面
+    openDiaryViewer(dateStr, diaryEntry, chat);
+    
+    // 触发AI回复
+    generateAiDiaryComment(dateStr, targetType);
+    
+    // 清空输入框
+    inputEl.value = '';
+}
+
+/**
+ * 删除评论
+ */
+async function deleteDiaryComment(dateStr, targetType, index) {
+     const chat = state.chats[activeLoversSpaceCharId];
+     const diaryEntry = chat.loversSpaceData.emotionDiaries[dateStr];
+     if (diaryEntry && diaryEntry[targetType + 'Comments']) {
+         diaryEntry[targetType + 'Comments'].splice(index, 1);
+         await db.chats.put(chat);
+         openDiaryViewer(dateStr, diaryEntry, chat);
+     }
+}
+
+/**
+ * 【全新】AI自动生成日记评论
+ */
+async function generateAiDiaryComment(dateStr, targetType) {
+  const chat = state.chats[activeLoversSpaceCharId];
+  if (!chat) return;
+
+  const diaryEntry = chat.loversSpaceData.emotionDiaries?.[dateStr];
+  if (!diaryEntry) return;
+
+  const userNickname = chat.settings.myNickname || '我';
+  const charName = chat.name;
+  let context = "";
+  
+  // 简单的防抖/延迟，模拟AI思考
+  await new Promise(r => setTimeout(r, 2000));
+
+  if (targetType === 'user') {
+      // 用户评论了自己的日记，或者刚刚写了日记
+      context = `${userNickname}写了一篇日记。
+      心情: ${diaryEntry.userEmoji}
+      内容: "${diaryEntry.userDiary}"
+      
+      请你(扮演${charName})阅读这篇日记，并发表一条温暖、有趣或调皮的评论。`;
+  } else {
+      // 用户评论了Char的日记
+      const comments = diaryEntry.charComments || [];
+      const lastComment = comments[comments.length - 1];
+      if (!lastComment || lastComment.author !== 'user') return;
+
+      context = `你(${charName})写了一篇日记:
+      心情: ${diaryEntry.charEmoji}
+      内容: "${diaryEntry.charDiary}"
+      
+      ${userNickname}刚刚评论了你的日记: "${lastComment.content}"
+      
+      请你(扮演${charName})回复这条评论。`;
+  }
+
+  const systemPrompt = `
+# 角色扮演任务
+${chat.settings.aiPersona}
+
+# 任务
+${context}
+
+# 要求
+1. 保持人设，语气自然。
+2. 内容不要太长，50字以内。
+3. 【必须且只能】输出评论内容的纯文本，不要包含JSON或其他格式。
+`;
+
+  try {
+      const { proxyUrl, apiKey, model } = state.apiConfig;
+      if (!proxyUrl || !apiKey) return;
+
+      const messagesForApi = [{ role: 'user', content: systemPrompt }];
+      // 简单的请求封装
+      let isGemini = proxyUrl.includes('google') || model.includes('gemini'); 
+      let body, url, headers;
+      
+      if (isGemini) {
+           url = `${GEMINI_API_URL}/${model}:generateContent?key=${getRandomValue(apiKey)}`;
+           headers = { 'Content-Type': 'application/json' };
+           body = JSON.stringify({
+             contents: messagesForApi,
+             generationConfig: { temperature: 0.8 }
+           });
+      } else {
+           url = `${proxyUrl}/v1/chat/completions`;
+           headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` };
+           body = JSON.stringify({
+             model: model,
+             messages: messagesForApi,
+             temperature: 0.8
+           });
+      }
+
+      const response = await fetch(url, { method: 'POST', headers, body });
+      if (!response.ok) return;
+      
+      const data = await response.json();
+      const content = (isGemini ? data.candidates?.[0]?.content?.parts?.[0]?.text : data.choices?.[0]?.message?.content)?.trim();
+
+      if (content) {
+          if (!diaryEntry[targetType + 'Comments']) {
+              diaryEntry[targetType + 'Comments'] = [];
+          }
+          
+          diaryEntry[targetType + 'Comments'].push({
+              author: 'char',
+              content: content,
+              timestamp: Date.now()
+          });
+          
+          await db.chats.put(chat);
+          
+          // 如果界面还开着，刷新它
+          if (document.getElementById('ls-diary-viewer-modal').classList.contains('visible') && currentDiaryDate === dateStr) {
+               openDiaryViewer(dateStr, diaryEntry, chat);
+          }
+      }
+  } catch (e) {
+      console.error("AI Comment Gen Failed", e);
+  }
 }
 
 /**
@@ -1774,13 +2044,11 @@ async function handleSaveUserDiary() {
   const targetChat = state.chats[activeLoversSpaceCharId];
   if (targetChat) {
     const userNickname = state.qzoneSettings.nickname || '我';
-    // ▼▼▼ 用这块【新代码】替换旧的 notificationMessage 定义 ▼▼▼
     const notificationMessage = {
       role: 'user',
-      type: 'ls_diary_notification', // 【核心修改1】给它一个独一无二的类型
+      type: 'ls_diary_notification',
       content: {
-        // 【核心修改2】内容变成一个对象，方便携带更多信息
-        userEmoji: userEmoji, // 把用户选择的表情也带上
+        userEmoji: userEmoji,
         text: '我刚刚写了今天的心情日记哦，你也快去看看吧！',
       },
       timestamp: Date.now(),
@@ -1796,22 +2064,19 @@ async function handleSaveUserDiary() {
             你的任务:
             1.  【必须】根据你的人设和今天的聊天记录，也写一篇你自己的心情日记，并使用 'ls_diary_entry' 指令发送。
             2.  【必须】在写完日记后，立刻就用户今天的日记内容，以你的角色口吻，主动开启一段新的对话。]`,
-      timestamp: Date.now() + 1, // 确保时间戳在后
-      isHidden: true, // 这个标记能让消息对用户隐藏，但AI能看见
+      timestamp: Date.now() + 1,
+      isHidden: true, // 确保这行代码存在
     };
     targetChat.history.push(hiddenMessage);
-
-    // 3. 保存所有更改到数据库
+    
     await db.chats.put(targetChat);
-
-    // 4. 主动跳转到单聊界面，并触发AI响应
-    openChat(activeLoversSpaceCharId);
+    
+    // 【核心新增】让AI对用户的日记进行评论
+    generateAiDiaryComment(currentDiaryDate, 'user');
+    
+    // 触发常规聊天回应
     triggerAiResponse();
   }
-  // --- 【核心联动功能结束】 ---
-
-  // ▲▲▲ 新代码粘贴结束 ▲▲▲
-
   alert('日记已保存！');
 }
 
@@ -3406,6 +3671,22 @@ function initLoversSpace() {
   // 日记查看弹窗关闭按钮
   document.getElementById('ls-close-diary-viewer-btn').addEventListener('click', () => {
     document.getElementById('ls-diary-viewer-modal').classList.remove('visible');
+  });
+
+  // 日记查看弹窗内的点击事件（使用事件委托）
+  document.getElementById('ls-diary-viewer-body').addEventListener('click', e => {
+      if (e.target.classList.contains('ls-diary-comment-submit-btn')) {
+          const dateStr = e.target.dataset.date;
+          const targetType = e.target.dataset.target;
+          handlePostDiaryComment(dateStr, targetType);
+      }
+      
+      if (e.target.classList.contains('ls-diary-comment-delete-btn')) {
+          const dateStr = e.target.dataset.date;
+          const targetType = e.target.dataset.target;
+          const index = parseInt(e.target.dataset.index);
+          deleteDiaryComment(dateStr, targetType, index);
+      }
   });
 
   /* --- 情绪日记事件监听结束 --- */
