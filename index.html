@@ -168,6 +168,42 @@
             background: #ff3b30;
             color: white;
         }
+        
+        /* APP位置互换样式 */
+        .app-swap-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg-secondary, #f5f5f5);
+        }
+        
+        .app-swap-item:hover {
+            border-color: var(--primary-color, #007aff);
+            transform: scale(1.02);
+        }
+        
+        .app-swap-item.selected {
+            border-color: #ff9500;
+            background: rgba(255, 149, 0, 0.1);
+        }
+        
+        .app-swap-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .app-swap-item span {
+            font-size: 12px;
+            color: var(--text-primary, #000);
+            text-align: center;
+        }
     </style>
     <!-- ▼▼▼ 在这里添加下面这行 ▼▼▼ -->
     <style id="custom-theme-style"></style>
@@ -942,6 +978,7 @@
 </div>
 <!-- ▲▲▲ 定时自动导出功能结束 ▲▲▲ -->
 
+<button class="form-button form-button-secondary" id="change-log-btn" style="margin-top: 10px; border-color: #4a90e2; color: #4a90e2;">📝 更新日志</button>
 <button class="form-button form-button-secondary" id="clear-orphaned-data-btn" style="margin-top: 10px; border-color: #ff9966; color: #ff9966;">🧹 清理失效数据</button>
 			<button class="form-button" id="export-data-btn">导出数据</button>
 <!-- ▼▼▼ 在这里粘贴下面的新按钮 ▼▼▼ -->
@@ -1700,6 +1737,67 @@
 </div>
 <button class="form-button form-button-secondary" id="reset-app-names-btn" style="margin-top: 15px;">恢复默认App名字</button>
 <hr style="width: 80%; opacity: 0.3; margin: 30px 0;">
+<!-- ▼▼▼ APP位置更换区域 ▼▼▼ -->
+<div style="width:100%; text-align: left; margin-bottom: 15px;">
+    <label style="font-weight: 500; color: var(--text-secondary);">APP 位置更换</label>
+    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 5px; opacity: 0.8;">选中两个APP可以互换位置</p>
+</div>
+<div id="app-position-swap-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
+    <!-- APP位置列表将由JS动态生成在这里 -->
+</div>
+<!-- ▲▲▲ APP位置更换区域结束 ▲▲▲ -->
+<hr style="width: 80%; opacity: 0.3; margin: 30px 0;">
+
+<!-- ▼▼▼ 主屏幕外观设置区域 ▼▼▼ -->
+<div style="width:100%; text-align: left; margin-bottom: 15px;">
+    <label style="font-weight: 500; color: var(--text-secondary);">主屏幕外观设置</label>
+    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 5px; opacity: 0.8;">自定义添加到主屏幕时的应用名称和图标</p>
+</div>
+
+<!-- 应用名称设置 -->
+<div class="form-group" style="width: 100%;">
+    <label for="pwa-app-name-input">应用名称</label>
+    <input type="text" id="pwa-app-name-input" placeholder="例如：EPhone（兔k机版）" value="EPhone（兔k机版）">
+    <p style="font-size: 11px; color: var(--text-secondary); margin-top: 5px; opacity: 0.7;">设置添加到主屏幕后显示的应用名称</p>
+</div>
+
+<!-- 应用图标设置 -->
+<div style="width:100%; margin-top: 20px;">
+    <label style="font-weight: 500; color: var(--text-secondary); font-size: 14px;">应用图标</label>
+    <p style="font-size: 11px; color: var(--text-secondary); margin-top: 5px; opacity: 0.7;">设置添加到主屏幕后显示的图标（建议尺寸：512x512）</p>
+    
+    <!-- 图标预览 -->
+    <div id="pwa-icon-preview" style="width: 120px; height: 120px; border-radius: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 15px auto; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <img id="pwa-icon-preview-img" src="https://i.postimg.cc/Kj8JnRcp/267611-CC01-F8-A3-B4910-A2-C2-FFDE479-DC.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+    
+    <!-- 上传方式选择 -->
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button class="form-button" onclick="document.getElementById('pwa-icon-upload-input').click();" style="flex: 1;">本地上传图标</button>
+        <button class="form-button form-button-secondary" onclick="showPWAIconUrlInput();" style="flex: 1;">使用URL图标</button>
+    </div>
+    
+    <input type="file" id="pwa-icon-upload-input" accept="image/*" hidden>
+    
+    <!-- URL输入框（默认隐藏） -->
+    <div id="pwa-icon-url-container" style="display: none; margin-top: 15px;">
+        <input type="text" id="pwa-icon-url-input" placeholder="输入图标URL地址..." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary);">
+        <button class="form-button" onclick="applyPWAIconUrl();" style="margin-top: 10px; width: 100%;">应用URL图标</button>
+    </div>
+    
+    <button class="form-button form-button-secondary" onclick="resetPWAIcon();" style="margin-top: 10px; width: 100%;">恢复默认图标</button>
+</div>
+
+<!-- 提示信息 -->
+<div style="background: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; padding: 12px; border-radius: 8px; margin-top: 20px;">
+    <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">
+        ⚠️ <strong>重要提示：</strong>修改后需要重新添加到主屏幕才能看到效果。<br>
+        删除旧的主屏幕图标，然后在浏览器中重新"添加到主屏幕"。
+    </p>
+</div>
+<!-- ▲▲▲ 主屏幕外观设置区域结束 ▲▲▲ -->
+
+<hr style="width: 80%; opacity: 0.3; margin: 30px 0;">
 <div style="width:100%; text-align: left; margin-bottom: 15px;">
     <label style="font-weight: 500; color: var(--text-secondary);">铃声设置</label>
 </div>
@@ -2328,8 +2426,8 @@
         <div class="modal-header">
             <span>搜索结果</span>
         </div>
-        <div class="modal-body" id="search-results-list" style="padding: 0;">
-            <!-- 搜索结果将由JS动态生成在这里 -->
+        <div class="modal-body" id="music-search-results-list" style="padding: 0;">
+            <!-- 音乐搜索结果将由JS动态生成在这里 -->
         </div>
         <div class="modal-footer">
             <button class="cancel" id="cancel-music-search-btn" style="width: 100%;">取消</button>
@@ -3070,7 +3168,7 @@
             <label for="conquest-initial-affection">
                 初始好感度
                 <p style="font-size: 12px; font-weight: normal; color: #999; margin-top: 5px;">
-                    设置角色对你的默认好感度（建议 0-100）
+                    设置你对角色的默认好感度（建议 0-100）
                 </p>
             </label>
             <input type="number" id="conquest-initial-affection" min="0" max="100" value="50" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
@@ -3092,7 +3190,7 @@
             <label for="conquest-current-affection">
                 实时好感度
                 <p style="font-size: 12px; font-weight: normal; color: #999; margin-top: 5px;">
-                    当前角色对你的好感度（可随时调整）
+                    当前你对角色的好感度（可随时调整）
                 </p>
             </label>
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -5272,6 +5370,13 @@
     </div>
 </div>
 <!-- ▲▲▲ 新增代码结束 ▲▲▲ -->
+<div class="game-card" data-game="draw-guess">
+    <div class="game-icon">🎨</div>
+    <div class="game-info">
+        <div class="game-title">你画我猜</div>
+        <div class="game-desc">用画笔传递心意</div>
+    </div>
+</div>
              <p style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); font-size: 14px; margin-top: 20px;">更多游戏正在火速开发中...</p>
         </div>
     </div>
@@ -6286,6 +6391,153 @@
     </div>
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新】你画我猜游戏HTML ▼▼▼ -->
+<div id="draw-guess-setup-screen" class="screen">
+    <div class="header">
+        <span class="back-btn" onclick="showScreen('game-hall-screen')">‹</span>
+        <span>你画我猜 - 选择伙伴</span>
+        <span style="width: 30px;"></span>
+    </div>
+    <div class="form-container">
+        <div class="form-group">
+            <label>选择一位伙伴一起玩</label>
+            <div id="draw-guess-player-selection" class="list-container" style="height: 400px; border: 1px solid var(--border-color); border-radius: 8px; padding: 0;">
+                <!-- 角色列表将由JS动态生成 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="draw-guess-game-screen" class="screen">
+    <div class="header">
+        <span class="back-btn" id="exit-draw-guess-game-btn">‹ 退出</span>
+        <span>你画我猜</span>
+        <span style="width: 30px;"></span>
+    </div>
+    
+    <div class="list-container" id="draw-guess-content">
+        <!-- 游戏交互区域 -->
+        <div id="draw-guess-interactive-area" style="display: none;">
+            <!-- 头像容器 -->
+            <div class="player-avatars-container">
+                <div class="player-info">
+                    <img id="draw-guess-user-avatar" src="" class="player-avatar">
+                    <span id="draw-guess-user-name" class="player-name"></span>
+                </div>
+                <div class="player-info">
+                    <img id="draw-guess-char-avatar" src="" class="player-avatar">
+                    <span id="draw-guess-char-name" class="player-name"></span>
+                </div>
+            </div>
+            <!-- 对话框 -->
+            <div id="draw-guess-dialogue-box">
+                <!-- 对话内容将由JS动态生成 -->
+            </div>
+            <!-- 输入区域 -->
+            <div class="draw-guess-input-area">
+                <div id="draw-guess-action-bar" style="display:none;">
+                    <button class="action-bar-btn" data-action="reply">回复</button>
+                    <button class="action-bar-btn" data-action="resay">重说</button>
+                    <button class="action-bar-btn" data-action="delete">删除</button>
+                    <button class="action-bar-btn" data-action="edit">编辑</button>
+                </div>
+                <div class="draw-guess-input-row">
+                    <input type="text" id="draw-guess-input" placeholder="输入你的猜测或对话...">
+                    <button id="draw-guess-send-btn">发送</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="draw-guess-main-area">
+            <!-- 欢迎提示语 -->
+            <p id="draw-guess-welcome-text">点击"开始游戏"按钮开始吧！</p>
+
+            <!-- 绘画工作室容器 -->
+            <div id="draw-guess-studio" style="display: none;">
+                <!-- 画板 -->
+                <canvas id="drawing-canvas"></canvas>
+            
+                <!-- 工具栏容器 -->
+                <div id="draw-guess-tool-bar">
+                    <!-- 左侧工具：调色盘、画笔、橡皮、撤回 -->
+                    <div class="drawing-tools left">
+                        <div class="color-palette">
+                            <div class="color-dot active" style="background-color: #000000;" data-color="#000000"></div>
+                            <div class="color-dot" style="background-color: #ff3b30;" data-color="#ff3b30"></div>
+                            <div class="color-dot" style="background-color: #ff9500;" data-color="#ff9500"></div>
+                            <div class="color-dot" style="background-color: #ffcc00;" data-color="#ffcc00"></div>
+                            <div class="color-dot" style="background-color: #4cd964;" data-color="#4cd964"></div>
+                            <div class="color-dot" style="background-color: #007aff;" data-color="#007aff"></div>
+                            <div class="color-dot" style="background-color: #5856d6;" data-color="#5856d6"></div>
+                            <div class="color-dot" style="background-color: #af52de;" data-color="#af52de"></div>
+                            <div class="color-dot" style="background-color: #ffffff; border: 1px solid #ddd;" data-color="#ffffff"></div>
+                        </div>
+                        <div id="custom-color-picker-container" class="custom-color-picker">
+                            <input type="color" id="custom-color-input" value="#000000">
+                        </div>
+                        <div class="tool-buttons">
+                            <button class="tool-btn active" data-tool="pen">笔</button>
+                            <button class="tool-btn" data-tool="eraser">橡皮</button>
+                            <button class="tool-btn" data-tool="undo">撤回</button>
+                            <button id="clear-canvas-btn" class="tool-btn" data-tool="clear">清空</button>
+                        </div>
+                    </div>
+            
+                    <!-- 笔刷高级设置 -->
+                    <div id="brush-settings" style="display: none; width: 100%; max-width: 150px;">
+                        <div id="pen-settings">
+                            <label for="pen-type-select">类型</label>
+                            <select id="pen-type-select">
+                                <option value="pen">钢笔</option>
+                                <option value="pencil">铅笔</option>
+                                <option value="watercolor">水笔</option>
+                                <option value="brush">画笔</option>
+                                <option value="calligraphy">毛笔</option>
+                            </select>
+                        </div>
+                        <div class="size-control">
+                            <label for="brush-size-slider">大小</label>
+                            <input type="range" id="brush-size-slider" min="1" max="50" value="5">
+                            <input type="number" id="brush-size-input" min="1" value="5">
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧游戏控制按钮 -->
+                    <div class="game-controls-group">
+                        <button class="game-control-btn" id="draw-guess-get-topic-btn">AI出题</button>
+                        <button class="game-control-btn" id="draw-guess-ai-turn-btn">轮到他了</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部操作按钮 -->
+        <div id="draw-guess-bottom-bar" style="display: block;">
+            <button id="start-draw-guess-game-btn" class="form-button">开始游戏</button>
+        </div>
+    </div>
+</div>
+
+<div id="draw-guess-message-manager-modal" class="modal">
+    <div class="modal-content" style="height: 70%;">
+        <div class="modal-header">
+            <span id="draw-guess-manager-title">管理消息</span>
+            <label style="font-size: 14px; font-weight: normal; display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" id="draw-guess-manager-select-all"> 全选
+            </label>
+        </div>
+        <div class="modal-body" id="draw-guess-manager-list" style="padding: 0;">
+            <!-- 消息列表将由JS动态生成在这里 -->
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="draw-guess-manager-cancel-btn">取消</button>
+            <button class="save" id="draw-guess-manager-confirm-btn">确认</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 你画我猜HTML结束 ▲▲▲ -->
+
 <!-- ▼▼▼ 【全新】这是User自己的私信功能，请粘贴到 <div id="weibo-screen">...</div> 之后 ▼▼▼ -->
 
 <!-- 1. User私信列表页面 -->
@@ -6644,10 +6896,20 @@
                     <textarea id="accounting-note" placeholder="添加备注..." style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; resize: none; font-size: 14px;" rows="3"></textarea>
                 </div>
 
-                <!-- 日期选择 -->
+                <!-- 日期和时间选择 -->
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label style="font-size: 14px; color: #666; margin-bottom: 8px; display: block;">日期</label>
-                    <input type="date" id="accounting-date" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                    <input type="date" id="accounting-date" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; margin-bottom: 10px;">
+                    <label style="font-size: 14px; color: #666; margin-bottom: 8px; display: block;">时间</label>
+                    <input type="time" id="accounting-time" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; margin-bottom: 10px;">
+                    <!-- 快捷时间按钮 -->
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="quick-time-btn" data-time="now" style="padding: 8px 12px; border: 1px solid #ddd; background: white; color: #666; border-radius: 6px; cursor: pointer; font-size: 12px;">现在</button>
+                        <button type="button" class="quick-time-btn" data-time="08:00" style="padding: 8px 12px; border: 1px solid #ddd; background: white; color: #666; border-radius: 6px; cursor: pointer; font-size: 12px;">早8点</button>
+                        <button type="button" class="quick-time-btn" data-time="12:00" style="padding: 8px 12px; border: 1px solid #ddd; background: white; color: #666; border-radius: 6px; cursor: pointer; font-size: 12px;">中午12点</button>
+                        <button type="button" class="quick-time-btn" data-time="18:00" style="padding: 8px 12px; border: 1px solid #ddd; background: white; color: #666; border-radius: 6px; cursor: pointer; font-size: 12px;">晚6点</button>
+                        <button type="button" class="quick-time-btn" data-time="20:00" style="padding: 8px 12px; border: 1px solid #ddd; background: white; color: #666; border-radius: 6px; cursor: pointer; font-size: 12px;">晚8点</button>
+                    </div>
                 </div>
 
                 <!-- 是否通知CHAR -->
@@ -6926,10 +7188,16 @@
     <div class="modal-content" style="height: 90%; max-height: 90%; width: 95%; max-width: 800px;">
         <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
             <span>学习中心</span>
-            <button id="study-ask-char-btn" style="background: none; border: none; color: #ff6b9d; font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                求助CHAR
-            </button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button id="study-online-search-btn" style="background: none; border: none; color: #2196f3; font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                    在线搜索
+                </button>
+                <button id="study-ask-char-btn" style="background: none; border: none; color: #ff6b9d; font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    求助CHAR
+                </button>
+            </div>
         </div>
         <div class="modal-body" style="padding: 0; display: flex; flex-direction: column; overflow: hidden; height: 100%;">
             <!-- Tab切换 -->
@@ -7105,11 +7373,56 @@
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
                             刷新题库
                         </button>
+                        <button id="add-subject-btn" style="padding: 8px 15px; background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: bold;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            新增科目
+                        </button>
                         <button id="import-bank-btn" style="padding: 8px 15px; background: #e3f2fd; color: #2196f3; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
                             <span>+</span> 导入题库
                         </button>
                     </div>
-                    <input type="file" id="bank-file-input" accept=".json,.txt" style="display: none;">
+                    <input type="file" id="bank-file-input" accept=".json,.txt,.html,.htm,.docx,.xml,.csv" style="display: none;">
+                    
+                    <!-- 导入题库选择弹窗 -->
+                    <div id="import-select-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+                        <div style="background: white; border-radius: 16px; width: 90%; max-width: 450px; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 8px 32px rgba(0,0,0,0.2);">
+                            <!-- 标题 -->
+                            <div style="padding: 20px; border-bottom: 1px solid #eee;">
+                                <h3 style="margin: 0; font-size: 18px; color: #333;">📚 导入题库</h3>
+                                <p style="margin: 8px 0 0 0; font-size: 13px; color: #999;">请选择导入的科目和存储位</p>
+                                <p style="margin: 8px 0 0 0; font-size: 12px; color: #4caf50; font-weight: 500;">✨ 支持格式：JSON、TXT、HTML、DOCX、XML、CSV</p>
+                            </div>
+                            
+                            <!-- 内容 -->
+                            <div style="flex: 1; overflow-y: auto; padding: 20px;">
+                                <!-- 步骤1：选择科目 -->
+                                <div id="import-step-1" style="display: block;">
+                                    <div style="margin-bottom: 15px;">
+                                        <label style="display: block; margin-bottom: 10px; font-weight: 500; color: #555;">1️⃣ 选择科目</label>
+                                        <select id="import-subject-select" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; cursor: pointer; background: white;">
+                                            <option value="">-- 请选择科目 --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <!-- 步骤2：选择存储位 -->
+                                <div id="import-step-2" style="display: none;">
+                                    <div style="margin-bottom: 15px;">
+                                        <label style="display: block; margin-bottom: 10px; font-weight: 500; color: #555;">2️⃣ 选择存储位</label>
+                                        <div id="import-slots-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto;">
+                                            <!-- 存储位列表将动态生成 -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 底部按钮 -->
+                            <div style="padding: 15px 20px; border-top: 1px solid #eee; display: flex; gap: 10px; justify-content: flex-end;">
+                                <button id="import-modal-cancel" style="padding: 10px 20px; border: 1px solid #ddd; background: white; color: #666; border-radius: 8px; cursor: pointer; font-size: 14px;">取消</button>
+                                <button id="import-modal-confirm" style="padding: 10px 20px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; opacity: 0.5; pointer-events: none;">选择文件</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div id="banks-list" style="display: flex; flex-direction: column; gap: 15px;">
@@ -7178,6 +7491,124 @@
     </div>
 </div>
 <!-- ▲▲▲ 学习中心模态框结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 在线搜题模态框 ▼▼▼ -->
+<div id="online-question-search-modal" class="modal">
+    <div class="modal-content" style="height: 90%; max-height: 90%; width: 95%; max-width: 900px;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>在线搜题</span>
+            <button id="close-online-search-btn" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
+            <!-- 搜索区域 -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <h3 style="color: white; margin: 0 0 15px 0; font-size: 20px;">搜索题目和试卷</h3>
+                <div style="display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap;">
+                    <input type="text" id="online-search-keyword" placeholder="输入科目、题目关键词..." style="flex: 1; min-width: 200px; padding: 12px 15px; border: none; border-radius: 8px; font-size: 14px; outline: none;" />
+                    <button id="do-online-search-btn" style="padding: 12px 30px; background: #4caf50; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                        搜索
+                    </button>
+                </div>
+                <div style="margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.9);">
+                    💡 提示：支持模糊搜索，可以搜索科目（如"数学"）或输入题目的部分内容
+                </div>
+            </div>
+
+            <!-- 搜索结果区域 -->
+            <div id="online-search-results" style="flex: 1; min-height: 300px;">
+                <div id="search-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: #999;">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin-bottom: 20px;">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <p style="font-size: 16px; margin: 0;">在上方输入关键词开始搜索</p>
+                    <p style="font-size: 13px; margin: 10px 0 0 0;">支持搜索各大网课题库、考试题目</p>
+                </div>
+                <div id="search-loading" style="display: none; text-align: center; padding: 40px;">
+                    <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <p style="margin-top: 15px; color: #666;">搜索中...</p>
+                </div>
+                <div id="search-results-list" style="display: none; flex-direction: column; gap: 12px;">
+                    <!-- 搜索结果将在这里显示 -->
+                </div>
+                <div id="search-no-results" style="display: none; text-align: center; padding: 40px; color: #999;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5" style="margin-bottom: 15px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <p style="font-size: 16px;">未找到相关题目</p>
+                    <p style="font-size: 13px; margin-top: 8px;">请尝试其他关键词</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 在线搜题模态框结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 题目详情模态框 ▼▼▼ -->
+<div id="question-detail-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px; width: 90%; max-height: 85vh;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>题目详情</span>
+            <button id="close-question-detail-btn" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 20px; overflow-y: auto; max-height: calc(85vh - 120px);">
+            <div id="question-detail-content">
+                <!-- 题目详情将在这里显示 -->
+            </div>
+        </div>
+        <div class="modal-footer" style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; gap: 10px; align-items: center; width: 100%;">
+                <label style="font-size: 14px; color: #333; font-weight: 500; white-space: nowrap;">选择科目：</label>
+                <select id="subject-selector" style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer;">
+                    <option value="">请选择科目</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; width: 100%;">
+                <label style="font-size: 14px; color: #333; font-weight: 500; white-space: nowrap;">存储位置：</label>
+                <select id="slot-selector" style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer;" disabled>
+                    <option value="">请先选择科目</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button id="add-to-bank-btn" style="padding: 10px 20px; background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">添加到题库</button>
+                <button id="close-detail-btn" class="cancel">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 题目详情模态框结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 题库存储位管理模态框 ▼▼▼ -->
+<div id="bank-slots-manager-modal" class="modal">
+    <div class="modal-content" style="max-width: 600px; width: 90%; max-height: 80vh;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <span id="bank-slots-subject-title">题库管理</span>
+            <button id="add-bank-slot-btn" style="padding: 8px 16px; background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 5px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                新增存储位
+            </button>
+        </div>
+        <div class="modal-body" style="padding: 20px; overflow-y: auto; max-height: calc(80vh - 150px);">
+            <div style="background: #e3f2fd; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #1976d2;">
+                💡 提示：存储位用于分类管理题库，每个科目都有一个默认存储位。AI生成的题目将保存在默认存储位中。
+            </div>
+            
+            <div id="bank-slots-list" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- 存储位列表将由JS动态生成 -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="close-bank-slots-manager-btn">关闭</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 题库存储位管理模态框结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 消息存放模态框 ▼▼▼ -->
 <div id="message-storage-modal" class="modal">
@@ -9619,7 +10050,7 @@ async function addSongFromSearch() {
     }
 
     const modal = document.getElementById('music-search-results-modal');
-    const listEl = document.getElementById('search-results-list');
+    const listEl = document.getElementById('music-search-results-list');
     listEl.innerHTML = '';
 
     combinedResults.forEach(song => {
@@ -10335,7 +10766,7 @@ function getRandomItem(arr) {
 // main-app.js
 
 // ▼▼▼ 用这块新代码替换旧的 db.version(...) ▼▼▼
-db.version(57).stores({ // 版本号从 56 升级到 57 (新增学习功能)
+db.version(58).stores({ // 版本号从 57 升级到 58 (记忆库迁移到IndexedDB)
     chats: '&id, isGroup, groupId, ownerId, isPinned, characterPhoneData, latestInnerVoice, innerVoiceHistory, loversSpaceData.emotionDiaries, settings.summary, settings.weiboNickname, settings.innerVoiceHideHeaderBorder, settings.innerVoiceAdopterLabelFormat, interactionStats, unlockedSymbols, settings.selectedIntimacyBadge, settings.enableCoupleAvatarRecognition, settings.coupleAvatarRecognitionMemory', 
     apiConfig: '&id',
     globalSettings: '&id, activeThemeId', 
@@ -10357,6 +10788,7 @@ db.version(57).stores({ // 版本号从 56 升级到 57 (新增学习功能)
     customAvatarFrames: '&id, name, url',   
     themes: '++id, name, css',
     apiPresets: '++id, name, proxyUrl',
+    memoryBank: '&id, timestamp, name', // 新增：记忆库表，支持海量数据存储
     bubbleStylePresets: '++id, name, css',
     fontPresets: '&id, name, url',
     homeScreenPresets: '++id, name',
@@ -10399,7 +10831,8 @@ db.version(57).stores({ // 版本号从 56 升级到 57 (新增学习功能)
     // ▼▼▼ 学习功能数据表 ▼▼▼
     studySettings: '&id, dailyGoal, weeklyGoal, monthlyGoal',
     studySubjects: '++id, name, category, isDefault',
-    questionBanks: '++id, subjectId, type, content, answer, options, difficulty, explanation',
+    questionBankSlots: '++id, subjectId, name, isDefault, createdAt',
+    questionBanks: '++id, subjectId, slotId, type, content, answer, options, difficulty, explanation',
     studyRecords: '++id, date, subjectId, score, type, timestamp, details',
     studyGoals: '++id, type, target, current, startDate, endDate'
     // ▲▲▲ 学习功能数据表结束 ▲▲▲
@@ -14248,13 +14681,194 @@ async function renderWallpaperScreen() {
     renderIconSettings();
     renderAppNameSettings();
     
+    // 渲染APP位置互换列表
+    renderAppPositionSwapGrid();
+    
     // 加载预设下拉框
     loadHomeScreenPresetsToDropdown(); 
+    
+    // 加载PWA主屏幕外观设置
+    await loadPWASettings();
 }
 
         window.renderWallpaperScreenProxy = renderWallpaperScreen;
 
         function applyGlobalWallpaper() { const homeScreen = document.getElementById('home-screen'); const wallpaper = state.globalSettings.wallpaper; if (wallpaper && wallpaper.startsWith('data:image')) homeScreen.style.backgroundImage = `url(${wallpaper})`; else if (wallpaper) homeScreen.style.backgroundImage = wallpaper; }
+
+// ===== PWA 主屏幕外观设置功能 =====
+
+// 默认PWA配置
+const DEFAULT_PWA_CONFIG = {
+    name: 'EPhone（兔k机版）',
+    icon: 'https://i.postimg.cc/Kj8JnRcp/267611-CC01-F8-A3-B4910-A2-C2-FFDE479-DC.jpg'
+};
+
+// 全局变量存储当前PWA图标
+let currentPWAIconBase64 = null;
+
+// 显示URL输入框
+function showPWAIconUrlInput() {
+    const container = document.getElementById('pwa-icon-url-container');
+    container.style.display = container.style.display === 'none' ? 'block' : 'none';
+}
+
+// 应用URL图标
+function applyPWAIconUrl() {
+    const urlInput = document.getElementById('pwa-icon-url-input');
+    const url = urlInput.value.trim();
+    
+    if (!url) {
+        alert('请输入图标URL地址！');
+        return;
+    }
+    
+    // 验证URL格式
+    try {
+        new URL(url);
+    } catch (e) {
+        alert('无效的URL地址！请输入正确的图片链接。');
+        return;
+    }
+    
+    // 更新预览
+    const previewImg = document.getElementById('pwa-icon-preview-img');
+    previewImg.src = url;
+    currentPWAIconBase64 = url; // 存储URL作为图标源
+    
+    // 隐藏URL输入框
+    document.getElementById('pwa-icon-url-container').style.display = 'none';
+    alert('图标已更新！点击"保存所有外观设置"按钮保存。');
+}
+
+// 恢复默认图标
+function resetPWAIcon() {
+    const previewImg = document.getElementById('pwa-icon-preview-img');
+    previewImg.src = DEFAULT_PWA_CONFIG.icon;
+    currentPWAIconBase64 = DEFAULT_PWA_CONFIG.icon;
+    
+    // 清空URL输入框
+    document.getElementById('pwa-icon-url-input').value = '';
+    
+    alert('已恢复默认图标！点击"保存所有外观设置"按钮保存。');
+}
+
+// 动态生成manifest.json
+async function generateManifest() {
+    const appName = state.globalSettings.pwaAppName || DEFAULT_PWA_CONFIG.name;
+    const iconUrl = state.globalSettings.pwaIcon || DEFAULT_PWA_CONFIG.icon;
+    
+    // 自动检测图片类型
+    const getImageType = (url) => {
+        const ext = url.split('.').pop().split('?')[0].toLowerCase();
+        if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
+        if (ext === 'png') return 'image/png';
+        if (ext === 'webp') return 'image/webp';
+        if (ext === 'svg') return 'image/svg+xml';
+        return 'image/png'; // 默认
+    };
+    
+    const imageType = getImageType(iconUrl);
+    
+    const manifest = {
+        name: appName,
+        short_name: appName,
+        start_url: "./index.html",
+        display: "standalone",
+        background_color: "#ffffff",
+        theme_color: "#000000",
+        icons: [
+            {
+                src: iconUrl,
+                sizes: "192x192",
+                type: imageType,
+                purpose: "any maskable"
+            },
+            {
+                src: iconUrl,
+                sizes: "512x512",
+                type: imageType,
+                purpose: "any maskable"
+            }
+        ]
+    };
+    
+    // 创建Blob并生成URL
+    const manifestBlob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' });
+    const manifestUrl = URL.createObjectURL(manifestBlob);
+    
+    // 更新manifest链接
+    let manifestLink = document.querySelector('link[rel="manifest"]');
+    if (manifestLink) {
+        manifestLink.href = manifestUrl;
+    } else {
+        manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = manifestUrl;
+        document.head.appendChild(manifestLink);
+    }
+    
+    // 同时更新apple-touch-icon
+    updateAppleTouchIcon(iconUrl);
+    
+    console.log('[PWA] Manifest已更新:', manifest);
+}
+
+// 更新Apple Touch Icon
+function updateAppleTouchIcon(iconUrl) {
+    // 移除所有现有的apple-touch-icon
+    document.querySelectorAll('link[rel="apple-touch-icon"]').forEach(link => link.remove());
+    
+    // 添加新的apple-touch-icon
+    const sizes = ['180x180', '167x167', '152x152', '120x120'];
+    sizes.forEach(size => {
+        const link = document.createElement('link');
+        link.rel = 'apple-touch-icon';
+        link.sizes = size;
+        link.href = iconUrl;
+        document.head.appendChild(link);
+    });
+}
+
+// 加载PWA设置到UI
+async function loadPWASettings() {
+    // 加载应用名称
+    const appNameInput = document.getElementById('pwa-app-name-input');
+    if (state.globalSettings.pwaAppName) {
+        appNameInput.value = state.globalSettings.pwaAppName;
+    }
+    
+    // 加载图标
+    const previewImg = document.getElementById('pwa-icon-preview-img');
+    if (state.globalSettings.pwaIcon) {
+        previewImg.src = state.globalSettings.pwaIcon;
+        currentPWAIconBase64 = state.globalSettings.pwaIcon;
+    }
+    
+    // 生成manifest
+    await generateManifest();
+}
+
+// 保存PWA设置
+async function savePWASettings() {
+    // 保存应用名称
+    const appName = document.getElementById('pwa-app-name-input').value.trim();
+    if (appName) {
+        state.globalSettings.pwaAppName = appName;
+    }
+    
+    // 保存图标
+    if (currentPWAIconBase64) {
+        state.globalSettings.pwaIcon = currentPWAIconBase64;
+    }
+    
+    // 重新生成manifest
+    await generateManifest();
+    
+    console.log('[PWA] 设置已保存:', {
+        name: state.globalSettings.pwaAppName,
+        icon: state.globalSettings.pwaIcon
+    });
+}
 
 async function renderWorldBookScreen() {
     const listEl = document.getElementById('world-book-list');
@@ -15747,6 +16361,10 @@ ${summaries.map((summary, index) => `- 总结${index + 1}: ${summary.content}`).
 `;
 }
 // ▲▲▲ 代码添加结束 ▲▲▲
+// ▼▼▼ 【新增】声明记账和学习数据变量，供后续更新使用 ▼▼▼
+let accountingSummaryData = null;
+let studyInfoData = null;
+// ▲▲▲ 新增结束 ▲▲▲
 // ▼▼▼ 第3步 第1处修改 ▼▼▼
     // --- 【线下模式核心拦截逻辑】 ---
     if (!chat.isGroup && chat.settings.offlineMode && chat.settings.offlineMode.enabled) {
@@ -17342,9 +17960,9 @@ if (weiboContext) {
 }
 
 // 【新增】为AI准备用户账单摘要上下文（移到if块外面，确保总是被添加）
-const accountingSummary = await getAccountingSummaryForChar(state.activeChatId, 30);
-if (accountingSummary) {
-    messagesPayload.push({ role: 'system', content: accountingSummary });
+accountingSummaryData = await getAccountingSummaryForChar(state.activeChatId, 30);
+if (accountingSummaryData) {
+    messagesPayload.push({ role: 'system', content: accountingSummaryData.content });
 }
 
 // 【新增】为AI准备用户月经追踪信息上下文（移到if块外面，确保总是被添加）
@@ -17355,9 +17973,9 @@ if (periodInfo) {
 
 // ▼▼▼ 【新增】为AI准备用户学习信息上下文 ▼▼▼
 if (window.getStudyInfoForChar) {
-    const studyInfo = await window.getStudyInfoForChar();
-    if (studyInfo) {
-        messagesPayload.push({ role: 'system', content: studyInfo });
+    studyInfoData = await window.getStudyInfoForChar(state.activeChatId);
+    if (studyInfoData) {
+        messagesPayload.push({ role: 'system', content: studyInfoData.content });
     }
 }
 // ▲▲▲ 新增结束 ▲▲▲
@@ -20218,6 +20836,39 @@ case 'forum_comment': { // 使用大括号创建块级作用域
             }
         }
         playNotificationSound();
+        
+        // 【新增】在AI回复后，更新记账和学习的提及追踪状态
+        if (accountingSummaryData && accountingSummaryData.shouldMention) {
+            if (!chat.accountingMentionTracking) {
+                chat.accountingMentionTracking = {
+                    lastMentionTime: 0,
+                    mentionedRecordIds: []
+                };
+            }
+            chat.accountingMentionTracking.lastMentionTime = Date.now();
+            if (!chat.accountingMentionTracking.mentionedRecordIds.includes(accountingSummaryData.latestRecordId)) {
+                chat.accountingMentionTracking.mentionedRecordIds.push(accountingSummaryData.latestRecordId);
+                // 只保留最近50个记录ID，避免数组过大
+                if (chat.accountingMentionTracking.mentionedRecordIds.length > 50) {
+                    chat.accountingMentionTracking.mentionedRecordIds = 
+                        chat.accountingMentionTracking.mentionedRecordIds.slice(-50);
+                }
+            }
+        }
+        
+        if (studyInfoData && studyInfoData.shouldMention) {
+            if (!chat.studyMentionTracking) {
+                chat.studyMentionTracking = {
+                    lastMentionTime: 0,
+                    lastMentionedDate: '',
+                    lastMentionedCount: 0
+                };
+            }
+            chat.studyMentionTracking.lastMentionTime = Date.now();
+            chat.studyMentionTracking.lastMentionedDate = studyInfoData.currentDate;
+            chat.studyMentionTracking.lastMentionedCount = studyInfoData.currentCount;
+        }
+        
         await db.chats.put(chat);
 checkAndTriggerSummary(chatId);
 
@@ -25612,6 +26263,169 @@ const appLabels = {
     }
 }
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
+
+// ▼▼▼ APP位置互换功能 ▼▼▼
+/**
+ * 获取所有APP的DOM元素映射
+ */
+function getAllAppElements() {
+    const appElements = {};
+    const appIds = ['qq', 'world-book', 'check-phone', 'weibo', 'forum', 'lovers-space', 
+                    'x-social', 'game-hall', 'taobao', 'date-a-live', 'api-settings', 
+                    'font', 'wallpaper'];
+    
+    appIds.forEach(appId => {
+        // 查找包含该APP图标的容器
+        const iconImg = document.getElementById(`icon-img-${appId}`);
+        if (iconImg) {
+            const container = iconImg.closest('.desktop-app-icon');
+            if (container) {
+                appElements[appId] = container;
+            }
+        }
+    });
+    
+    return appElements;
+}
+
+/**
+ * 获取APP的默认顺序
+ */
+function getDefaultAppOrder() {
+    return ['qq', 'world-book', 'check-phone', 'weibo', 'forum', 'lovers-space', 
+            'x-social', 'game-hall', 'taobao', 'date-a-live', 'api-settings', 
+            'font', 'wallpaper'];
+}
+
+/**
+ * 获取当前APP的显示顺序
+ */
+function getCurrentAppOrder() {
+    if (!state.globalSettings.appOrder) {
+        state.globalSettings.appOrder = getDefaultAppOrder();
+    }
+    return [...state.globalSettings.appOrder];
+}
+
+/**
+ * 渲染APP位置列表
+ */
+function renderAppPositionSwapGrid() {
+    const grid = document.getElementById('app-position-swap-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    const currentOrder = getCurrentAppOrder();
+    
+    const appLabels = {
+        'world-book': '世界书',
+        'qq': 'QQ',
+        'api-settings': 'API设置',
+        'wallpaper': '外观设置',
+        'font': '字体',
+        'check-phone': '查手机',
+        'weibo': '微博',
+        'forum': '圈子',
+        'lovers-space': '情侣空间',
+        'game-hall': '游戏大厅',
+        'x-social': 'X社交',
+        'taobao': '桃宝',
+        'date-a-live':'约会大作战'
+    };
+    
+    currentOrder.forEach(appId => {
+        const iconUrl = state.globalSettings.appIcons[appId] || '';
+        const labelText = appLabels[appId] || '未知App';
+        
+        const item = document.createElement('div');
+        item.className = 'app-swap-item';
+        item.dataset.appId = appId;
+        
+        item.innerHTML = `
+            <img src="${iconUrl}" alt="${labelText}">
+            <span>${labelText}</span>
+        `;
+        
+        grid.appendChild(item);
+    });
+}
+
+// 用于存储选中的APP
+let selectedAppsForSwap = [];
+
+/**
+ * 交换两个APP的位置
+ */
+async function swapAppPositions(appId1, appId2) {
+    const currentOrder = getCurrentAppOrder();
+    const index1 = currentOrder.indexOf(appId1);
+    const index2 = currentOrder.indexOf(appId2);
+    
+    if (index1 === -1 || index2 === -1) {
+        console.error('无法找到APP ID:', appId1, appId2);
+        return;
+    }
+    
+    // 交换数组中的位置
+    [currentOrder[index1], currentOrder[index2]] = [currentOrder[index2], currentOrder[index1]];
+    
+    // 保存到state
+    state.globalSettings.appOrder = currentOrder;
+    await db.globalSettings.put(state.globalSettings);
+    
+    // 更新主屏幕显示
+    updateHomeScreenAppOrder();
+    
+    // 重新渲染APP位置列表
+    renderAppPositionSwapGrid();
+}
+
+/**
+ * 根据保存的顺序更新主屏幕APP的DOM位置
+ */
+function updateHomeScreenAppOrder() {
+    const currentOrder = getCurrentAppOrder();
+    const appElements = getAllAppElements();
+    
+    // 为了实现位置交换，我们需要找到每个APP的父容器，并按顺序重新插入
+    const containers = {
+        'desktop-app-container': document.getElementById('desktop-app-container'),
+        'second-page-top-right-apps': document.getElementById('second-page-top-right-apps'),
+        'desktop-dock': document.getElementById('desktop-dock')
+    };
+    
+    // 定义每个APP应该在哪个容器中
+    const appContainerMap = {
+        'qq': 'desktop-app-container',
+        'world-book': 'desktop-app-container',
+        'check-phone': 'desktop-app-container',
+        'weibo': 'desktop-app-container',
+        'forum': 'second-page-top-right-apps',
+        'lovers-space': 'second-page-top-right-apps',
+        'x-social': 'second-page-top-right-apps',
+        'game-hall': 'standalone',
+        'taobao': 'standalone',
+        'date-a-live': 'standalone',
+        'api-settings': 'desktop-dock',
+        'font': 'desktop-dock',
+        'wallpaper': 'desktop-dock'
+    };
+    
+    // 按顺序重新插入元素
+    currentOrder.forEach(appId => {
+        const element = appElements[appId];
+        const containerName = appContainerMap[appId];
+        
+        if (!element || containerName === 'standalone') return;
+        
+        const container = containers[containerName];
+        if (container && element.parentNode === container) {
+            // 将元素移到容器末尾
+            container.appendChild(element);
+        }
+    });
+}
+// ▲▲▲ APP位置互换功能结束 ▲▲▲
 
 // ▼▼▼ 用这块【最终确认版】的代码，替换旧的 openBrowser 和 closeBrowser 函数 ▼▼▼
 
@@ -36318,6 +37132,129 @@ async function getContextForTokenCalculation(chatId) {
     return combinedText;
 }
 /**
+ * 显示更新日志
+ */
+// 全局更新日志数据
+const globalChangeLogs = {
+    '11.24': [
+        { title: 'IOS下拉问题修复', desc: '修复IOS添加到主屏后，下拉会出现空白，并且轻微手指移动会导致页面滚动的问题。' },
+        { title: 'APP互换位置', desc: '新增APP互换位置的功能！' },
+        { title: '学习中心题库导入优化', desc: '修复完整优化了学习中心导入题库的逻辑，新建自定义科目的问题。目前支持题库格式：JSON、TXT、HTML、DOCX、XML、CSV。' },
+        { title: '自定义主屏幕', desc: '新增添加主屏幕的时候可以自定义图标和名称。' },
+        { title: '题库在线搜索', desc: '新增题库可以在线搜索。' },
+        { title: '你画我猜游戏', desc: '新增游戏：你画我猜，后面应该还会有个拓展。' },
+        { title: '记忆库BUG修复', desc: '修复记忆库保存当前条数多没有反应的BUG。' },
+        { title: '记账时间选择', desc: '记账新增可以自定义具体时间选择。' },
+        { title: '记账刷题逻辑优化', desc: '优化记账、刷题逻辑，不会再啰嗦重复。' },
+        { title: '删除自定义心情', desc: '新增情侣空间自定义添加心情的删除按钮。' },
+        { title: 'X黑屏问题修复', desc: '尝试修复了一下X黑屏的问题。' }
+    ],
+    '11.21': [
+        { title: '记忆存放功能', desc: '可以存放多条信息然后对不同的CHAR发出了。' },
+        { title: '字体槽位管理', desc: '新增字体槽位添加按钮，可以无限添加槽位。新增编辑字体编辑槽位按钮，可以删除槽位。' },
+            { title: '头像库导出', desc: '新增头像库导出功能。' },
+            { title: '清除本机功能', desc: '新增清除本机功能。' },
+            { title: 'PC端优化', desc: '优化了一下PC端左右切换滑页。使用键盘的左右箭头 (← 和 →) 进行切换。' },
+            { title: '情侣头像识图', desc: '新增情侣头像开关可以识图。需要手动打开开关，会消耗一次API进行识图。' },
+            { title: 'USER头像库', desc: '新增USER头像库，优化头像库下面显示头像的命名。点击头像可以立刻使用这个头像。' },
+            { title: '头像形状自定义', desc: '新增USER和CHAR的头像形状可以更改形状，可以自定义，可以添加为预设。' },
+            { title: '修改输入框文案', desc: '新增修改输入框文案。' },
+            { title: '页面动态效果', desc: '新增页面动态效果。预设了下雪动态效果。有预设库，可以自定义动态效果。' },
+            { title: '角色记忆库', desc: '新增角色记忆库。方便一个角色多段记忆，互不影响。' },
+            { title: '自定义气泡颜色', desc: '新增自定义气泡颜色。' },
+            { title: '提示词回复限制', desc: '修改提示词回复下限，增加回复上限。' },
+            { title: '同步码功能', desc: '新增同步码。仅作为测试功能放上，请不要完全依赖此功能。做好数据备份。' },
+            { title: '自定义心情', desc: '情侣空间的日记新增自定义心情功能。' },
+            { title: '气泡和主题一键适配', desc: '新增气泡和主题一键适配按钮，暂时不要使用。' },
+            { title: '查找聊天记录优化', desc: '查找聊天记录新增按类别查找。' },
+            { title: 'token过大提示', desc: '新增token过大提示的开关。' },
+            { title: '情侣空间昵称头像编辑', desc: '新增情侣空间可以编辑上方昵称、头像。' },
+            { title: '角色真名设定', desc: '新增角色设置里面设定角色真名，因为之前角色的改过备注就会自动将真名覆盖。现在微博广场刷新也是真名了。' },
+            { title: '删除指定范围记录', desc: '新增删除指定范围的聊天记录，比如第2条到第10条。' },
+            { title: '八卦六爻', desc: '新增娱乐：八卦六爻。' },
+            { title: '淘宝余额管理', desc: '新增淘宝余额可以直接修改。并且和我的钱包的余额同步。' },
+            { title: '我的钱包', desc: '新增我的钱包，余额和桃宝同步。转账、转出、退回转账会和余额绑定。' },
+            { title: '微博角色不相关开关', desc: '新增微博角色不相关开关，开启后不会生成多个CHAR相互认识的内容，除非角色设定或者NPC库有。' },
+            { title: '记账功能', desc: '新增记账功能。' },
+            { title: '月经系统', desc: '新增月经系统，CHAR也能看到月经日期、周期、第几天等等。' },
+            { title: '音频播放修复', desc: '尝试修复音频播放失效问题。' },
+            { title: '定时导出数据', desc: '新增定时导出数据提醒开关。新增定时自动导出数据，可以自定义路径，留空使用默认路径。妈妈再也不用担心我浏览器删数据了。' },
+            { title: '自定义页面', desc: '新增自定义增加页面，可以自己增加第四页，第五页等等，并且可以删除。' },
+            { title: '重置外观优化', desc: '优化了一些重置外观的地方。' },
+            { title: '学习/刷题中心', desc: '新增学习/刷题中心，题库逻辑简陋，下次优化题库逻辑，也可以导入题库！' },
+            { title: '消息渲染优化', desc: '尝试优化了一下消息对HTML的渲染，和情侣空间移动端有白底的问题。' },
+            { title: '日记评语功能', desc: '情侣空间日记新增评语功能。可以互相评语了！评语暂时先这样，有个很完美的版本，被我覆盖了不知道丢掉哪里去了TUT。' },
+            { title: '攻略模式', desc: '新增攻略模式。CHAR攻略USER。' },
+            { title: '情侣空间说说修复', desc: '修复情侣空间说说不主动评论、评论错位的问题。' },
+            { title: '浏览器缓存优化', desc: '优化了一下浏览器缓存未加载的问题。应该不会出现APP点不开、点击没有反应的问题了。' },
+            { title: '我们记忆功能', desc: '新增我们记忆按钮，统计消息条数、通话次数，转账金额，最常说的话。' }
+    ]
+};
+
+// 显示指定日期的更新详情
+window.showChangeLogDetail = async function(date) {
+    const updates = globalChangeLogs[date];
+    if (!updates) return;
+    
+    // 生成该日期的更新详情HTML
+    const detailHtml = updates.map(update => `
+        <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);">
+            <div style="font-weight: bold; color: var(--text-primary); margin-bottom: 5px;">✨ ${update.title}</div>
+            <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.6;">${update.desc}</div>
+        </div>
+    `).join('');
+
+    const detailContent = `
+        <div style="text-align: left;">
+            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
+                <h3 style="color: #4a90e2; margin: 0;">📅 ${date}</h3>
+                <p style="color: var(--text-tertiary); font-size: 13px; margin-top: 5px;">共 ${updates.length} 项更新</p>
+            </div>
+            <div>
+                ${detailHtml}
+            </div>
+        </div>
+    `;
+
+    await showCustomAlert(`📝 更新日志 - ${date}`, detailContent);
+};
+
+// 显示更新日志列表
+async function showChangeLog() {
+    // 生成日期列表HTML
+    const dateListHtml = Object.keys(globalChangeLogs).map(date => {
+        const count = globalChangeLogs[date].length;
+        return `
+            <div onclick="showChangeLogDetail('${date}')" style="
+                padding: 15px 20px;
+                margin-bottom: 10px;
+                background: var(--bg-secondary);
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s;
+                border: 1px solid var(--border-color);
+            " 
+            onmouseenter="this.style.background='rgba(74, 144, 226, 0.1)'; this.style.transform='translateX(5px)'; this.style.borderColor='#4a90e2';"
+            onmouseleave="this.style.background='var(--bg-secondary)'; this.style.transform='translateX(0)'; this.style.borderColor='var(--border-color)';">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 16px; font-weight: bold; color: var(--text-primary);">📅 ${date}</span>
+                    <span style="font-size: 14px; color: var(--text-tertiary);">${count} 项更新</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const listContent = `
+        <div style="text-align: left; padding: 10px;">
+            <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 14px;">点击日期查看详细更新内容</p>
+            ${dateListHtml}
+        </div>
+    `;
+
+    await showCustomAlert('📝 更新日志', listContent);
+}
+
+/**
  * 【全新】清理所有与已删除角色关联的失效数据
  */
 async function clearOrphanedData() {
@@ -42530,6 +43467,7 @@ document.getElementById('phone-screen').classList.toggle('no-home-font-shadow', 
 
 applyAppIcons();
 applyAppLabels();
+updateHomeScreenAppOrder(); // 恢复保存的APP顺序
     // ▼▼▼ 在这里添加下面这行代码 ▼▼▼
     initDraggableLyricsBar(); // 初始化悬浮歌词栏的拖动功能
     // ▲▲▲ 添加结束 ▲▲▲
@@ -43107,6 +44045,7 @@ document.getElementById('phone-screen').addEventListener('click', unlockAudioCon
 // ▲▲▲ 新代码粘贴结束 ▲▲▲
             document.getElementById('custom-modal-cancel').addEventListener('click', hideCustomModal);
             document.getElementById('custom-modal-overlay').addEventListener('click', (e) => { if (e.target === modalOverlay) hideCustomModal(); });
+            document.getElementById('change-log-btn').addEventListener('click', showChangeLog);
             document.getElementById('clear-orphaned-data-btn').addEventListener('click', clearOrphanedData);
             document.getElementById('export-data-btn').addEventListener('click', exportBackup);
             
@@ -43215,7 +44154,7 @@ document.getElementById('cancel-music-search-btn').addEventListener('click', () 
     document.getElementById('music-search-results-modal').classList.remove('visible');
 });
 
-document.getElementById('search-results-list').addEventListener('click', (e) => {
+document.getElementById('music-search-results-list').addEventListener('click', (e) => {
     const item = e.target.closest('.search-result-item');
     if (item && item.dataset.songJson) {
         const songData = JSON.parse(item.dataset.songJson);
@@ -43344,6 +44283,84 @@ document.getElementById('send-btn').addEventListener('click', async () => {
             chatInput.addEventListener('input', () => { chatInput.style.height = 'auto'; chatInput.style.height = (chatInput.scrollHeight) + 'px'; });
 
             document.getElementById('wallpaper-upload-input').addEventListener('change', async (event) => { const file = event.target.files[0]; if(file) { const dataUrl = await new Promise((res, rej) => { const reader = new FileReader(); reader.onload = () => res(reader.result); reader.onerror = () => rej(reader.error); reader.readAsDataURL(file); }); newWallpaperBase64 = dataUrl; renderWallpaperScreen(); } });
+
+// PWA图标上传监听器
+document.getElementById('pwa-icon-upload-input').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        // 验证文件类型
+        if (!file.type.startsWith('image/')) {
+            alert('请选择图片文件！');
+            return;
+        }
+        
+        // 验证文件大小（不超过2MB）
+        if (file.size > 2 * 1024 * 1024) {
+            alert('图片文件过大！请选择小于2MB的图片。');
+            return;
+        }
+        
+        // 读取文件为Base64
+        const dataUrl = await new Promise((res, rej) => {
+            const reader = new FileReader();
+            reader.onload = () => res(reader.result);
+            reader.onerror = () => rej(reader.error);
+            reader.readAsDataURL(file);
+        });
+        
+        // 更新预览
+        const previewImg = document.getElementById('pwa-icon-preview-img');
+        previewImg.src = dataUrl;
+        currentPWAIconBase64 = dataUrl;
+        
+        alert('图标已上传！点击"保存所有外观设置"按钮保存。');
+    }
+});
+
+// PWA图标URL输入框监听器（支持自动下载URL图标）
+document.getElementById('pwa-icon-url-input').addEventListener('blur', async (event) => {
+    const url = event.target.value.trim();
+    if (!url) return;
+    
+    // 验证是否为有效URL
+    try {
+        new URL(url);
+    } catch (e) {
+        alert('请输入有效的图片URL！');
+        return;
+    }
+    
+    try {
+        // 尝试加载图片
+        const img = new Image();
+        img.crossOrigin = 'anonymous'; // 允许跨域
+        
+        await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = () => reject(new Error('无法加载图片'));
+            img.src = url;
+        });
+        
+        // 将图片转换为Base64
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const dataUrl = canvas.toDataURL('image/png');
+        
+        // 更新预览
+        const previewImg = document.getElementById('pwa-icon-preview-img');
+        previewImg.src = dataUrl;
+        currentPWAIconBase64 = dataUrl;
+        
+        alert('图标已从URL加载！点击"保存所有外观设置"按钮保存。');
+    } catch (error) {
+        alert('无法从该URL加载图标，可能是CORS限制或无效的图片链接。请尝试直接上传图片文件。');
+        console.error('PWA图标加载错误:', error);
+    }
+});
+
 // ▼▼▼ 请用这整块【修复版】代码，替换你旧的 'save-wallpaper-btn' 事件监听器 ▼▼▼
 document.getElementById('save-wallpaper-btn').addEventListener('click', async () => {
     let changesMade = false;
@@ -43397,6 +44414,9 @@ document.getElementById('save-wallpaper-btn').addEventListener('click', async ()
     
     // 保存App名称
     saveAppLabels();
+
+    // 保存PWA设置
+    await savePWASettings();
 
     // 将所有设置一次性写入数据库
     await db.globalSettings.put(state.globalSettings);
@@ -46738,6 +47758,45 @@ document.getElementById('close-ai-avatar-library-btn').addEventListener('click',
             });
             // ▲▲▲ 替换结束 ▲▲▲
 
+            // ▼▼▼ APP位置互换事件监听器 ▼▼▼
+            document.getElementById('app-position-swap-grid').addEventListener('click', async (e) => {
+                const item = e.target.closest('.app-swap-item');
+                if (!item) return;
+                
+                const appId = item.dataset.appId;
+                
+                // 切换选中状态
+                if (item.classList.contains('selected')) {
+                    item.classList.remove('selected');
+                    selectedAppsForSwap = selectedAppsForSwap.filter(id => id !== appId);
+                } else {
+                    item.classList.add('selected');
+                    selectedAppsForSwap.push(appId);
+                }
+                
+                // 如果选中了两个APP，执行交换
+                if (selectedAppsForSwap.length === 2) {
+                    const [app1, app2] = selectedAppsForSwap;
+                    await swapAppPositions(app1, app2);
+                    
+                    // 清空选中状态
+                    selectedAppsForSwap = [];
+                    
+                    // 提示用户
+                    const grid = document.getElementById('app-position-swap-grid');
+                    const items = grid.querySelectorAll('.app-swap-item');
+                    items.forEach(i => i.classList.remove('selected'));
+                } else if (selectedAppsForSwap.length > 2) {
+                    // 如果意外选中了超过2个，重置
+                    selectedAppsForSwap = [appId];
+                    const grid = document.getElementById('app-position-swap-grid');
+                    const items = grid.querySelectorAll('.app-swap-item');
+                    items.forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                }
+            });
+            // ▲▲▲ APP位置互换事件监听器结束 ▲▲▲
+
 
 // ▼▼▼ 在 init() 函数的末尾，粘贴这段【全新的事件监听器】 ▼▼▼
 
@@ -49009,7 +50068,14 @@ async function openAccountingModal() {
     currentAccountingType = 'expense';
     document.getElementById('accounting-amount').value = '';
     document.getElementById('accounting-note').value = '';
-    document.getElementById('accounting-date').valueAsDate = new Date();
+    
+    // 设置日期和时间为当前时间
+    const now = new Date();
+    document.getElementById('accounting-date').valueAsDate = now;
+    // 设置时间为当前时间（格式：HH:mm）
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('accounting-time').value = `${hours}:${minutes}`;
     
     // 【优化】从localStorage读取用户上次的开关设置，默认为true
     const savedNotifyCharState = localStorage.getItem('accountingNotifyChar');
@@ -49177,7 +50243,14 @@ async function addCustomCategory() {
 async function saveAccountingRecord() {
     const amount = parseFloat(document.getElementById('accounting-amount').value);
     const note = document.getElementById('accounting-note').value.trim();
-    const date = new Date(document.getElementById('accounting-date').value);
+    
+    // 正确处理日期和时间
+    const dateValue = document.getElementById('accounting-date').value;
+    const timeValue = document.getElementById('accounting-time').value || '00:00';
+    // 组合日期和时间（格式：YYYY-MM-DDTHH:mm）
+    const dateTimeString = `${dateValue}T${timeValue}`;
+    const date = new Date(dateTimeString);
+    
     const notifyChar = document.getElementById('notify-char-toggle').checked;
     
     if (!amount || amount <= 0) {
@@ -49256,9 +50329,14 @@ async function saveAccountingRecord() {
     
     alert('记账成功！');
     
-    // 清空表单
+    // 清空表单并重置为当前时间
     document.getElementById('accounting-amount').value = '';
     document.getElementById('accounting-note').value = '';
+    const now = new Date();
+    document.getElementById('accounting-date').valueAsDate = now;
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('accounting-time').value = `${hours}:${minutes}`;
     selectedCategory = null;
     await renderAccountingCategories();
 }
@@ -49677,6 +50755,24 @@ document.getElementById('add-category-btn').addEventListener('click', addCustomC
 // 保存记账记录事件
 document.getElementById('save-accounting-btn').addEventListener('click', saveAccountingRecord);
 
+// 快捷时间按钮事件
+document.querySelectorAll('.quick-time-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault(); // 防止表单提交
+        const timeValue = btn.dataset.time;
+        if (timeValue === 'now') {
+            // 设置为当前时间
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('accounting-time').value = `${hours}:${minutes}`;
+        } else {
+            // 设置为指定时间
+            document.getElementById('accounting-time').value = timeValue;
+        }
+    });
+});
+
 // 【优化】监听"通知当前角色"开关的变化，实时保存到localStorage
 document.getElementById('notify-char-toggle').addEventListener('change', (e) => {
     localStorage.setItem('accountingNotifyChar', e.target.checked.toString());
@@ -49721,6 +50817,28 @@ async function getAccountingSummaryForChar(chatId, daysBack = 30) {
         return null;  // 没有可通知角色的记录，返回null，角色完全看不到记账信息
     }
     
+    // 【新增】智能提及追踪：检查AI是否已经在当前会话中提及过这些记账记录
+    const chat = chatId ? await db.chats.get(chatId) : null;
+    if (!chat) {
+        return null;
+    }
+    
+    // 初始化提及追踪字段
+    if (!chat.accountingMentionTracking) {
+        chat.accountingMentionTracking = {
+            lastMentionTime: 0,  // 最后一次AI提及记账的时间
+            mentionedRecordIds: []  // 已经提及过的记账记录ID列表
+        };
+    }
+    
+    // 找出最新的记账记录
+    const latestRecord = notifiableRecords[0];
+    const hasNewRecords = !chat.accountingMentionTracking.mentionedRecordIds.includes(latestRecord.id);
+    
+    // 检查是否有新记录或距离上次提及已经超过一段时间（4小时）
+    const timeSinceLastMention = now - chat.accountingMentionTracking.lastMentionTime;
+    const cooldownPeriod = 4 * 60 * 60 * 1000; // 4小时冷却期
+    
     // 计算统计数据（只统计允许通知角色的记录）
     const expenses = notifiableRecords.filter(r => r.type === 'expense');
     const incomes = notifiableRecords.filter(r => r.type === 'income');
@@ -49737,8 +50855,18 @@ async function getAccountingSummaryForChar(chatId, daysBack = 30) {
         categoryStats[r.category].count++;
     });
     
+    // 【新增】构建智能提示：告诉AI这些内容的提及状态
+    let mentionStatus = '';
+    if (!hasNewRecords && timeSinceLastMention < cooldownPeriod) {
+        // 已经提过且在冷却期内
+        mentionStatus = `\n⚠️ 【重要提示】以下记账信息你在最近的对话中已经提及过了（${Math.floor(timeSinceLastMention / (60 * 1000))}分钟前）。\n💡 除非用户主动询问或有特殊需要，否则请不要再重复提起这些记账内容，避免显得啰嗦。\n💡 你可以简单回应用户的话题，无需每次都提醒记账情况。\n\n`;
+    } else if (hasNewRecords) {
+        // 有新记录
+        mentionStatus = `\n✨ 【提示】用户有新的记账记录，你可以适度关心一下。\n💡 但注意：关心一次即可，不要在后续对话中反复提起。\n\n`;
+    }
+    
     // 构建摘要文本
-    let summary = `\n═══════════════════════════\n📊 用户账单摘要（最近${daysBack}天）\n═══════════════════════════\n\n`;
+    let summary = `\n═══════════════════════════\n📊 用户账单摘要（最近${daysBack}天）\n═══════════════════════════\n${mentionStatus}`;
     summary += `💵 总支出：¥${totalExpense.toFixed(2)} (${expenses.length}笔)\n`;
     summary += `💰 总收入：¥${totalIncome.toFixed(2)} (${incomes.length}笔)\n`;
     summary += `📈 收支差：${totalIncome >= totalExpense ? '+' : ''}¥${(totalIncome - totalExpense).toFixed(2)}\n\n`;
@@ -49834,7 +50962,13 @@ async function getAccountingSummaryForChar(chatId, daysBack = 30) {
     }
     summary += `═══════════════════════════\n`;
     
-    return summary;
+    // 【新增】将提及追踪信息附加到返回对象中，供后续更新使用
+    return {
+        content: summary,
+        hasNewRecords: hasNewRecords,
+        latestRecordId: latestRecord.id,
+        shouldMention: hasNewRecords || timeSinceLastMention >= cooldownPeriod
+    };
 }
 
 // 在全局暴露，供消息处理使用
@@ -50359,6 +51493,18 @@ let currentStudySession = {
         stopStudyTimer();
     });
     
+    // 题库存储位管理模态框事件
+    const addBankSlotBtn = document.getElementById('add-bank-slot-btn');
+    if(addBankSlotBtn) addBankSlotBtn.addEventListener('click', addBankSlot);
+    
+    const closeBankSlotsBtn = document.getElementById('close-bank-slots-manager-btn');
+    if(closeBankSlotsBtn) closeBankSlotsBtn.addEventListener('click', () => {
+        document.getElementById('bank-slots-manager-modal').classList.remove('visible');
+        // 移除浮动删除按钮
+        const deleteBtn = document.getElementById('delete-selected-slots-btn');
+        if(deleteBtn) deleteBtn.remove();
+    });
+    
     // Tabs
     document.querySelectorAll('.study-tab').forEach(tab => {
         tab.addEventListener('click', () => switchStudyTab(tab.dataset.tab));
@@ -50398,16 +51544,73 @@ let currentStudySession = {
          switchStudyTab('exam');
     });
 
-    // Import
+    // Add subject
+    const addSubjectBtn = document.getElementById('add-subject-btn');
+    if(addSubjectBtn) addSubjectBtn.addEventListener('click', addNewSubject);
+    
+    // Import - 修改为先显示选择弹窗
     const importBtn = document.getElementById('import-bank-btn');
-    if(importBtn) importBtn.addEventListener('click', () => document.getElementById('bank-file-input').click());
+    if(importBtn) importBtn.addEventListener('click', showImportSelectModal);
     
     const fileInput = document.getElementById('bank-file-input');
     if(fileInput) fileInput.addEventListener('change', handleBankImport);
+    
+    // 导入弹窗相关事件
+    const importSubjectSelect = document.getElementById('import-subject-select');
+    if(importSubjectSelect) importSubjectSelect.addEventListener('change', (e) => handleImportSubjectChange(e.target.value));
+    
+    const importModalCancel = document.getElementById('import-modal-cancel');
+    if(importModalCancel) importModalCancel.addEventListener('click', hideImportSelectModal);
+    
+    const importModalConfirm = document.getElementById('import-modal-confirm');
+    if(importModalConfirm) importModalConfirm.addEventListener('click', () => {
+        if(selectedImportSubjectId && selectedImportSlotId) {
+            document.getElementById('bank-file-input').click();
+        }
+    });
 
     // Ask CHAR
     const askBtn = document.getElementById('study-ask-char-btn');
     if(askBtn) askBtn.addEventListener('click', askCharForStudyHelp);
+    
+    // Online Search
+    const onlineSearchBtn = document.getElementById('study-online-search-btn');
+    if(onlineSearchBtn) onlineSearchBtn.addEventListener('click', openOnlineQuestionSearch);
+    
+    const doSearchBtn = document.getElementById('do-online-search-btn');
+    if(doSearchBtn) doSearchBtn.addEventListener('click', performOnlineSearch);
+    
+    const closeOnlineSearchBtn = document.getElementById('close-online-search-btn');
+    if(closeOnlineSearchBtn) closeOnlineSearchBtn.addEventListener('click', () => {
+        document.getElementById('online-question-search-modal').classList.remove('visible');
+    });
+    
+    const closeQuestionDetailBtn = document.getElementById('close-question-detail-btn');
+    if(closeQuestionDetailBtn) closeQuestionDetailBtn.addEventListener('click', () => {
+        document.getElementById('question-detail-modal').classList.remove('visible');
+    });
+    
+    const closeDetailBtn = document.getElementById('close-detail-btn');
+    if(closeDetailBtn) closeDetailBtn.addEventListener('click', () => {
+        document.getElementById('question-detail-modal').classList.remove('visible');
+    });
+    
+    const addToBankBtn = document.getElementById('add-to-bank-btn');
+    if(addToBankBtn) addToBankBtn.addEventListener('click', addOnlineQuestionToBank);
+    
+    // 科目选择变化时加载对应的存储位
+    const subjectSelector = document.getElementById('subject-selector');
+    if(subjectSelector) subjectSelector.addEventListener('change', handleSubjectChange);
+    
+    // Enter key to search
+    const searchInput = document.getElementById('online-search-keyword');
+    if(searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                performOnlineSearch();
+            }
+        });
+    }
     
     // Goals
     const saveGoalsBtn = document.getElementById('save-goals-btn');
@@ -51280,41 +52483,758 @@ function setupCanvas(canvasId, colorId, clearBtnId) {
     });
 }
 
-// 题库导入
-function handleBankImport(e) {
+// 全局变量：存储选中的科目和存储位
+let selectedImportSubjectId = null;
+let selectedImportSlotId = null;
+
+// 显示导入选择弹窗
+async function showImportSelectModal() {
+    const modal = document.getElementById('import-select-modal');
+    const subjectSelect = document.getElementById('import-subject-select');
+    const step1 = document.getElementById('import-step-1');
+    const step2 = document.getElementById('import-step-2');
+    const confirmBtn = document.getElementById('import-modal-confirm');
+    
+    // 重置状态
+    selectedImportSubjectId = null;
+    selectedImportSlotId = null;
+    step1.style.display = 'block';
+    step2.style.display = 'none';
+    confirmBtn.style.opacity = '0.5';
+    confirmBtn.style.pointerEvents = 'none';
+    
+    // 加载科目列表
+    const subjects = await db.studySubjects.toArray();
+    subjectSelect.innerHTML = '<option value="">-- 请选择科目 --</option>';
+    subjects.forEach(s => {
+        const option = document.createElement('option');
+        option.value = s.id;
+        option.textContent = s.name;
+        subjectSelect.appendChild(option);
+    });
+    
+    // 显示弹窗
+    modal.style.display = 'flex';
+}
+
+// 隐藏导入选择弹窗
+function hideImportSelectModal() {
+    const modal = document.getElementById('import-select-modal');
+    modal.style.display = 'none';
+    selectedImportSubjectId = null;
+    selectedImportSlotId = null;
+}
+
+// 处理科目选择
+async function handleImportSubjectChange(subjectId) {
+    const step2 = document.getElementById('import-step-2');
+    const slotsList = document.getElementById('import-slots-list');
+    const confirmBtn = document.getElementById('import-modal-confirm');
+    
+    if (!subjectId) {
+        step2.style.display = 'none';
+        selectedImportSubjectId = null;
+        selectedImportSlotId = null;
+        confirmBtn.style.opacity = '0.5';
+        confirmBtn.style.pointerEvents = 'none';
+        return;
+    }
+    
+    selectedImportSubjectId = parseInt(subjectId);
+    
+    // 加载该科目的存储位
+    const slots = await db.questionBankSlots
+        .where('subjectId').equals(selectedImportSubjectId)
+        .toArray();
+    
+    if (slots.length === 0) {
+        slotsList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">该科目暂无存储位</div>';
+        step2.style.display = 'block';
+        return;
+    }
+    
+    // 渲染存储位列表
+    slotsList.innerHTML = slots.map(slot => `
+        <div class="import-slot-item" data-slot-id="${slot.id}" style="padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px;">
+            <input type="radio" name="import-slot" value="${slot.id}" style="width: 18px; height: 18px; cursor: pointer;">
+            <div style="flex: 1;">
+                <div style="font-weight: 500; color: #333;">${slot.name}</div>
+                ${slot.isDefault ? '<div style="font-size: 11px; color: #ff6b9d; margin-top: 2px;">默认存储位</div>' : ''}
+            </div>
+        </div>
+    `).join('');
+    
+    step2.style.display = 'block';
+    
+    // 添加点击事件
+    const slotItems = slotsList.querySelectorAll('.import-slot-item');
+    slotItems.forEach(item => {
+        const radio = item.querySelector('input[type="radio"]');
+        
+        item.addEventListener('click', (e) => {
+            if (e.target !== radio) {
+                radio.checked = true;
+            }
+            selectedImportSlotId = parseInt(radio.value);
+            
+            // 更新选中样式
+            slotItems.forEach(si => {
+                si.style.borderColor = '#e0e0e0';
+                si.style.background = 'white';
+            });
+            item.style.borderColor = '#667eea';
+            item.style.background = '#f8f9ff';
+            
+            // 启用确认按钮
+            confirmBtn.style.opacity = '1';
+            confirmBtn.style.pointerEvents = 'auto';
+        });
+        
+        radio.addEventListener('change', () => {
+            if (radio.checked) {
+                selectedImportSlotId = parseInt(radio.value);
+                
+                // 更新选中样式
+                slotItems.forEach(si => {
+                    si.style.borderColor = '#e0e0e0';
+                    si.style.background = 'white';
+                });
+                item.style.borderColor = '#667eea';
+                item.style.background = '#f8f9ff';
+                
+                // 启用确认按钮
+                confirmBtn.style.opacity = '1';
+                confirmBtn.style.pointerEvents = 'auto';
+            }
+        });
+    });
+}
+
+// ========== 智能通用题库解析系统 ==========
+
+/**
+ * 智能通用题库解析器 - 能够自动识别和解析各种格式的题库
+ * 支持：网上各种试卷、题库、练习题等多种格式
+ */
+function parseQuestionsUniversal(text) {
+    const questions = [];
+    
+    // 预处理：统一换行符，移除空行
+    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = text.split('\n');
+    
+    let currentQuestion = null;
+    let currentOptions = [];
+    let currentAnswer = '';
+    let currentExplanation = '';
+    let inQuestionBlock = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) {
+            // 空行可能表示题目结束
+            if (currentQuestion) {
+                questions.push(createQuestion(currentQuestion, currentOptions, currentAnswer, currentExplanation));
+                currentQuestion = null;
+                currentOptions = [];
+                currentAnswer = '';
+                currentExplanation = '';
+                inQuestionBlock = false;
+            }
+            continue;
+        }
+        
+        // ===== 模式1：识别题目编号开头 =====
+        // 支持：1. 、1、、（1）、[1]、1）、【1】等
+        const questionNumberMatch = line.match(/^[\[【\(（]?\d+[\]】\)）\.、\s]/);
+        if (questionNumberMatch) {
+            // 保存上一题
+            if (currentQuestion) {
+                questions.push(createQuestion(currentQuestion, currentOptions, currentAnswer, currentExplanation));
+            }
+            // 开始新题
+            currentQuestion = line.replace(/^[\[【\(（]?\d+[\]】\)）\.、\s]+/, '').trim();
+            currentOptions = [];
+            currentAnswer = '';
+            currentExplanation = '';
+            inQuestionBlock = true;
+            continue;
+        }
+        
+        // ===== 模式2：识别题型标记 =====
+        // 支持：【单选题】、【多选题】、【判断题】、【填空题】、（单选）等
+        const typeMatch = line.match(/^[\[【\(（]?(单选题?|多选题?|判断题?|填空题?|简答题?|问答题?)[\]】\)）]/);
+        if (typeMatch) {
+            if (currentQuestion) {
+                questions.push(createQuestion(currentQuestion, currentOptions, currentAnswer, currentExplanation));
+            }
+            currentQuestion = line.replace(/^[\[【\(（]?(单选题?|多选题?|判断题?|填空题?|简答题?|问答题?)[\]】\)）]\s*/, '').trim();
+            currentOptions = [];
+            currentAnswer = '';
+            currentExplanation = '';
+            inQuestionBlock = true;
+            continue;
+        }
+        
+        // ===== 模式3：识别选项 =====
+        // 支持：A. 、A、、（A）、[A]、A）等，也支持 a. 、a、等小写
+        const optionMatch = line.match(/^[\[【\(（]?([A-Za-z])[\]】\)）\.、\s]/);
+        if (optionMatch && inQuestionBlock) {
+            const optionText = line.replace(/^[\[【\(（]?[A-Za-z][\]】\)）\.、\s]+/, '').trim();
+            currentOptions.push(optionText);
+            continue;
+        }
+        
+        // ===== 模式4：识别答案行 =====
+        // 支持：答案：A、正确答案：A、参考答案：A、标准答案：A等
+        if (/^(答案|正确答案|参考答案|标准答案)[\s:：]/.test(line)) {
+            currentAnswer = line.replace(/^(答案|正确答案|参考答案|标准答案)[\s:：]+/, '').trim();
+            continue;
+        }
+        
+        // ===== 模式5：识别解析行 =====
+        // 支持：解析：、解释：、说明：、详解：等
+        if (/^(解析|解释|说明|详解|答案解析)[\s:：]/.test(line)) {
+            currentExplanation = line.replace(/^(解析|解释|说明|详解|答案解析)[\s:：]+/, '').trim();
+            continue;
+        }
+        
+        // ===== 模式6：问题关键词识别 =====
+        // 如果包含问号或"以下"、"关于"等关键词，可能是题目
+        if (!currentQuestion && (line.includes('？') || line.includes('?') || 
+            /^(以下|关于|下列|根据|请问|问题|试述|简述|说明|计算)/.test(line))) {
+            currentQuestion = line;
+            currentOptions = [];
+            currentAnswer = '';
+            currentExplanation = '';
+            inQuestionBlock = true;
+            continue;
+        }
+        
+        // ===== 模式7：继续追加内容 =====
+        if (inQuestionBlock) {
+            if (!currentAnswer && !currentExplanation) {
+                // 如果还没有答案和解析，这行可能是题目的延续或选项的延续
+                if (currentOptions.length > 0) {
+                    // 追加到最后一个选项
+                    currentOptions[currentOptions.length - 1] += ' ' + line;
+                } else if (currentQuestion) {
+                    // 追加到题目
+                    currentQuestion += ' ' + line;
+                }
+            } else if (currentExplanation) {
+                // 追加到解析
+                currentExplanation += ' ' + line;
+            } else if (currentAnswer) {
+                // 可能是解析的开始
+                currentExplanation = line;
+            }
+        }
+    }
+    
+    // 保存最后一题
+    if (currentQuestion) {
+        questions.push(createQuestion(currentQuestion, currentOptions, currentAnswer, currentExplanation));
+    }
+    
+    return questions;
+}
+
+/**
+ * 创建标准化的题目对象
+ */
+function createQuestion(content, options, answer, explanation) {
+    // 清理内容
+    content = content.trim();
+    answer = answer.trim();
+    explanation = explanation.trim();
+    
+    // 智能判断题目类型
+    let type = 'choice';
+    if (content.includes('判断') || answer.toLowerCase() === 'true' || answer.toLowerCase() === 'false' || 
+        answer === '对' || answer === '错' || answer === '正确' || answer === '错误' || answer === 'T' || answer === 'F') {
+        type = 'judge';
+    } else if (options.length === 0 && !answer.match(/^[A-Za-z]$/)) {
+        type = 'blank';
+    } else if (content.length > 100 || explanation.length > 200) {
+        type = 'essay';
+    }
+    
+    return {
+        type: type,
+        content: content,
+        answer: answer,
+        options: options,
+        explanation: explanation,
+        difficulty: 'medium'
+    };
+}
+
+/**
+ * 智能格式检测和预处理
+ */
+function detectAndPreprocessFormat(text, fileExt) {
+    // 尝试检测是否是JSON格式（即使文件扩展名不是.json）
+    if (text.trim().startsWith('{') || text.trim().startsWith('[')) {
+        try {
+            JSON.parse(text);
+            return { format: 'json', text: text };
+        } catch (e) {
+            // 不是有效的JSON，继续其他检测
+        }
+    }
+    
+    // 检测是否包含HTML标签
+    if (/<[^>]+>/g.test(text)) {
+        return { format: 'html', text: text };
+    }
+    
+    // 检测是否是XML格式
+    if (text.trim().startsWith('<?xml') || text.trim().startsWith('<question')) {
+        return { format: 'xml', text: text };
+    }
+    
+    // 检测是否是CSV格式（包含大量逗号分隔）
+    const lines = text.split('\n').slice(0, 10); // 检查前10行
+    const commaCount = lines.reduce((sum, line) => sum + (line.match(/,/g) || []).length, 0);
+    if (commaCount > lines.length * 2) { // 平均每行超过2个逗号
+        return { format: 'csv', text: text };
+    }
+    
+    // 默认作为通用文本格式
+    return { format: 'universal', text: text };
+}
+
+// ========== 原有的专用格式解析函数（作为备用） ==========
+
+/**
+ * 从 JSON 格式解析题目
+ */
+function parseQuestionsFromJSON(text) {
+    const data = JSON.parse(text);
+    
+    let questions = [];
+    if (Array.isArray(data)) {
+        questions = data;
+    } else if (Array.isArray(data.questions)) {
+        questions = data.questions;
+    } else {
+        throw new Error('JSON格式错误！需要是题目数组或包含questions字段的对象。');
+    }
+    
+    return questions;
+}
+
+/**
+ * 从 TXT 格式解析题目（增强版 - 优先使用通用解析器）
+ */
+function parseQuestionsFromTXT(text) {
+    // 先尝试结构化格式
+    const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+    
+    // 格式1: 使用 ||| 分隔的结构化格式
+    if (lines.some(line => line.includes('|||'))) {
+        const questions = [];
+        for (const line of lines) {
+            const parts = line.split('|||');
+            if (parts.length >= 2) {
+                questions.push({
+                    content: parts[0].trim(),
+                    answer: parts[1].trim(),
+                    options: parts[2] ? parts[2].split('|').map(o => o.trim()) : [],
+                    explanation: parts[3] ? parts[3].trim() : ''
+                });
+            }
+        }
+        if (questions.length > 0) return questions;
+    }
+    
+    // 格式2: 使用通用解析器处理自然文本格式
+    const universalQuestions = parseQuestionsUniversal(text);
+    if (universalQuestions.length > 0) {
+        return universalQuestions;
+    }
+    
+    // 格式3: 最后回退 - 每行一个问题
+    const questions = [];
+    for (const line of lines) {
+        if (line.length > 5) { // 至少5个字符才算是有效问题
+            questions.push({
+                content: line,
+                answer: '',
+                options: [],
+                explanation: ''
+            });
+        }
+    }
+    
+    return questions;
+}
+
+/**
+ * 从 HTML 格式解析题目（增强版 - 自动回退到通用解析）
+ * 支持多种 HTML 结构
+ */
+function parseQuestionsFromHTML(text) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'text/html');
+    const questions = [];
+    
+    // 方法1：查找所有的 <li> 标签（常见的列表格式）
+    const listItems = doc.querySelectorAll('li, p');
+    listItems.forEach(item => {
+        const content = item.textContent.trim();
+        if (content) {
+            questions.push({
+                type: 'choice',
+                content: content,
+                answer: '',
+                options: [],
+                explanation: '',
+                difficulty: 'medium'
+            });
+        }
+    });
+    
+    // 方法2：如果没有找到 li/p 标签，尝试查找 div 或其他容器
+    if (questions.length === 0) {
+        const divs = doc.querySelectorAll('div[class*="question"], div[class*="item"]');
+        divs.forEach(div => {
+            const content = div.textContent.trim();
+            if (content) {
+                questions.push({
+                    type: 'choice',
+                    content: content,
+                    answer: '',
+                    options: [],
+                    explanation: '',
+                    difficulty: 'medium'
+                });
+            }
+        });
+    }
+    
+    // 方法3：如果还是没有找到，提取所有文本使用通用解析器
+    if (questions.length === 0) {
+        const bodyText = doc.body.textContent || '';
+        const universalQuestions = parseQuestionsUniversal(bodyText);
+        if (universalQuestions.length > 0) {
+            return universalQuestions;
+        }
+        // 最后回退到TXT解析
+        return parseQuestionsFromTXT(bodyText);
+    }
+    
+    return questions;
+}
+
+/**
+ * 从 DOCX 格式解析题目（增强版，使用 mammoth.js）
+ */
+async function parseQuestionsFromDOCX(arrayBuffer) {
+    try {
+        // 使用 mammoth 提取文本
+        const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+        const text = result.value;
+        
+        // 优先使用通用解析器
+        const universalQuestions = parseQuestionsUniversal(text);
+        if (universalQuestions.length > 0) return universalQuestions;
+        
+        // 回退到TXT解析
+        return parseQuestionsFromTXT(text);
+    } catch (error) {
+        throw new Error('DOCX文件解析失败：' + error.message);
+    }
+}
+
+/**
+ * 从 XML 格式解析题目（增强版）
+ */
+function parseQuestionsFromXML(text) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(text, 'text/xml');
+    const questions = [];
+    
+    // 检查是否有解析错误
+    const parseError = xmlDoc.querySelector('parsererror');
+    if (parseError) {
+        // XML格式有误，使用通用解析器
+        const universalQuestions = parseQuestionsUniversal(text);
+        if (universalQuestions.length > 0) return universalQuestions;
+        return parseQuestionsFromTXT(text);
+    }
+    
+    // 查找所有的 question 节点
+    const questionNodes = xmlDoc.querySelectorAll('question, item');
+    questionNodes.forEach(node => {
+        const contentNode = node.querySelector('content, text, question');
+        const answerNode = node.querySelector('answer');
+        const explanationNode = node.querySelector('explanation');
+        
+        questions.push({
+            type: 'choice',
+            content: contentNode ? contentNode.textContent.trim() : '',
+            answer: answerNode ? answerNode.textContent.trim() : '',
+            options: [],
+            explanation: explanationNode ? explanationNode.textContent.trim() : '',
+            difficulty: 'medium'
+        });
+    });
+    
+    // 如果没有找到结构化的 XML，使用通用解析器
+    if (questions.length === 0) {
+        const bodyText = xmlDoc.documentElement.textContent || '';
+        const universalQuestions = parseQuestionsUniversal(bodyText);
+        if (universalQuestions.length > 0) return universalQuestions;
+        return parseQuestionsFromTXT(bodyText);
+    }
+    
+    return questions;
+}
+
+/**
+ * 从 CSV 格式解析题目（增强版）
+ * 格式：问题,答案,选项1,选项2,选项3,选项4,解析
+ */
+function parseQuestionsFromCSV(text) {
+    const lines = text.split('\n').filter(line => line.trim());
+    const questions = [];
+    
+    // 跳过表头（如果第一行看起来像表头）
+    const startIndex = lines[0] && (lines[0].includes('问题') || lines[0].includes('Question')) ? 1 : 0;
+    
+    for (let i = startIndex; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        // 简单的 CSV 解析（不处理引号内的逗号）
+        const parts = line.split(',').map(p => p.trim());
+        
+        if (parts.length > 0 && parts[0]) {
+            const question = {
+                type: 'choice',
+                content: parts[0] || '',
+                answer: parts[1] || '',
+                options: [],
+                explanation: '',
+                difficulty: 'medium'
+            };
+            
+            // 提取选项（跳过问题和答案）
+            for (let j = 2; j < parts.length - 1 && j < 6; j++) {
+                if (parts[j]) {
+                    question.options.push(parts[j]);
+                }
+            }
+            
+            // 最后一列作为解析（如果存在）
+            if (parts.length > 6) {
+                question.explanation = parts[parts.length - 1];
+            }
+            
+            questions.push(question);
+        }
+    }
+    
+    // 如果没有成功解析出题目，使用通用解析器
+    if (questions.length === 0) {
+        const universalQuestions = parseQuestionsUniversal(text);
+        if (universalQuestions.length > 0) return universalQuestions;
+        return parseQuestionsFromTXT(text);
+    }
+    
+    return questions;
+}
+
+// 题库导入（支持多种格式）
+async function handleBankImport(e) {
     const file = e.target.files[0];
     if (!file) return;
     
-    const reader = new FileReader();
-    reader.onload = async (evt) => {
-        try {
-            const data = JSON.parse(evt.target.result);
-            // Expected format: { name: "Subject", questions: [...] }
-            if (data.name && Array.isArray(data.questions)) {
-                const subjectId = await db.studySubjects.add({
-                    name: data.name,
-                    category: 'custom',
-                    isDefault: 0
-                });
-                
-                for (const q of data.questions) {
-                    await db.questionBanks.add({
-                        subjectId,
-                        ...q
-                    });
-                }
-                alert('导入成功！');
-                loadStudySubjectsSelect();
-                loadBanksList();
-            } else {
-                alert('格式错误');
+    // 检查是否已选择科目和存储位
+    if (!selectedImportSubjectId || !selectedImportSlotId) {
+        alert('❌ 请先选择科目和存储位！');
+        return;
+    }
+    
+    // 获取文件扩展名
+    const fileName = file.name.toLowerCase();
+    const fileExt = fileName.substring(fileName.lastIndexOf('.'));
+    
+    try {
+        let questions = [];
+        
+        console.log(`[导入] 开始解析文件: ${file.name}, 格式: ${fileExt}`);
+        
+        // 根据文件类型选择解析方式
+        if (fileExt === '.docx') {
+            // DOCX 格式需要读取为 ArrayBuffer
+            const arrayBuffer = await file.arrayBuffer();
+            console.log('[导入] 使用 DOCX 解析器');
+            questions = await parseQuestionsFromDOCX(arrayBuffer);
+        } else {
+            // 其他格式读取为文本
+            const text = await file.text();
+            
+            switch (fileExt) {
+                case '.json':
+                    console.log('[导入] 使用 JSON 解析器');
+                    questions = parseQuestionsFromJSON(text);
+                    break;
+                case '.txt':
+                    console.log('[导入] 使用 TXT 解析器');
+                    questions = parseQuestionsFromTXT(text);
+                    break;
+                case '.html':
+                case '.htm':
+                    console.log('[导入] 使用 HTML 解析器');
+                    questions = parseQuestionsFromHTML(text);
+                    break;
+                case '.xml':
+                    console.log('[导入] 使用 XML 解析器');
+                    questions = parseQuestionsFromXML(text);
+                    break;
+                case '.csv':
+                    console.log('[导入] 使用 CSV 解析器');
+                    questions = parseQuestionsFromCSV(text);
+                    break;
+                default:
+                    throw new Error(`不支持的文件格式：${fileExt}\n支持的格式：.json, .txt, .html, .htm, .docx, .xml, .csv`);
             }
-        } catch (err) {
-            console.error(err);
-            alert('导入失败');
         }
-    };
-    reader.readAsText(file);
+        
+        console.log(`[导入] 解析结果: ${questions.length} 道题目`);
+        
+        // 验证是否解析到题目
+        if (!questions || questions.length === 0) {
+            // 最后的回退：尝试使用通用解析器
+            console.log('[导入] 格式解析器未能解析题目，使用通用解析器作为回退');
+            try {
+                const text = await file.text();
+                questions = parseQuestionsUniversal(text);
+                console.log(`[导入] 通用解析器结果: ${questions ? questions.length : 0} 道题目`);
+                if (!questions || questions.length === 0) {
+                    alert('❌ 未能从文件中解析出题目！\n请检查文件格式是否正确。');
+                    hideImportSelectModal();
+                    e.target.value = '';
+                    return;
+                }
+            } catch (fallbackError) {
+                console.error('[导入] 通用解析器也失败:', fallbackError);
+                alert('❌ 未能从文件中解析出题目！\n请检查文件格式是否正确。');
+                hideImportSelectModal();
+                e.target.value = '';
+                return;
+            }
+        }
+        
+        // 显示导入进度提示
+        const progressMsg = `正在导入题目... (共 ${questions.length} 道)`;
+        console.log(progressMsg);
+        
+        // 导入题目到指定的科目和存储位
+        let successCount = 0;
+        for (const q of questions) {
+            try {
+                await db.questionBanks.add({
+                    subjectId: selectedImportSubjectId,
+                    slotId: selectedImportSlotId,
+                    type: q.type || 'choice',
+                    content: q.content || q.question || '',
+                    answer: q.answer || '',
+                    options: q.options || [],
+                    difficulty: q.difficulty || 'medium',
+                    explanation: q.explanation || ''
+                });
+                successCount++;
+            } catch (err) {
+                console.error('导入题目失败:', err, q);
+            }
+        }
+        
+        // 隐藏弹窗
+        hideImportSelectModal();
+        
+        // 显示结果
+        const formatName = {
+            '.json': 'JSON',
+            '.txt': 'TXT',
+            '.html': 'HTML',
+            '.htm': 'HTML',
+            '.docx': 'DOCX',
+            '.xml': 'XML',
+            '.csv': 'CSV'
+        }[fileExt] || fileExt.toUpperCase();
+        
+        if (successCount === questions.length) {
+            alert(`✅ ${formatName} 格式导入成功！\n\n共导入 ${successCount} 道题目。`);
+        } else {
+            alert(`⚠️ ${formatName} 格式部分导入成功！\n\n成功：${successCount} 道\n失败：${questions.length - successCount} 道`);
+        }
+        
+        // 刷新列表
+        loadBanksList();
+        
+    } catch (err) {
+        console.error('导入失败:', err);
+        alert(`❌ 导入失败！\n\n错误信息：${err.message}\n\n请检查文件格式是否正确。`);
+        hideImportSelectModal();
+    }
+    
+    // 重置文件输入框
+    e.target.value = '';
+}
+
+// 新增科目功能
+async function addNewSubject() {
+    const subjectName = prompt('请输入科目名称：');
+    
+    if (!subjectName) {
+        return; // 用户取消
+    }
+    
+    if (!subjectName.trim()) {
+        alert('❌ 科目名称不能为空！');
+        return;
+    }
+    
+    try {
+        // 检查是否已存在同名科目
+        const existingSubject = await db.studySubjects
+            .where('name')
+            .equals(subjectName.trim())
+            .first();
+        
+        if (existingSubject) {
+            alert('❌ 该科目已存在！');
+            return;
+        }
+        
+        // 添加新科目
+        const subjectId = await db.studySubjects.add({
+            name: subjectName.trim(),
+            category: 'custom',
+            createdAt: new Date()
+        });
+        
+        // 为新科目创建默认存储位
+        await db.questionBankSlots.add({
+            subjectId: subjectId,
+            name: '默认题库',
+            isDefault: true,
+            createdAt: new Date()
+        });
+        
+        alert(`✅ 科目「${subjectName.trim()}」创建成功！`);
+        
+        // 刷新题库列表
+        loadBanksList();
+        
+    } catch (error) {
+        console.error('添加科目失败:', error);
+        alert('❌ 添加科目失败，请重试！');
+    }
 }
 
 async function loadBanksList() {
@@ -51327,10 +53247,181 @@ async function loadBanksList() {
             <div style="font-weight: bold; margin-bottom: 5px;">${s.name}</div>
             <div style="font-size: 12px; color: #999;">${s.category === 'university' ? '官方题库' : '自定义'}</div>
             <div style="margin-top: 10px; text-align: right;">
-                <button style="padding: 4px 10px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">管理</button>
+                <button class="manage-bank-btn" data-subject-id="${s.id}" data-subject-name="${s.name}" style="padding: 6px 12px; background: linear-gradient(135deg, #ff9800 0%, #fb8c00 100%); color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 500; box-shadow: 0 2px 6px rgba(251, 140, 0, 0.3);">📚 管理题库</button>
             </div>
         </div>
     `).join('');
+    
+    // 为所有管理按钮添加点击事件
+    container.querySelectorAll('.manage-bank-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const subjectId = parseInt(btn.dataset.subjectId);
+            const subjectName = btn.dataset.subjectName;
+            openBankSlotsManager(subjectId, subjectName);
+        });
+    });
+}
+
+// ========== 题库存储位管理功能 ==========
+
+// 当前管理的科目ID（全局变量）
+let currentManagingSubjectId = null;
+
+// 打开题库存储位管理界面
+async function openBankSlotsManager(subjectId, subjectName) {
+    currentManagingSubjectId = subjectId;
+    
+    // 设置标题
+    document.getElementById('bank-slots-subject-title').textContent = `${subjectName} - 题库管理`;
+    
+    // 确保该科目有默认存储位
+    await ensureDefaultSlot(subjectId);
+    
+    // 加载存储位列表
+    await loadBankSlotsList(subjectId);
+    
+    // 显示模态框
+    document.getElementById('bank-slots-manager-modal').classList.add('visible');
+}
+
+// 确保科目有默认存储位
+async function ensureDefaultSlot(subjectId) {
+    const defaultSlot = await db.questionBankSlots
+        .where('subjectId').equals(subjectId)
+        .and(slot => slot.isDefault === true)
+        .first();
+    
+    if (!defaultSlot) {
+        // 创建默认存储位
+        await db.questionBankSlots.add({
+            subjectId: subjectId,
+            name: '默认题库',
+            isDefault: true,
+            createdAt: new Date().toISOString()
+        });
+        console.log(`已为科目 ${subjectId} 创建默认存储位`);
+    }
+}
+
+// 加载存储位列表
+async function loadBankSlotsList(subjectId) {
+    const slots = await db.questionBankSlots
+        .where('subjectId').equals(subjectId)
+        .toArray();
+    
+    const container = document.getElementById('bank-slots-list');
+    if (!container) return;
+    
+    if (slots.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">暂无存储位</div>';
+        return;
+    }
+    
+    // 为每个存储位统计题目数量
+    const slotsWithCount = await Promise.all(slots.map(async (slot) => {
+        const count = await db.questionBanks
+            .where('slotId').equals(slot.id)
+            .count();
+        return { ...slot, questionCount: count };
+    }));
+    
+    container.innerHTML = slotsWithCount.map(slot => `
+        <div class="bank-slot-item" data-slot-id="${slot.id}" style="background: white; border: 2px solid ${slot.isDefault ? '#ff6b9d' : '#e0e0e0'}; border-radius: 10px; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                    <span style="font-weight: bold; font-size: 15px;">${slot.name}</span>
+                    ${slot.isDefault ? '<span style="background: #ff6b9d; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px;">默认</span>' : ''}
+                </div>
+                <div style="font-size: 12px; color: #666;">
+                    题目数量: ${slot.questionCount}
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                ${!slot.isDefault ? `
+                    <input type="checkbox" class="slot-checkbox" data-slot-id="${slot.id}" style="width: 18px; height: 18px; cursor: pointer;">
+                ` : ''}
+            </div>
+        </div>
+    `).join('');
+    
+    // 添加删除按钮（浮动在右下角）
+    const hasNonDefaultSlots = slotsWithCount.some(s => !s.isDefault);
+    if (hasNonDefaultSlots) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.id = 'delete-selected-slots-btn';
+        deleteBtn.innerHTML = '🗑️ 删除选中';
+        deleteBtn.style.cssText = 'position: fixed; bottom: 100px; right: 30px; padding: 12px 20px; background: #ff3b30; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 14px; box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4); z-index: 10001; display: none;';
+        
+        // 移除旧的删除按钮（如果存在）
+        const oldBtn = document.getElementById('delete-selected-slots-btn');
+        if (oldBtn) oldBtn.remove();
+        
+        document.body.appendChild(deleteBtn);
+        
+        // 监听复选框变化
+        const checkboxes = container.querySelectorAll('.slot-checkbox');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const anyChecked = Array.from(checkboxes).some(c => c.checked);
+                deleteBtn.style.display = anyChecked ? 'block' : 'none';
+            });
+        });
+        
+        // 删除按钮点击事件
+        deleteBtn.addEventListener('click', async () => {
+            const selectedIds = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => parseInt(cb.dataset.slotId));
+            
+            if (selectedIds.length === 0) return;
+            
+            if (!confirm(`确定要删除选中的 ${selectedIds.length} 个存储位吗？\n注意：存储位中的题目也会被删除！`)) {
+                return;
+            }
+            
+            try {
+                // 删除存储位及其题目
+                for (const slotId of selectedIds) {
+                    await db.questionBanks.where('slotId').equals(slotId).delete();
+                    await db.questionBankSlots.delete(slotId);
+                }
+                
+                alert('删除成功！');
+                await loadBankSlotsList(currentManagingSubjectId);
+            } catch (err) {
+                console.error('删除存储位失败:', err);
+                alert('删除失败，请重试');
+            }
+        });
+    }
+}
+
+// 新增存储位
+async function addBankSlot() {
+    if (!currentManagingSubjectId) {
+        alert('请先选择一个科目');
+        return;
+    }
+    
+    const slotName = prompt('请输入存储位名称:');
+    if (!slotName || slotName.trim() === '') {
+        return;
+    }
+    
+    try {
+        await db.questionBankSlots.add({
+            subjectId: currentManagingSubjectId,
+            name: slotName.trim(),
+            isDefault: false,
+            createdAt: new Date().toISOString()
+        });
+        
+        alert('存储位创建成功！');
+        await loadBankSlotsList(currentManagingSubjectId);
+    } catch (err) {
+        console.error('创建存储位失败:', err);
+        alert('创建失败，请重试');
+    }
 }
 
 // 目标与统计
@@ -51409,7 +53500,7 @@ async function updateStudyStatsDisplay() {
     }
 }
 
-async function getStudyInfoForChar() {
+async function getStudyInfoForChar(chatId) {
     const settings = await db.studySettings.get('default');
     const today = new Date().toISOString().split('T')[0];
     const allRecords = await db.studyRecords.where('date').equals(today).toArray();
@@ -51424,16 +53515,454 @@ async function getStudyInfoForChar() {
         return null;  // 没有可通知角色的记录，返回null，角色完全不知道学习中心
     }
     
+    // 【新增】智能提及追踪：检查AI是否已经在当前会话中提及过学习记录
+    const chat = chatId ? await db.chats.get(chatId) : null;
+    if (!chat) {
+        return null;
+    }
+    
+    // 初始化提及追踪字段
+    if (!chat.studyMentionTracking) {
+        chat.studyMentionTracking = {
+            lastMentionTime: 0,  // 最后一次AI提及学习的时间
+            lastMentionedDate: '',  // 最后提及的日期
+            lastMentionedCount: 0  // 最后提及时的刷题数量
+        };
+    }
+    
+    const now = Date.now();
+    const currentCount = notifiableRecords.length;
+    const hasNewRecords = chat.studyMentionTracking.lastMentionedDate !== today || 
+                          chat.studyMentionTracking.lastMentionedCount < currentCount;
+    
+    // 检查是否有新记录或距离上次提及已经超过一段时间（4小时）
+    const timeSinceLastMention = now - chat.studyMentionTracking.lastMentionTime;
+    const cooldownPeriod = 4 * 60 * 60 * 1000; // 4小时冷却期
+    
+    // 【新增】构建智能提示：告诉AI这些内容的提及状态
+    let mentionStatus = '';
+    if (!hasNewRecords && timeSinceLastMention < cooldownPeriod) {
+        // 已经提过且在冷却期内
+        mentionStatus = `\n⚠️ 【重要提示】以下学习信息你在最近的对话中已经提及过了（${Math.floor(timeSinceLastMention / (60 * 1000))}分钟前）。\n💡 除非用户主动询问或有特殊需要，否则请不要再重复提起这些学习内容，避免显得啰嗦。\n💡 你可以简单回应用户的话题，无需每次都提醒学习情况。\n\n`;
+    } else if (hasNewRecords) {
+        // 有新记录
+        mentionStatus = `\n✨ 【提示】用户有新的学习记录，你可以适度关心一下。\n💡 但注意：关心一次即可，不要在后续对话中反复提起。\n\n`;
+    }
+    
     let info = `════════════════════════════\n`;
     info += `📚 【用户的学习情况】\n`;
+    info += `${mentionStatus}`;
     info += `今日刷题：${notifiableRecords.length}道\n`;
     if (settings && settings.dailyGoal) info += `今日目标：${settings.dailyGoal}道\n`;
     if (notifiableExams.length > 0) {
         info += `最近考试成绩：${notifiableExams[0].score}分 (${notifiableExams[0].date})\n`;
     }
     info += `════════════════════════════\n`;
-    return info;
+    
+    // 【新增】将提及追踪信息附加到返回对象中，供后续更新使用
+    return {
+        content: info,
+        hasNewRecords: hasNewRecords,
+        currentDate: today,
+        currentCount: currentCount,
+        shouldMention: hasNewRecords || timeSinceLastMention >= cooldownPeriod
+    };
 }
+
+// ▼▼▼ 在线搜题功能开始 ▼▼▼
+let currentOnlineQuestion = null; // 存储当前选中的题目
+
+/**
+ * 打开在线搜题模态框
+ */
+function openOnlineQuestionSearch() {
+    document.getElementById('online-question-search-modal').classList.add('visible');
+    document.getElementById('online-search-keyword').value = '';
+    document.getElementById('online-search-keyword').focus();
+    
+    // 重置显示状态
+    document.getElementById('search-placeholder').style.display = 'flex';
+    document.getElementById('search-loading').style.display = 'none';
+    document.getElementById('search-results-list').style.display = 'none';
+    document.getElementById('search-no-results').style.display = 'none';
+}
+
+/**
+ * 执行在线搜索
+ */
+async function performOnlineSearch() {
+    const keyword = document.getElementById('online-search-keyword').value.trim();
+    if (!keyword) {
+        alert('请输入搜索关键词');
+        return;
+    }
+    
+    // 显示加载状态
+    document.getElementById('search-placeholder').style.display = 'none';
+    document.getElementById('search-loading').style.display = 'block';
+    document.getElementById('search-results-list').style.display = 'none';
+    document.getElementById('search-no-results').style.display = 'none';
+    
+    try {
+        // 使用免费API搜索题目（hive-net.cn）
+        const apiUrl = `https://www.hive-net.cn/backend/wangke/search?token=free&question=${encodeURIComponent(keyword)}`;
+        
+        console.log('正在搜索题目:', apiUrl);
+        
+        const response = await fetch(apiUrl);
+        
+        if (!response.ok) {
+            throw new Error(`搜索请求失败: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        console.log('搜索结果:', result);
+        console.log('题目数据:', result.data);
+        
+        // 隐藏加载状态
+        document.getElementById('search-loading').style.display = 'none';
+        
+        // 检查多种可能的字段名
+        let questionList = null;
+        if (result.code === 0 && result.data) {
+            // 尝试不同的字段名
+            questionList = result.data.reasonList || result.data.questions || result.data.list || result.data.items || result.data.data;
+            
+            console.log('题目列表:', questionList);
+            
+            if (questionList && questionList.length > 0) {
+                // 显示搜索结果
+                displaySearchResults(questionList);
+            } else {
+                // 显示无结果
+                console.log('未找到题目列表，data结构:', Object.keys(result.data));
+                document.getElementById('search-no-results').style.display = 'block';
+            }
+        } else {
+            // 显示无结果
+            document.getElementById('search-no-results').style.display = 'block';
+        }
+    } catch (error) {
+        console.error('在线搜题失败:', error);
+        document.getElementById('search-loading').style.display = 'none';
+        document.getElementById('search-no-results').style.display = 'block';
+        
+        // 如果是CORS错误，给出提示
+        if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+            alert('搜索失败：可能是网络问题或API限制。\n\n提示：该API支持CORS，但可能需要稳定的网络连接。');
+        } else {
+            alert('搜索失败：' + error.message);
+        }
+    }
+}
+
+/**
+ * 显示搜索结果
+ */
+function displaySearchResults(questions) {
+    console.log('开始显示搜索结果，题目数量:', questions.length);
+    const resultsList = document.getElementById('search-results-list');
+    
+    if (!resultsList) {
+        console.error('未找到 search-results-list 元素');
+        alert('界面元素错误，请刷新页面重试');
+        return;
+    }
+    
+    console.log('找到结果列表容器:', resultsList);
+    resultsList.style.display = 'flex';
+    resultsList.innerHTML = '';
+    
+    questions.forEach((q, index) => {
+        console.log(`处理第 ${index + 1} 题:`, q.question);
+        const item = document.createElement('div');
+        item.style.cssText = 'background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 18px; cursor: pointer; transition: all 0.2s;';
+        
+        // 题型徽章
+        const typeText = q.type === 0 ? '单选题' : q.type === 1 ? '多选题' : '判断题';
+        const typeColor = q.type === 0 ? '#2196f3' : q.type === 1 ? '#ff9800' : '#4caf50';
+        
+        // 科目标签
+        const courseText = q.course || '未分类';
+        
+        item.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <span style="background: ${typeColor}; color: white; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 500;">${typeText}</span>
+                    <span style="background: #e3f2fd; color: #1976d2; padding: 3px 10px; border-radius: 4px; font-size: 12px;">${courseText}</span>
+                </div>
+                <span style="color: #999; font-size: 12px;">#${index + 1}</span>
+            </div>
+            <div style="font-size: 15px; line-height: 1.6; color: #333; margin-bottom: 10px; font-weight: 500;">${escapeHtml(q.question)}</div>
+            <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; border-left: 3px solid #4caf50;">
+                <div style="font-size: 12px; color: #666; margin-bottom: 5px;">答案：</div>
+                <div style="font-size: 14px; color: #2e7d32; font-weight: 500;">${escapeHtml(q.reason)}</div>
+            </div>
+        `;
+        
+        // 悬停效果
+        item.addEventListener('mouseenter', () => {
+            item.style.borderColor = '#667eea';
+            item.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.15)';
+            item.style.transform = 'translateY(-2px)';
+        });
+        
+        item.addEventListener('mouseleave', () => {
+            item.style.borderColor = '#e0e0e0';
+            item.style.boxShadow = 'none';
+            item.style.transform = 'translateY(0)';
+        });
+        
+        // 点击查看详情
+        item.addEventListener('click', () => {
+            showQuestionDetail(q);
+        });
+        
+        resultsList.appendChild(item);
+    });
+}
+
+/**
+ * 显示题目详情
+ */
+async function showQuestionDetail(question) {
+    currentOnlineQuestion = question;
+    
+    const detailContent = document.getElementById('question-detail-content');
+    
+    // 题型
+    const typeText = question.type === 0 ? '单选题' : question.type === 1 ? '多选题' : '判断题';
+    const typeColor = question.type === 0 ? '#2196f3' : question.type === 1 ? '#ff9800' : '#4caf50';
+    
+    // 解析选项
+    let optionsHtml = '';
+    if (question.options) {
+        const optionParts = question.options.split(',');
+        optionsHtml = '<div style="margin: 15px 0;"><div style="font-weight: 500; margin-bottom: 10px; color: #666;">选项：</div>';
+        optionParts.forEach(opt => {
+            optionsHtml += `<div style="padding: 8px 12px; background: #f5f5f5; margin-bottom: 6px; border-radius: 6px; font-size: 14px;">${escapeHtml(opt)}</div>`;
+        });
+        optionsHtml += '</div>';
+    }
+    
+    detailContent.innerHTML = `
+        <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+            <span style="background: ${typeColor}; color: white; padding: 4px 12px; border-radius: 5px; font-size: 13px; font-weight: 500;">${typeText}</span>
+            <span style="background: #e3f2fd; color: #1976d2; padding: 4px 12px; border-radius: 5px; font-size: 13px;">${question.course || '未分类'}</span>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #667eea;">
+            <div style="font-size: 12px; color: #999; margin-bottom: 8px;">题目：</div>
+            <div style="font-size: 16px; line-height: 1.8; color: #333; font-weight: 500;">${escapeHtml(question.question)}</div>
+        </div>
+        
+        ${optionsHtml}
+        
+        <div style="background: #e8f5e9; padding: 20px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #4caf50;">
+            <div style="font-size: 12px; color: #2e7d32; margin-bottom: 8px; font-weight: 500;">✓ 正确答案：</div>
+            <div style="font-size: 15px; line-height: 1.6; color: #1b5e20; font-weight: 600;">${escapeHtml(question.reason)}</div>
+        </div>
+        
+        ${question.explanation && question.explanation !== '无' ? `
+        <div style="background: #fff8e1; padding: 20px; border-radius: 10px; border-left: 4px solid #ffa726;">
+            <div style="font-size: 12px; color: #e65100; margin-bottom: 8px; font-weight: 500;">📖 解析：</div>
+            <div style="font-size: 14px; line-height: 1.7; color: #e65100;">${escapeHtml(question.explanation)}</div>
+        </div>
+        ` : ''}
+        
+        ${question.tag ? `
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+            <span style="font-size: 12px; color: #999;">标签：</span>
+            ${question.tag.split(',').map(tag => `<span style="display: inline-block; padding: 3px 8px; background: #f0f0f0; border-radius: 3px; font-size: 12px; margin: 0 5px 5px 0;">${tag}</span>`).join('')}
+        </div>
+        ` : ''}
+    `;
+    
+    // 加载科目和存储位到选择器
+    await loadSubjectSlotsSelector();
+    
+    document.getElementById('question-detail-modal').classList.add('visible');
+}
+
+/**
+ * 加载科目到选择器
+ */
+async function loadSubjectSlotsSelector() {
+    const subjectSelector = document.getElementById('subject-selector');
+    const slotSelector = document.getElementById('slot-selector');
+    
+    if (!subjectSelector || !slotSelector) return;
+    
+    try {
+        // 获取所有科目
+        const subjects = await db.studySubjects.toArray();
+        
+        // 清空科目选择器
+        subjectSelector.innerHTML = '<option value="">请选择科目</option>';
+        
+        if (subjects.length === 0) {
+            subjectSelector.innerHTML = '<option value="">请先创建科目</option>';
+            slotSelector.innerHTML = '<option value="">请先选择科目</option>';
+            slotSelector.disabled = true;
+            return;
+        }
+        
+        // 加载所有科目
+        subjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject.id;
+            option.textContent = `${subject.name} (${subject.category === 'university' ? '大学' : (subject.category === 'exam' ? '考试' : '自定义')})`;
+            subjectSelector.appendChild(option);
+        });
+        
+        // 重置存储位选择器
+        slotSelector.innerHTML = '<option value="">请先选择科目</option>';
+        slotSelector.disabled = true;
+        
+    } catch (error) {
+        console.error('加载科目失败:', error);
+    }
+}
+
+/**
+ * 处理科目选择变化
+ */
+async function handleSubjectChange() {
+    const subjectSelector = document.getElementById('subject-selector');
+    const slotSelector = document.getElementById('slot-selector');
+    
+    if (!subjectSelector || !slotSelector) return;
+    
+    const subjectId = parseInt(subjectSelector.value);
+    
+    if (!subjectId) {
+        slotSelector.innerHTML = '<option value="">请先选择科目</option>';
+        slotSelector.disabled = true;
+        return;
+    }
+    
+    try {
+        // 确保该科目有默认存储位
+        await ensureDefaultSlot(subjectId);
+        
+        // 获取该科目的所有存储位
+        const slots = await db.questionBankSlots
+            .where('subjectId').equals(subjectId)
+            .toArray();
+        
+        // 清空存储位选择器
+        slotSelector.innerHTML = '<option value="">请选择存储位</option>';
+        
+        if (slots.length === 0) {
+            slotSelector.innerHTML = '<option value="">该科目暂无存储位</option>';
+            slotSelector.disabled = true;
+            return;
+        }
+        
+        // 默认存储位排在前面
+        slots.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+        
+        // 加载存储位
+        slots.forEach(slot => {
+            const option = document.createElement('option');
+            option.value = slot.id;
+            option.textContent = `${slot.name}${slot.isDefault ? ' (默认)' : ''}`;
+            slotSelector.appendChild(option);
+        });
+        
+        // 启用存储位选择器并默认选中第一个存储位
+        slotSelector.disabled = false;
+        if (slotSelector.options.length > 1) {
+            slotSelector.selectedIndex = 1;
+        }
+        
+    } catch (error) {
+        console.error('加载存储位失败:', error);
+        slotSelector.innerHTML = '<option value="">加载失败</option>';
+        slotSelector.disabled = true;
+    }
+}
+
+/**
+ * 将在线题目添加到题库
+ */
+async function addOnlineQuestionToBank() {
+    if (!currentOnlineQuestion) {
+        alert('没有选中的题目');
+        return;
+    }
+    
+    try {
+        // 获取选择的科目和存储位
+        const subjectSelector = document.getElementById('subject-selector');
+        const slotSelector = document.getElementById('slot-selector');
+        
+        if (!subjectSelector || !subjectSelector.value) {
+            alert('请选择科目');
+            return;
+        }
+        
+        if (!slotSelector || !slotSelector.value) {
+            alert('请选择存储位');
+            return;
+        }
+        
+        const subjectId = parseInt(subjectSelector.value);
+        const slotId = parseInt(slotSelector.value);
+        
+        // 转换题目格式
+        const q = currentOnlineQuestion;
+        const newQuestion = {
+            subjectId: subjectId,
+            slotId: slotId,
+            type: q.type === 0 ? 'single' : q.type === 1 ? 'multiple' : 'judge',
+            question: q.question,
+            options: q.options ? parseOptions(q.options) : [],
+            correctAnswer: q.reason,
+            explanation: q.explanation || '',
+            tags: q.tag ? q.tag.split(',') : [],
+            difficulty: 'medium',
+            createdAt: new Date().toISOString()
+        };
+        
+        await db.questionBanks.add(newQuestion);
+        
+        alert('✅ 题目已添加到题库！');
+        document.getElementById('question-detail-modal').classList.remove('visible');
+        
+    } catch (error) {
+        console.error('添加题目失败:', error);
+        alert('添加失败：' + error.message);
+    }
+}
+
+/**
+ * 解析选项字符串为数组
+ */
+function parseOptions(optionsStr) {
+    if (!optionsStr) return [];
+    const parts = optionsStr.split(',');
+    return parts.map(part => {
+        const match = part.match(/^([A-Z]):(.*)/);
+        if (match) {
+            return { label: match[1], text: match[2].trim() };
+        }
+        return { label: '', text: part.trim() };
+    });
+}
+
+/**
+ * 转义HTML特殊字符
+ */
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ▲▲▲ 在线搜题功能结束 ▲▲▲
 
 // ▲▲▲ 学习功能结束 ▲▲▲
 
@@ -54789,24 +57318,47 @@ const avatarFrames = [
 (function() {
     'use strict';
     
-    // 记忆库数据存储key
+    // 记忆库数据存储key（用于旧数据迁移）
     const MEMORY_BANK_KEY = 'ephone-memory-bank';
     
     // 初始化记忆库
-    function initMemoryBank() {
-        loadMemoryBankUI();
+    async function initMemoryBank() {
+        await migrateMemoriesFromLocalStorage(); // 迁移旧数据
+        await loadMemoryBankUI();
         bindMemoryBankEvents();
     }
     
-    // 获取所有记忆
-    function getMemories() {
-        const data = localStorage.getItem(MEMORY_BANK_KEY);
-        return data ? JSON.parse(data) : [];
+    // 从localStorage迁移数据到IndexedDB（仅在首次运行时执行）
+    async function migrateMemoriesFromLocalStorage() {
+        try {
+            const oldData = localStorage.getItem(MEMORY_BANK_KEY);
+            if (oldData) {
+                const memories = JSON.parse(oldData);
+                if (memories.length > 0) {
+                    // 检查IndexedDB中是否已有数据
+                    const existingCount = await db.memoryBank.count();
+                    if (existingCount === 0) {
+                        // 批量迁移到IndexedDB
+                        await db.memoryBank.bulkAdd(memories);
+                        console.log(`✅ 已迁移 ${memories.length} 条记忆从localStorage到IndexedDB`);
+                    }
+                    // 迁移成功后删除localStorage数据
+                    localStorage.removeItem(MEMORY_BANK_KEY);
+                }
+            }
+        } catch (error) {
+            console.error('记忆迁移失败:', error);
+        }
     }
     
-    // 保存记忆列表
-    function saveMemories(memories) {
-        localStorage.setItem(MEMORY_BANK_KEY, JSON.stringify(memories));
+    // 获取所有记忆（从IndexedDB）
+    async function getMemories() {
+        try {
+            return await db.memoryBank.orderBy('timestamp').reverse().toArray();
+        } catch (error) {
+            console.error('读取记忆失败:', error);
+            return [];
+        }
     }
     
     // 保存当前状态为记忆
@@ -54840,47 +57392,50 @@ const avatarFrames = [
         // 使用用户输入的名称，如果为空则使用默认名称
         const memoryName = customName.trim() || defaultName;
         
-        // 创建记忆对象，保存所有相关数据
-        const memory = {
-            id: Date.now().toString(),
-            name: memoryName,
-            timestamp: Date.now(),
-            chatData: {
-                id: chat.id,
-                name: chat.name,
-                avatar: chat.avatar,
-                persona: chat.persona,
-                history: chat.history,
-                settings: chat.settings,
-                relationship: chat.relationship,
-                members: chat.members,
-                isGroup: chat.isGroup,
-                // 保存美化设置
-                customCSS: chat.settings?.customCSS || '',
-                background: chat.settings?.background || '',
-                messageStyle: chat.settings?.messageStyle || {},
-                avatarShape: chat.settings?.avatarShape || {},
-                effectSettings: chat.effectSettings || {},
-            },
-            globalSettings: {
-                theme: localStorage.getItem('ephone-theme') || 'light',
-                customPlaceholder: localStorage.getItem('custom-chat-placeholder') || '',
-                showStatusBar: localStorage.getItem('showStatusBar') || 'true',
-            },
-            messageCount: chat.history ? chat.history.length : 0,
-        };
-        
-        const memories = getMemories();
-        memories.unshift(memory); // 添加到列表开头
-        saveMemories(memories);
-        
-        await showCustomAlert('保存成功', `已保存当前状态到记忆库\n包含 ${memory.messageCount} 条聊天记录`);
-        loadMemoryBankUI();
+        try {
+            // 创建记忆对象，保存所有相关数据
+            const memory = {
+                id: Date.now().toString(),
+                name: memoryName,
+                timestamp: Date.now(),
+                chatData: {
+                    id: chat.id,
+                    name: chat.name,
+                    avatar: chat.avatar,
+                    persona: chat.persona,
+                    history: chat.history, // IndexedDB支持大数据，无需担心大小
+                    settings: chat.settings,
+                    relationship: chat.relationship,
+                    members: chat.members,
+                    isGroup: chat.isGroup,
+                    // 保存美化设置
+                    customCSS: chat.settings?.customCSS || '',
+                    background: chat.settings?.background || '',
+                    messageStyle: chat.settings?.messageStyle || {},
+                    avatarShape: chat.settings?.avatarShape || {},
+                    effectSettings: chat.effectSettings || {},
+                },
+                globalSettings: {
+                    theme: localStorage.getItem('ephone-theme') || 'light',
+                    customPlaceholder: localStorage.getItem('custom-chat-placeholder') || '',
+                    showStatusBar: localStorage.getItem('showStatusBar') || 'true',
+                },
+                messageCount: chat.history ? chat.history.length : 0,
+            };
+            
+            // 直接保存到IndexedDB，支持海量数据（GB级别）
+            await db.memoryBank.add(memory);
+            
+            await showCustomAlert('保存成功', `已保存当前状态到记忆库\n包含 ${memory.messageCount} 条聊天记录\n\n💡 现在支持保存任意大小的数据！`);
+            await loadMemoryBankUI();
+        } catch (error) {
+            console.error('保存记忆失败:', error);
+            await showCustomAlert('保存失败', `发生错误: ${error.message}`);
+        }
     }
     
     // 删除选中的记忆
     async function deleteSelectedMemories() {
-        const memories = getMemories();
         const checkboxes = document.querySelectorAll('.memory-card-checkbox:checked');
         
         if (checkboxes.length === 0) {
@@ -54895,18 +57450,21 @@ const avatarFrames = [
         
         if (!confirmed) return;
         
-        const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.memoryId);
-        const filteredMemories = memories.filter(m => !selectedIds.includes(m.id));
-        
-        saveMemories(filteredMemories);
-        await showCustomAlert('删除成功', `已删除 ${checkboxes.length} 个记忆`);
-        loadMemoryBankUI();
+        try {
+            const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.memoryId);
+            // 批量删除
+            await db.memoryBank.bulkDelete(selectedIds);
+            await showCustomAlert('删除成功', `已删除 ${checkboxes.length} 个记忆`);
+            await loadMemoryBankUI();
+        } catch (error) {
+            console.error('删除记忆失败:', error);
+            await showCustomAlert('删除失败', `发生错误: ${error.message}`);
+        }
     }
     
     // 恢复记忆
     async function restoreMemory(memoryId) {
-        const memories = getMemories();
-        const memory = memories.find(m => m.id === memoryId);
+        const memory = await db.memoryBank.get(memoryId);
         
         if (!memory) {
             await showCustomAlert('错误', '未找到该记忆');
@@ -54998,23 +57556,22 @@ const avatarFrames = [
     }
     
     // 重命名记忆
-    function renameMemory(memoryId, newName) {
+    async function renameMemory(memoryId, newName) {
         if (!newName || !newName.trim()) return;
         
-        const memories = getMemories();
-        const memory = memories.find(m => m.id === memoryId);
-        if (memory) {
-            memory.name = newName.trim();
-            saveMemories(memories);
+        try {
+            await db.memoryBank.update(memoryId, { name: newName.trim() });
+        } catch (error) {
+            console.error('重命名记忆失败:', error);
         }
     }
     
     // 加载记忆库UI
-    function loadMemoryBankUI() {
+    async function loadMemoryBankUI() {
         const listContainer = document.getElementById('memory-bank-list');
         if (!listContainer) return;
         
-        const memories = getMemories();
+        const memories = await getMemories();
         
         if (memories.length === 0) {
             listContainer.innerHTML = `
@@ -55092,7 +57649,7 @@ const avatarFrames = [
                     } else {
                         input.readOnly = true;
                         editBtn.textContent = '编辑';
-                        renameMemory(memoryId, input.value);
+                        await renameMemory(memoryId, input.value);
                     }
                     return;
                 }

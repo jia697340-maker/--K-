@@ -1706,6 +1706,33 @@ async function addCustomMood() {
 }
 
 /**
+ * 【新功能】删除自定义心情
+ */
+async function deleteCustomMood(index) {
+  const chat = state.chats[activeLoversSpaceCharId];
+  if (!chat || !chat.loversSpaceData.customMoods) return;
+  
+  // 确认删除
+  const mood = chat.loversSpaceData.customMoods[index];
+  if (!confirm(`确定要删除 "${mood.emoji} ${mood.meaning}" 吗？`)) return;
+  
+  // 删除指定的自定义心情
+  chat.loversSpaceData.customMoods.splice(index, 1);
+  
+  await db.chats.put(chat);
+  
+  // 刷新编辑器界面
+  const currentContent = document.getElementById('ls-diary-content-input').value;
+  const selectedEmojiEl = document.querySelector('#ls-emoji-selector .emoji-option.selected');
+  const currentSelectedEmoji = selectedEmojiEl ? selectedEmojiEl.dataset.emoji : null;
+  
+  openDiaryEditor(currentDiaryDate, { 
+    userDiary: currentContent,
+    userEmoji: currentSelectedEmoji
+  });
+}
+
+/**
  * 打开日记编辑器 (支持自定义心情)
  */
 function openDiaryEditor(dateStr, entryData) {
@@ -1727,12 +1754,20 @@ function openDiaryEditor(dateStr, entryData) {
     { emoji: '🤢', meaning: '不适' }
   ];
 
-  // 合并自定义心情
+  // 自定义心情
   const customMoods = chat.loversSpaceData.customMoods || [];
-  const allMoods = [...defaultEmojis, ...customMoods];
 
-  let html = allMoods.map(m => 
+  // 生成默认心情的HTML（不带删除按钮）
+  let html = defaultEmojis.map(m => 
     `<span class="emoji-option" data-emoji="${m.emoji}" title="${m.meaning}">${m.emoji}</span>`
+  ).join('');
+
+  // 生成自定义心情的HTML（带删除按钮）
+  html += customMoods.map((m, index) => 
+    `<span class="emoji-option-wrapper">
+      <span class="emoji-option" data-emoji="${m.emoji}" title="${m.meaning}">${m.emoji}</span>
+      <span class="delete-mood-btn" data-index="${index}" title="删除这个心情">×</span>
+    </span>`
   ).join('');
 
   // 添加“新增”按钮
@@ -1748,6 +1783,16 @@ function openDiaryEditor(dateStr, entryData) {
       addCustomMood();
     };
   }
+
+  // 绑定“删除”按钮的点击事件
+  const deleteButtons = emojiSelector.querySelectorAll('.delete-mood-btn');
+  deleteButtons.forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const index = parseInt(btn.dataset.index);
+      deleteCustomMood(index);
+    };
+  });
 
   // 恢复之前的选择（如果有）
   const contentInput = document.getElementById('ls-diary-content-input');
