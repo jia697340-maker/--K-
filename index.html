@@ -1388,6 +1388,14 @@
 </button>
 <!-- ▲▲▲ 学习按钮结束 ▲▲▲ -->
 
+<!-- ▼▼▼ 电视机按钮 ▼▼▼ -->
+<button id="tv-search-btn" class="chat-action-icon-btn action-button" title="影视搜索">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 3H3C1.9 3 1 3.9 1 5V17C1 18.1 1.9 19 3 19H8V21H16V19H21C22.1 19 23 18.1 23 17V5C23 3.9 22.1 3 21 3ZM21 17H3V5H21V17ZM16 11.5C16 10.12 17.12 9 18.5 9C19.88 9 21 10.12 21 11.5C21 12.88 19.88 14 18.5 14C17.12 14 16 12.88 16 11.5Z" fill="currentColor"/>
+    </svg>
+</button>
+<!-- ▲▲▲ 电视机按钮结束 ▲▲▲ -->
+
 <!-- ▼▼▼ 消息存放按钮 ▼▼▼ -->
 <button id="message-storage-btn" class="chat-action-icon-btn action-button" title="消息存放">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -3168,7 +3176,7 @@
             <label for="conquest-initial-affection">
                 初始好感度
                 <p style="font-size: 12px; font-weight: normal; color: #999; margin-top: 5px;">
-                    设置你对角色的默认好感度（建议 0-100）
+                    设置角色对你的默认好感度（建议 0-100）
                 </p>
             </label>
             <input type="number" id="conquest-initial-affection" min="0" max="100" value="50" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
@@ -3190,7 +3198,7 @@
             <label for="conquest-current-affection">
                 实时好感度
                 <p style="font-size: 12px; font-weight: normal; color: #999; margin-top: 5px;">
-                    当前你对角色的好感度（可随时调整）
+                    当前角色对你的好感度（可随时调整）
                 </p>
             </label>
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -7546,6 +7554,61 @@
     </div>
 </div>
 <!-- ▲▲▲ 在线搜题模态框结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 影视搜索模态框 ▼▼▼ -->
+<div id="tv-search-modal" class="modal">
+    <div class="modal-content" style="height: 90%; max-height: 90%; width: 95%; max-width: 1200px;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>📺 影视搜索</span>
+            <button id="close-tv-search-btn" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
+            <!-- 搜索区域 -->
+            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <h3 style="color: white; margin: 0 0 15px 0; font-size: 20px;">🎬 在线搜索影视资源</h3>
+                <div style="display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap;">
+                    <input type="text" id="tv-search-keyword" placeholder="输入电影、电视剧、动漫名称..." style="flex: 1; min-width: 200px; padding: 12px 15px; border: none; border-radius: 8px; font-size: 14px; outline: none;" />
+                    <button id="do-tv-search-btn" style="padding: 12px 30px; background: #ff6b9d; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                        搜索
+                    </button>
+                </div>
+                <div style="margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.9);">
+                    💡 提示：支持搜索电影、电视剧、动漫、综艺等影视资源
+                </div>
+            </div>
+
+            <!-- 搜索结果区域 -->
+            <div id="tv-search-results" style="flex: 1; min-height: 400px;">
+                <div id="tv-search-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: #999;">
+                    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5" style="margin-bottom: 20px;">
+                        <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                        <polyline points="17 2 12 7 7 2"></polyline>
+                    </svg>
+                    <p style="font-size: 18px; margin: 0; font-weight: 500;">在上方输入影视名称开始搜索</p>
+                    <p style="font-size: 14px; margin: 10px 0 0 0; color: #aaa;">支持搜索热门电影、电视剧、动漫等</p>
+                </div>
+                <div id="tv-search-loading" style="display: none; text-align: center; padding: 60px;">
+                    <div style="display: inline-block; width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #f093fb; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <p style="margin-top: 20px; color: #666; font-size: 16px;">正在搜索影视资源...</p>
+                </div>
+                <div id="tv-results-list" style="display: none;">
+                    <!-- 搜索结果将在这里显示 -->
+                </div>
+                <div id="tv-no-results" style="display: none; text-align: center; padding: 60px; color: #999;">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5" style="margin-bottom: 20px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <p style="font-size: 18px; font-weight: 500;">未找到相关影视资源</p>
+                    <p style="font-size: 14px; margin-top: 10px; color: #aaa;">请尝试其他关键词或检查网络连接</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 影视搜索模态框结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 题目详情模态框 ▼▼▼ -->
 <div id="question-detail-modal" class="modal">
@@ -37137,12 +37200,12 @@ async function getContextForTokenCalculation(chatId) {
 // 全局更新日志数据
 const globalChangeLogs = {
     '11.24': [
-        { title: 'IOS下拉问题修复', desc: '修复IOS添加到主屏后，下拉会出现空白，并且轻微手指移动会导致页面滚动的问题。' },
+        { title: 'IOS全屏逻辑恢复', desc: '将PWA和全屏逻辑恢复到原版，保留主屏幕外观设置功能。修复了之前iOS全屏修复导致的新问题。' },
         { title: 'APP互换位置', desc: '新增APP互换位置的功能！' },
         { title: '学习中心题库导入优化', desc: '修复完整优化了学习中心导入题库的逻辑，新建自定义科目的问题。目前支持题库格式：JSON、TXT、HTML、DOCX、XML、CSV。' },
         { title: '自定义主屏幕', desc: '新增添加主屏幕的时候可以自定义图标和名称。' },
         { title: '题库在线搜索', desc: '新增题库可以在线搜索。' },
-        { title: '你画我猜游戏', desc: '新增游戏：你画我猜，后面应该还会有个拓展。' },
+        { title: '你画我猜游戏', desc: '新增游戏：你画我猜，后面应该还会有个拓展：便签机。' },
         { title: '记忆库BUG修复', desc: '修复记忆库保存当前条数多没有反应的BUG。' },
         { title: '记账时间选择', desc: '记账新增可以自定义具体时间选择。' },
         { title: '记账刷题逻辑优化', desc: '优化记账、刷题逻辑，不会再啰嗦重复。' },
@@ -51612,6 +51675,25 @@ let currentStudySession = {
         });
     }
     
+    // TV Search Events
+    const tvSearchBtn = document.getElementById('tv-search-btn');
+    if(tvSearchBtn) tvSearchBtn.addEventListener('click', openTvSearchModal);
+    
+    const doTvSearchBtn = document.getElementById('do-tv-search-btn');
+    if(doTvSearchBtn) doTvSearchBtn.addEventListener('click', performTvSearch);
+    
+    const closeTvSearchBtn = document.getElementById('close-tv-search-btn');
+    if(closeTvSearchBtn) closeTvSearchBtn.addEventListener('click', closeTvSearchModal);
+    
+    const tvSearchInput = document.getElementById('tv-search-keyword');
+    if(tvSearchInput) {
+        tvSearchInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                performTvSearch();
+            }
+        });
+    }
+    
     // Goals
     const saveGoalsBtn = document.getElementById('save-goals-btn');
     if(saveGoalsBtn) saveGoalsBtn.addEventListener('click', saveStudyGoals);
@@ -53963,6 +54045,369 @@ function escapeHtml(text) {
 }
 
 // ▲▲▲ 在线搜题功能结束 ▲▲▲
+
+// ▼▼▼ 影视搜索功能开始 ▼▼▼
+
+/**
+ * 多个备用影视搜索API接口
+ * 使用支持CORS的API源
+ */
+const TV_API_SOURCES = [
+    {
+        name: '量子影视',
+        searchUrl: 'https://cj.lziapi.com/api.php/provide/vod/',
+        params: { ac: 'detail', wd: '' },
+        parseResponse: (data) => {
+            if (data.list && Array.isArray(data.list)) {
+                return data.list.map(item => ({
+                    id: item.vod_id,
+                    title: item.vod_name,
+                    pic: item.vod_pic,
+                    year: item.vod_year,
+                    area: item.vod_area,
+                    type: item.vod_class,
+                    actor: item.vod_actor,
+                    director: item.vod_director,
+                    desc: item.vod_content,
+                    playUrl: item.vod_play_url,
+                    score: item.vod_score || '暂无评分',
+                    playFrom: item.vod_play_from || '',
+                    apiSource: 'lziapi'
+                }));
+            }
+            return [];
+        }
+    },
+    {
+        name: '非凡资源',
+        searchUrl: 'https://cj.ffzyapi.com/api.php/provide/vod/',
+        params: { ac: 'detail', wd: '' },
+        parseResponse: (data) => {
+            if (data.list && Array.isArray(data.list)) {
+                return data.list.map(item => ({
+                    id: item.vod_id,
+                    title: item.vod_name,
+                    pic: item.vod_pic,
+                    year: item.vod_year,
+                    area: item.vod_area,
+                    type: item.vod_class,
+                    actor: item.vod_actor,
+                    director: item.vod_director,
+                    desc: item.vod_content,
+                    playUrl: item.vod_play_url,
+                    score: item.vod_score || '暂无评分',
+                    playFrom: item.vod_play_from || '',
+                    apiSource: 'ffzyapi'
+                }));
+            }
+            return [];
+        }
+    },
+    {
+        name: '光速资源',
+        searchUrl: 'https://api.guangsuapi.com/api.php/provide/vod/',
+        params: { ac: 'detail', wd: '' },
+        parseResponse: (data) => {
+            if (data.list && Array.isArray(data.list)) {
+                return data.list.map(item => ({
+                    id: item.vod_id,
+                    title: item.vod_name,
+                    pic: item.vod_pic,
+                    year: item.vod_year,
+                    area: item.vod_area,
+                    type: item.vod_class,
+                    actor: item.vod_actor,
+                    director: item.vod_director,
+                    desc: item.vod_content,
+                    playUrl: item.vod_play_url,
+                    score: item.vod_score || '暂无评分',
+                    playFrom: item.vod_play_from || '',
+                    apiSource: 'guangsuapi'
+                }));
+            }
+            return [];
+        }
+    }
+];
+
+/**
+ * 打开影视搜索模态框
+ */
+function openTvSearchModal() {
+    document.getElementById('tv-search-modal').classList.add('visible');
+    document.getElementById('tv-search-keyword').value = '';
+    document.getElementById('tv-search-keyword').focus();
+    
+    // 重置显示状态
+    document.getElementById('tv-search-placeholder').style.display = 'flex';
+    document.getElementById('tv-search-loading').style.display = 'none';
+    document.getElementById('tv-results-list').style.display = 'none';
+    document.getElementById('tv-no-results').style.display = 'none';
+}
+
+/**
+ * 关闭影视搜索模态框
+ */
+function closeTvSearchModal() {
+    document.getElementById('tv-search-modal').classList.remove('visible');
+}
+
+/**
+ * 执行影视搜索（尝试多个API源）
+ */
+async function performTvSearch() {
+    const keyword = document.getElementById('tv-search-keyword').value.trim();
+    if (!keyword) {
+        alert('请输入影视名称');
+        return;
+    }
+    
+    // 显示加载状态
+    document.getElementById('tv-search-placeholder').style.display = 'none';
+    document.getElementById('tv-search-loading').style.display = 'block';
+    document.getElementById('tv-results-list').style.display = 'none';
+    document.getElementById('tv-no-results').style.display = 'none';
+    
+    let allResults = [];
+    let successCount = 0;
+    
+    // 尝试所有API源
+    for (const source of TV_API_SOURCES) {
+        try {
+            console.log(`正在尝试API: ${source.name}`);
+            
+            // 构建请求URL
+            const params = new URLSearchParams({
+                ...source.params,
+                wd: keyword
+            });
+            const apiUrl = `${source.searchUrl}?${params.toString()}`;
+            
+            console.log(`请求URL: ${apiUrl}`);
+            
+            const response = await fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                console.warn(`${source.name} 请求失败: ${response.status}`);
+                continue;
+            }
+            
+            const data = await response.json();
+            console.log(`${source.name} 返回数据:`, data);
+            
+            // 解析结果
+            const results = source.parseResponse(data);
+            if (results && results.length > 0) {
+                allResults.push(...results);
+                successCount++;
+                console.log(`${source.name} 找到 ${results.length} 个结果`);
+            }
+            
+        } catch (error) {
+            console.warn(`${source.name} 搜索失败:`, error);
+        }
+    }
+    
+    // 隐藏加载状态
+    document.getElementById('tv-search-loading').style.display = 'none';
+    
+    if (allResults.length > 0) {
+        // 去重（按标题）
+        const uniqueResults = [];
+        const titleSet = new Set();
+        
+        for (const result of allResults) {
+            if (!titleSet.has(result.title)) {
+                titleSet.add(result.title);
+                uniqueResults.push(result);
+            }
+        }
+        
+        console.log(`总共找到 ${uniqueResults.length} 个唯一结果（来自 ${successCount} 个API源）`);
+        displayTvResults(uniqueResults);
+    } else {
+        document.getElementById('tv-no-results').style.display = 'block';
+        
+        if (successCount === 0) {
+            alert(`搜索失败：所有API源都无法访问。\n\n已尝试 ${TV_API_SOURCES.length} 个API源，请检查网络连接。`);
+        }
+    }
+}
+
+/**
+ * 显示影视搜索结果
+ */
+function displayTvResults(results) {
+    const resultsList = document.getElementById('tv-results-list');
+    resultsList.style.display = 'grid';
+    resultsList.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+    resultsList.style.gap = '20px';
+    resultsList.style.padding = '10px';
+    resultsList.innerHTML = '';
+    
+    results.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.style.cssText = `
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        `;
+        
+        // 海报图片
+        const posterUrl = item.pic || 'https://via.placeholder.com/300x450?text=暂无海报';
+        
+        card.innerHTML = `
+            <div style="position: relative; padding-top: 150%; overflow: hidden; background: #f0f0f0;">
+                <img src="${escapeHtml(posterUrl)}" 
+                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"
+                     onerror="this.src='https://via.placeholder.com/300x450?text=暂无海报'">
+                <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,107,157,0.9); color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+                    ${escapeHtml(item.type || '影视')}
+                </div>
+                ${item.score !== '暂无评分' ? `
+                <div style="position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #ffd700; padding: 5px 10px; border-radius: 15px; font-size: 13px; font-weight: bold;">
+                    ⭐ ${escapeHtml(item.score)}
+                </div>
+                ` : ''}
+            </div>
+            <div style="padding: 15px; flex: 1; display: flex; flex-direction: column;">
+                <h4 style="margin: 0 0 10px 0; font-size: 16px; color: #333; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    ${escapeHtml(item.title)}
+                </h4>
+                <div style="font-size: 13px; color: #666; margin-bottom: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+                    ${item.year ? `<span>📅 ${escapeHtml(item.year)}</span>` : ''}
+                    ${item.area ? `<span>🌍 ${escapeHtml(item.area)}</span>` : ''}
+                </div>
+                ${item.actor ? `
+                <div style="font-size: 12px; color: #999; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
+                    👥 ${escapeHtml(item.actor)}
+                </div>
+                ` : ''}
+                <div style="margin-top: auto; padding-top: 10px;">
+                    <button style="width: 100%; padding: 10px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer;">
+                        查看详情
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // 悬停效果
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-5px)';
+            card.style.boxShadow = '0 8px 20px rgba(240,147,251,0.3)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+        });
+        
+        // 点击查看详情
+        card.addEventListener('click', () => {
+            showTvDetail(item);
+        });
+        
+        resultsList.appendChild(card);
+    });
+}
+
+/**
+ * 显示影视详情
+ */
+function showTvDetail(item) {
+    const detailHtml = `
+        <div style="display: flex; gap: 25px; flex-wrap: wrap;">
+            <div style="flex-shrink: 0;">
+                <img src="${escapeHtml(item.pic || 'https://via.placeholder.com/200x300?text=暂无海报')}" 
+                     style="width: 200px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
+                     onerror="this.src='https://via.placeholder.com/200x300?text=暂无海报'">
+            </div>
+            <div style="flex: 1; min-width: 250px;">
+                <h2 style="margin: 0 0 15px 0; font-size: 24px; color: #333;">${escapeHtml(item.title)}</h2>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <span style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 6px 15px; border-radius: 20px; font-size: 13px; font-weight: bold;">
+                        ${escapeHtml(item.type || '影视')}
+                    </span>
+                    ${item.score !== '暂无评分' ? `
+                    <span style="background: #ffd700; color: #333; padding: 6px 15px; border-radius: 20px; font-size: 13px; font-weight: bold;">
+                        ⭐ ${escapeHtml(item.score)}
+                    </span>
+                    ` : ''}
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    ${item.year ? `<p style="margin: 8px 0; font-size: 14px;"><strong>年份：</strong>${escapeHtml(item.year)}</p>` : ''}
+                    ${item.area ? `<p style="margin: 8px 0; font-size: 14px;"><strong>地区：</strong>${escapeHtml(item.area)}</p>` : ''}
+                    ${item.director ? `<p style="margin: 8px 0; font-size: 14px;"><strong>导演：</strong>${escapeHtml(item.director)}</p>` : ''}
+                    ${item.actor ? `<p style="margin: 8px 0; font-size: 14px;"><strong>主演：</strong>${escapeHtml(item.actor)}</p>` : ''}
+                </div>
+                
+                ${item.desc ? `
+                <div style="background: #fff8e1; padding: 15px; border-radius: 10px; border-left: 4px solid #ffa726;">
+                    <p style="margin: 0; font-size: 14px; line-height: 1.8; color: #666;">
+                        <strong style="color: #e65100;">📖 简介：</strong><br>
+                        ${escapeHtml(item.desc)}
+                    </p>
+                </div>
+                ` : ''}
+                
+                <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 10px; border-left: 4px solid #2196f3;">
+                    <p style="margin: 0; font-size: 13px; color: #1976d2;">
+                        💡 提示：此功能仅提供影视信息搜索，播放链接仅供参考。请通过正规渠道观看影视内容。
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // 创建详情弹窗
+    const detailModal = document.createElement('div');
+    detailModal.className = 'modal visible';
+    detailModal.style.zIndex = '10001';
+    detailModal.innerHTML = `
+        <div class="modal-content" style="max-width: 800px; width: 90%; max-height: 85vh;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>📺 影视详情</span>
+                <button class="close-detail-btn" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; overflow-y: auto; max-height: calc(85vh - 120px);">
+                ${detailHtml}
+            </div>
+            <div class="modal-footer">
+                <button class="cancel close-detail-btn">关闭</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(detailModal);
+    
+    // 绑定关闭按钮
+    detailModal.querySelectorAll('.close-detail-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            detailModal.remove();
+        });
+    });
+    
+    // 点击背景关闭
+    detailModal.addEventListener('click', (e) => {
+        if (e.target === detailModal) {
+            detailModal.remove();
+        }
+    });
+}
+
+// ▲▲▲ 影视搜索功能结束 ▲▲▲
 
 // ▲▲▲ 学习功能结束 ▲▲▲
 

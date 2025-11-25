@@ -12,10 +12,6 @@
 html {
   -webkit-text-size-adjust: 100%;
   height: 100%; /* 确保html元素也能撑满 */
-  width: 100%;
-  overflow: hidden;
-  /* iOS修复：防止橡皮筋效果 */
-  overscroll-behavior: none;
 }
 
 body {
@@ -24,11 +20,7 @@ body {
   font-weight: normal;
   background-color: #f0f2f5;
   height: 100%; /* 让body也撑满父元素(html) */
-  width: 100%;
   overflow: hidden; /* 防止body本身出现滚动条 */
-  /* iOS修复：防止橡皮筋效果和轻微滑动 */
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
 }
 /* ▲▲▲ 替换结束 ▲▲▲ */
 
@@ -42,9 +34,6 @@ body {
   display: flex;
   flex-direction: column;
   background-color: #ffffff; /* ★ 修改这里为白色 */
-  /* iOS修复：防止橡皮筋效果 */
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
 }
 /* ▲▲▲ 替换结束 ▲▲▲ */
 
@@ -19361,51 +19350,6 @@ body {
   transform: scale(0.98);
 }
 /* ▲▲▲ 删除记录按钮样式结束 ▲▲▲ */
-
-/* ▼▼▼ iOS专用橡皮筋效果修复 ▼▼▼ */
-/* 针对iOS Safari浏览器防止过度滚动（橡皮筋效果） */
-@supports (-webkit-touch-callout: none) {
-  /* 仅在iOS设备上应用 - 使用更温和的方式 */
-  html {
-    overscroll-behavior-y: none;
-  }
-  
-  body {
-    overscroll-behavior-y: none;
-    /* 防止轻微触摸导致页面移动 */
-    touch-action: pan-x pan-y;
-  }
-  
-  /* 确保主容器正确处理滚动 */
-  #phone-screen {
-    overscroll-behavior: none;
-    touch-action: pan-x pan-y;
-  }
-  
-  /* 确保所有页面容器不会触发橡皮筋效果 */
-  .screen {
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* 为所有可滚动内容添加防止橡皮筋效果 */
-  [style*="overflow-y: auto"],
-  [style*="overflow: auto"],
-  .modal-body,
-  #chat-area,
-  #chat-messages,
-  .content,
-  .content-area {
-    overscroll-behavior-y: contain;
-    -webkit-overflow-scrolling: touch;
-  }
-}
-
-/* 通用防止轻微滑动导致页面移动的修复 */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-/* ▲▲▲ iOS专用橡皮筋效果修复结束 ▲▲▲ */
 
 /* ▼▼▼ 你画我猜游戏样式 ▼▼▼ */
 #draw-guess-game-screen {
